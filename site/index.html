@@ -1,0 +1,789 @@
+<title>Programmes 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout : barre d'onglets en haut ; vue Thème = index des thèmes à gauche + fiches candidats ; tiroir de discussion à droite. */
+:root {
+  --paper: #F3F4F6; --surface: #FFFFFF; --sunk: #EBEDF1; --ink: #172030; --muted: #5A6476; --line: #D9DDE5;
+  --accent: #2647A8; --accent-ink: #FFFFFF; --accent-soft: #E5EBF9;
+  --s1: #0E7471; --s2: #A65B17; --s3: #6347AD; --s4: #AC3556;
+  --ok: #2F7A3E; --warn: #9A6A00; --bad: #A33A2B;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #10141B; --surface: #171C26; --sunk: #1D2330; --ink: #E5E8EE; --muted: #9AA3B3; --line: #2A3242;
+  --accent: #8FA9F3; --accent-ink: #0F1626; --accent-soft: #1D2742;
+  --s1: #4FC1BC; --s2: #E4A260; --s3: #A994EC; --s4: #EC8AA6;
+  --ok: #6CC27D; --warn: #E2B44C; --bad: #EE8A7B; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #10141B; --surface: #171C26; --sunk: #1D2330; --ink: #E5E8EE; --muted: #9AA3B3; --line: #2A3242;
+  --accent: #8FA9F3; --accent-ink: #0F1626; --accent-soft: #1D2742;
+  --s1: #4FC1BC; --s2: #E4A260; --s3: #A994EC; --s4: #EC8AA6;
+  --ok: #6CC27D; --warn: #E2B44C; --bad: #EE8A7B; color-scheme: dark }
+
+* { box-sizing: border-box }
+html, body { background: var(--paper); color: var(--ink) }
+body { font: 15px/1.55 var(--f-body); }
+button, select, input, textarea { font: inherit; color: inherit }
+h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.2 }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.wrap { max-width: 1280px; margin: 0 auto; padding-inline: 16px }
+
+header.top { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20 }
+.top-in { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 12px }
+.brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto }
+.brand h1 { font-size: 22px; letter-spacing: -0.01em }
+.brand .yr { font-family: var(--f-mono); font-size: 12px; color: var(--muted) }
+nav.tabs { display: flex; gap: 2px; flex-wrap: wrap }
+nav.tabs button { border: 0; background: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500 }
+nav.tabs button:hover { background: var(--sunk); color: var(--ink) }
+nav.tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent) }
+.chat-btn { border: 0; background: var(--accent); color: var(--accent-ink); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 600 }
+.srcline { font-size: 12px; color: var(--muted); padding-block: 6px; border-top: 1px solid var(--line) }
+.srcline a { color: inherit }
+
+main { padding-block: 20px 60px }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 7px 12px; border-radius: 8px; cursor: pointer; font-weight: 500 }
+.btn:hover { border-color: var(--muted) }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
+.btn:disabled { opacity: .5; cursor: not-allowed }
+.btn.sm { padding: 4px 9px; font-size: 13px }
+.eyebrow { font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted) }
+.muted { color: var(--muted) }
+.note { font-size: 13px; color: var(--muted) }
+
+/* Vue Thème */
+.theme-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px; align-items: start }
+.tindex { position: sticky; top: 120px; max-height: calc(100vh - 140px); overflow: auto; padding-right: 4px }
+.tindex details { border-bottom: 1px solid var(--line); padding-block: 6px }
+.tindex summary { cursor: pointer; font-weight: 600; padding: 4px 2px; list-style: none; display: flex; justify-content: space-between }
+.tindex summary::-webkit-details-marker { display: none }
+.tindex summary::after { content: "+"; color: var(--muted) }
+.tindex details[open] summary::after { content: "–" }
+.tindex button.sub { display: flex; justify-content: space-between; gap: 8px; width: 100%; text-align: left; border: 0; background: none; padding: 5px 8px; border-radius: 6px; cursor: pointer; color: var(--muted); font-size: 14px }
+.tindex button.sub:hover { background: var(--sunk); color: var(--ink) }
+.tindex button.sub[aria-current="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600 }
+.tindex .n { font-family: var(--f-mono); font-size: 12px }
+.mobile-picker { display: none }
+
+.sec-head { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; justify-content: space-between; margin-bottom: 14px }
+.sec-head h2 { font-size: 28px; letter-spacing: -0.015em }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-block: 10px 16px }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 10px 4px 4px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft) }
+.chip:disabled { opacity: .45; cursor: default }
+.mono { font-family: var(--f-mono) }
+.ini { width: 26px; height: 26px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--sunk); color: var(--ink); font: 600 11px var(--f-mono); flex: none }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; min-width: 0 }
+.card h3 { font-size: 17px; display: flex; align-items: center; gap: 8px }
+.card .party { font-size: 12px; color: var(--muted); font-family: var(--f-mono) }
+ol.props { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 7px; font-size: 14px }
+ol.props li::marker { font-family: var(--f-mono); font-size: 12px; color: var(--muted) }
+.srcbadge { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-left: 4px; white-space: nowrap }
+.empty-cands { margin-top: 14px; font-size: 13px; color: var(--muted) }
+.ptag { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-weight: 400; white-space: nowrap; cursor: help }
+.pos5 { display: inline-flex; gap: 2px; vertical-align: 1px }
+.pos5 i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--muted); opacity: .6 }
+.pos5 i.on { background: var(--ink); border-color: var(--ink); opacity: 1 }
+.cnt { font: 500 11px var(--f-mono); background: var(--sunk); color: var(--ink); border-radius: 999px; padding: 1px 7px; margin-left: 2px }
+.pnote { font-size: 12px; color: var(--muted); margin-top: 4px }
+
+/* Analyse IA */
+.ai { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; margin-bottom: 18px }
+.ai-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between }
+.ai-head h3 { font-size: 18px }
+.ai-body { margin-top: 12px; display: grid; gap: 16px }
+.ai-body p { margin: 0 }
+.ai-body h4 { font-size: 15px; margin-bottom: 6px }
+.ai-body ul { margin: 0; padding-left: 18px; display: grid; gap: 4px }
+.thinking { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s infinite ease-in-out }
+@keyframes pulse { 50% { opacity: .25 } }
+@media (prefers-reduced-motion: reduce) { .dot { animation: none } }
+.cmp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px }
+.cmp { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: var(--paper); min-width: 0 }
+.cmp h5 { margin: 0 0 6px; font: 600 15px var(--f-display); display: flex; gap: 8px; align-items: center }
+.cmp .lbl { font-family: var(--f-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-top: 10px; display: block }
+.cmp ul { font-size: 14px }
+.unc { display: inline-block; font-family: var(--f-mono); font-size: 11px; border-radius: 4px; padding: 1px 6px; border: 1px solid currentColor }
+.unc.faible { color: var(--ok) } .unc.moyenne { color: var(--warn) } .unc.elevee { color: var(--bad) }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px }
+table.pos { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px }
+table.pos th, table.pos td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line) }
+table.pos th { background: var(--sunk); font-weight: 600 }
+table.pos tr:last-child td { border-bottom: 0 }
+.err { color: var(--bad); font-size: 14px }
+.pinbtn { border: 0; background: none; color: var(--accent); cursor: pointer; font-size: 13px; padding: 2px 0 }
+
+/* Face-à-face */
+.vs-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; margin-bottom: 16px }
+.field { display: grid; gap: 4px; min-width: 0 }
+.field label { font-size: 12px; color: var(--muted) }
+.field select { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); max-width: 100% }
+.slot { border-left: 4px solid var(--c, var(--line)); padding-left: 8px }
+.vs-table { overflow-x: auto }
+.vs-row { display: grid; grid-template-columns: repeat(var(--cols), minmax(240px, 1fr)); gap: 10px; margin-bottom: 10px; min-width: calc(var(--cols) * 250px) }
+.vs-sub { font: 600 14px var(--f-display); margin: 18px 0 8px; display: flex; gap: 8px; align-items: baseline }
+.vs-cell { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; min-width: 0 }
+.vs-cell ol { margin: 0; padding-left: 18px; display: grid; gap: 5px }
+.vs-heads { position: sticky; top: 112px; z-index: 5; background: var(--paper); padding-block: 6px }
+.vs-heads .vs-cell { font: 600 15px var(--f-display); display: flex; align-items: center; gap: 8px; border-top-width: 4px }
+
+/* Historique / récap */
+.list { display: grid; gap: 8px }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: flex; gap: 12px; align-items: start; justify-content: space-between }
+.item .meta { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted) }
+.item h4 { font: 600 15px var(--f-body); margin: 2px 0 }
+.kind { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--sunk); color: var(--muted) }
+.two { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start }
+.prose { font-size: 15px; max-width: 72ch }
+.prose h3 { font-size: 19px; margin: 18px 0 6px } .prose h4 { font-size: 16px; margin: 14px 0 4px }
+.prose p { margin: 6px 0 } .prose ul, .prose ol { padding-left: 20px; margin: 6px 0 }
+.prose code { font-family: var(--f-mono); font-size: 13px; background: var(--sunk); padding: 0 4px; border-radius: 4px }
+.emptystate { border: 1px dashed var(--line); border-radius: var(--r); padding: 22px; color: var(--muted); text-align: left }
+
+/* Tiroir de discussion */
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100%); background: var(--surface); border-left: 1px solid var(--line); z-index: 40; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .22s ease; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-shadow: -12px 0 30px rgba(10, 20, 40, .12) }
+.drawer.open { transform: none }
+@media (prefers-reduced-motion: reduce) { .drawer { transition: none } }
+.d-head { padding: 12px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; align-items: center }
+.d-head h3 { font-size: 17px; margin-right: auto }
+.d-ctx { padding: 8px 14px; font-size: 12.5px; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--paper); display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.msgs { flex: 1; overflow: auto; padding: 14px; display: grid; align-content: start; gap: 12px }
+.msg { max-width: 92%; padding: 9px 12px; border-radius: 12px; font-size: 14px; min-width: 0 }
+.msg.user { justify-self: end; background: var(--accent); color: var(--accent-ink); border-bottom-right-radius: 4px; white-space: pre-wrap }
+.msg.assistant { justify-self: start; background: var(--paper); border: 1px solid var(--line); border-bottom-left-radius: 4px }
+.msg.assistant .prose { font-size: 14px }
+.msg .acts { margin-top: 6px; display: flex; gap: 10px }
+.composer { border-top: 1px solid var(--line); padding: 10px; display: grid; gap: 8px }
+.composer textarea { width: 100%; resize: none; min-height: 64px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--paper) }
+.composer .row { display: flex; gap: 8px; justify-content: space-between; align-items: center }
+.sugg { display: flex; gap: 6px; flex-wrap: wrap }
+.sugg button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; font-size: 12.5px; padding: 3px 9px; cursor: pointer }
+.toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 8px; font-size: 14px; z-index: 60 }
+
+@media (max-width: 900px) {
+  .theme-layout { grid-template-columns: minmax(0, 1fr) }
+  .tindex { display: none }
+  .mobile-picker { display: block; margin-bottom: 12px }
+  .mobile-picker select { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface) }
+  .two { grid-template-columns: minmax(0, 1fr) }
+  .vs-heads { top: 0; position: static }
+  .sec-head h2 { font-size: 23px }
+}
+</style>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand"><h1>Programmes 2027</h1><span class="yr">présidentielle · comparateur</span></div>
+    <nav class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-view="theme" aria-selected="true">Par thème</button>
+      <button role="tab" data-view="vs" aria-selected="false">Face-à-face</button>
+      <button role="tab" data-view="history" aria-selected="false">Historique</button>
+      <button role="tab" data-view="recap" aria-selected="false">Récap</button>
+    </nav>
+    <button class="chat-btn" id="openChat">Poser une question</button>
+  </div>
+  <div class="wrap srcline" id="srcline">Chargement des données…</div>
+</header>
+
+<main class="wrap">
+  <section id="view-theme"></section>
+  <section id="view-vs" hidden></section>
+  <section id="view-history" hidden></section>
+  <section id="view-recap" hidden></section>
+</main>
+
+<aside class="drawer" id="drawer" aria-label="Discussion">
+  <div class="d-head">
+    <h3>Discussion</h3>
+    <button class="btn sm" id="newConv">Nouvelle</button>
+    <button class="btn sm" id="closeChat" aria-label="Fermer">Fermer</button>
+  </div>
+  <div class="d-ctx" id="dctx"></div>
+  <div class="msgs" id="msgs"></div>
+  <form class="composer" id="composer">
+    <div class="sugg" id="sugg"></div>
+    <textarea id="chatInput" placeholder="Ex. : Quelles différences entre ces candidats sur la dette ?" rows="3"></textarea>
+    <div class="row"><span class="note" id="chatNote">Réponses factuelles, sources : propositions relevées.</span>
+      <span><button type="button" class="btn sm" id="stopChat" hidden>Arrêter</button> <button class="btn primary sm" id="sendChat">Envoyer</button></span></div>
+  </form>
+</aside>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+// ---------- utilitaires ----------
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const hash = (s) => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+const fmtDate = (t) => new Date(t).toLocaleString("fr-FR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const SLOT = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)"];
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2600); }
+function initials(name) { return name.split(/[\s-]+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase(); }
+
+// Mini rendu Markdown (titres, listes, gras, italique, code)
+function md(src) {
+  const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*(?!\s)(.+?)\*/g, "$1<em>$2</em>").replace(/`([^`]+)`/g, "<code>$1</code>");
+  const out = []; let list = null;
+  const close = () => { if (list) { out.push(`</${list}>`); list = null; } };
+  for (const raw of String(src || "").split("\n")) {
+    const l = raw.trimEnd();
+    let m;
+    if (!l.trim()) { close(); continue; }
+    if ((m = l.match(/^#{1,2}\s+(.*)/))) { close(); out.push(`<h3>${inline(m[1])}</h3>`); }
+    else if ((m = l.match(/^#{3,6}\s+(.*)/))) { close(); out.push(`<h4>${inline(m[1])}</h4>`); }
+    else if ((m = l.match(/^\s*[-*•]\s+(.*)/))) { if (list !== "ul") { close(); out.push("<ul>"); list = "ul"; } out.push(`<li>${inline(m[1])}</li>`); }
+    else if ((m = l.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== "ol") { close(); out.push("<ol>"); list = "ol"; } out.push(`<li>${inline(m[1])}</li>`); }
+    else if (/^\s*\|/.test(l)) { close(); if (!/^\s*\|[\s:|-]+\|\s*$/.test(l)) out.push(`<p>${inline(l.replace(/^\s*\||\|\s*$/g, "").split("|").map((c) => c.trim()).join(" · "))}</p>`); }
+    else { close(); out.push(`<p>${inline(l)}</p>`); }
+  }
+  close(); return out.join("");
+}
+
+// ---------- données ----------
+const D = { cands: [], candById: new Map(), themes: [], subById: new Map(), themeOfSub: new Map(), props: new Map(), fetchedAt: "", sourceUrl: "", extraSources: [] };
+const pkey = (cid, sid) => cid + "|" + sid;
+function propsOf(cid, sid) { return D.props.get(pkey(cid, sid)) || []; }
+function candsWith(sid) { return D.cands.filter((c) => propsOf(c.id, sid).length); }
+function countCand(cid) { let n = 0; for (const t of D.themes) for (const s of t.subs) n += propsOf(cid, s.id).length; return n; }
+
+async function loadData() {
+  const ifrap = await (await fetch("data.json")).json();
+  let extra = { items: [], sources: [] };
+  try { extra = await (await fetch("officiel.json")).json(); } catch {}
+  D.fetchedAt = ifrap.fetchedAt; D.sourceUrl = ifrap.source.url; D.extraUpdated = extra.updatedAt; D.extraSources = extra.sources || [];
+  let partis = { candidats: {}, blocs: [] };
+  try { partis = await (await fetch("partis.json")).json(); } catch {}
+  D.blocs = partis.blocs || []; D.partisUrl = partis.sourceUrl; D.partisMethode = partis.methode;
+  D.cands = ifrap.candidates;
+  D.cands.forEach((c) => {
+    const p = partis.candidats?.[c.id];
+    if (p) { c.pinfo = p; c.party = p.parti; }
+    D.candById.set(c.id, c);
+  });
+  D.themes = ifrap.themes;
+  for (const t of D.themes) for (const s of t.subs) {
+    D.subById.set(s.id, s); D.themeOfSub.set(s.id, t);
+    for (const [cid, list] of Object.entries(s.props)) D.props.set(pkey(cid, s.id), list.map((text) => ({ text, src: "IFRAP" })));
+  }
+  for (const it of extra.items || []) {
+    if (!D.subById.has(it.subId) || !D.candById.has(it.candidateId)) continue;
+    const k = pkey(it.candidateId, it.subId);
+    if (!D.props.has(k)) D.props.set(k, []);
+    D.props.get(k).push({ text: it.text, src: it.source, url: it.url, date: it.date });
+  }
+  const extraN = (extra.items || []).length;
+  $("#srcline").innerHTML = `Source principale : <a href="${esc(D.sourceUrl)}" target="_blank" rel="noopener">comparateur de la Fondation IFRAP</a> (think tank d'orientation libérale), relevé du <span class="mono">${esc(new Date(D.fetchedAt).toLocaleDateString("fr-FR"))}</span>`
+    + (extraN ? ` · ${extraN} proposition(s) issues de sources officielles des candidats (màj ${esc(new Date(extra.updatedAt).toLocaleDateString("fr-FR"))})` : "")
+    + ` · Positions des partis : <a href="${esc(D.partisUrl || "#")}" target="_blank" rel="noopener" title="${esc(D.partisMethode || "")}">blocs du ministère de l'Intérieur (2026)</a>`
+    + ` · mise à jour hebdomadaire.`;
+}
+
+// Parti + position (bloc officiel) sur un axe neutre à 5 crans
+function posScale(bloc) {
+  const i = D.blocs.indexOf(bloc);
+  if (i < 0) return "";
+  return `<span class="pos5" aria-hidden="true">${D.blocs.map((_, j) => `<i class="${j === i ? "on" : ""}"></i>`).join("")}</span>`;
+}
+function partyLine(c, short) {
+  const p = c.pinfo;
+  if (!p) return esc(c.party || "Parti non renseigné");
+  const tip = [p.parti, "Position : " + p.bloc + " (bloc du ministère de l'Intérieur)", "Base : " + p.base, p.note || ""].filter(Boolean).join("\n");
+  return `<span class="ptag" title="${esc(tip)}">${esc(short ? p.sigle : p.parti)} · ${posScale(p.bloc)} ${esc(p.bloc)}${!short && p.base.startsWith("par analogie") ? "*" : ""}</span>`;
+}
+const byLast = (a, b) => a.name.split(" ").slice(1).join(" ").localeCompare(b.name.split(" ").slice(1).join(" "), "fr");
+const partyText = (c) => c.pinfo ? `${c.pinfo.parti}, ${c.pinfo.bloc}` : (c.party || "parti non renseigné");
+
+// ---------- stockage (db privé par personne, sinon navigateur) ----------
+const Store = {
+  db: null, uid: null, items: new Map(),
+  async init() {
+    try {
+      if (window.claude?.use) {
+        const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+        const id = user ? await user.id() : null;
+        if (db && id) { this.db = db; this.uid = id; }
+      }
+    } catch {}
+    try {
+      if (this.db) { const snap = await this.db.collection("data/users/" + this.uid).get(); snap.docs.forEach((d) => this.items.set(d.id, { ...d.data(), id: d.id })); }
+      else { JSON.parse(localStorage.getItem("pc27-items") || "[]").forEach((o) => this.items.set(o.id, o)); }
+    } catch {}
+  },
+  list(type) { return [...this.items.values()].filter((o) => o.type === type).sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt)); },
+  async put(obj) {
+    this.items.set(obj.id, obj);
+    try {
+      if (this.db) { const { id, ...body } = obj; await this.db.collection("data/users/" + this.uid).doc(id).set(body); }
+      else localStorage.setItem("pc27-items", JSON.stringify([...this.items.values()]));
+    } catch (e) { if (e?.code === "quota_exceeded") toast("Espace de stockage plein : supprime d'anciennes conversations."); }
+  },
+  async del(id) {
+    this.items.delete(id);
+    try { if (this.db) await this.db.collection("data/users/" + this.uid).doc(id).delete(); else localStorage.setItem("pc27-items", JSON.stringify([...this.items.values()])); } catch {}
+  },
+  // Cache partagé des analyses (évite de repayer la même analyse)
+  async getAnalysis(key) {
+    try { if (this.db) { const s = await this.db.doc("analyses/" + key).get(); return s.exists ? s.data() : null; } return JSON.parse(localStorage.getItem("pc27-a-" + key) || "null"); } catch { return null; }
+  },
+  async setAnalysis(key, val) {
+    try { if (this.db) await this.db.doc("analyses/" + key).set(val); else localStorage.setItem("pc27-a-" + key, JSON.stringify(val)); } catch {}
+  },
+};
+const newId = (p) => p + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+// ---------- IA ----------
+let samplePromise = null;
+const getSample = () => (samplePromise ||= (window.claude?.use ? claude.use("sample").catch(() => null) : Promise.resolve(null)));
+const AI_ERR = { not_granted: "L'accès à Claude n'a pas été autorisé pour cette page.", sampling_disabled: "Claude n'est pas disponible pour ce compte.", rate_limited: "Trop de demandes pour le moment, réessaie dans quelques minutes.", session_expired: "Session expirée : reconnecte-toi.", prompt_too_large: "Trop de données à analyser d'un coup : réduis le nombre de candidats ou choisis un thème.", invalid_json: "La réponse n'a pas pu être lue. Réessaie.", refused: "Claude n'a pas pu répondre à cette demande.", empty_completion: "Réponse vide. Réessaie." };
+const aiErr = (e) => AI_ERR[e?.code] || "Erreur passagère. Réessaie.";
+
+const RULES = `Tu es l'assistant d'un comparateur des programmes de l'élection présidentielle française de 2027. Réponds en français.
+RÈGLES DE NEUTRALITÉ (obligatoires) :
+- Tu ne prends parti pour aucun candidat ni courant politique et ne recommandes aucun vote. Pas d'adjectifs valorisants ou dévalorisants (« courageux », « irréaliste », « dangereux », « ambitieux »…).
+- Chaque candidat est traité avec la même structure, le même niveau de détail et le même ton.
+- Sépare toujours : (1) ce que le programme propose (fait, d'après les données fournies) ; (2) les effets attendus selon ses promoteurs ; (3) les effets discutés par des institutions ou économistes (Cour des comptes, Conseil d'État, Conseil constitutionnel, INSEE, Banque de France, OFCE, IPP, OCDE, etc.) ou par les opposants — toujours attribués, jamais pris à ton compte.
+- Pour les conséquences, explique les mécanismes : qui paie, qui en bénéficie, ordres de grandeur connus, délais, contraintes juridiques (Constitution, droit européen, traités). Indique le degré d'incertitude.
+- N'attribue jamais à un candidat une mesure absente des données fournies. Si une information manque, écris « non précisé dans les propositions relevées ». Si tu utilises une connaissance générale (contexte, chiffres publics), signale-le.
+- Les propositions proviennent principalement du comparateur de la Fondation IFRAP (think tank d'orientation libérale) et éventuellement de sources officielles des candidats ; ce sont des relevés possiblement incomplets, susceptibles d'évoluer.`;
+
+function propsBlock(cids, sids) {
+  const lines = [];
+  for (const cid of cids) {
+    const c = D.candById.get(cid);
+    lines.push(`\n### ${c.name} (${partyText(c)})`);
+    let any = false;
+    for (const sid of sids) {
+      const ps = propsOf(cid, sid);
+      if (!ps.length) continue;
+      any = true;
+      if (sids.length > 1) lines.push(`[${D.subById.get(sid).name}]`);
+      ps.forEach((p) => lines.push(`- ${p.text}${p.src !== "IFRAP" ? " (source : " + p.src + ")" : ""}`));
+    }
+    if (!any) lines.push("- Aucune proposition relevée sur ce périmètre.");
+  }
+  return lines.join("\n");
+}
+
+// ---------- état ----------
+const S = { view: "theme", sub: null, themeSel: null, vs: [], vsScope: "", chatCtx: null, conv: null, chatCtl: null };
+
+function setView(v) {
+  S.view = v;
+  document.querySelectorAll("#tabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));
+  for (const k of ["theme", "vs", "history", "recap"]) $("#view-" + k).hidden = k !== v;
+  ({ theme: renderTheme, vs: renderVs, history: renderHistory, recap: renderRecap })[v]();
+  window.scrollTo({ top: 0 });
+}
+
+// ---------- vue Thème ----------
+function renderTheme() {
+  const el = $("#view-theme");
+  const sub = D.subById.get(S.sub), theme = D.themeOfSub.get(S.sub);
+  const withP = candsWith(S.sub);
+  if (!S.themeSel || S.themeSel.sub !== S.sub) S.themeSel = { sub: S.sub, ids: new Set(withP.map((c) => c.id)) };
+  const sel = D.cands.filter((c) => S.themeSel.ids.has(c.id));
+  const without = D.cands.filter((c) => !propsOf(c.id, S.sub).length);
+
+  const index = D.themes.map((t) => `<details ${t.subs.some((s) => s.id === S.sub) ? "open" : ""}><summary>${esc(t.name)}</summary>
+    ${t.subs.map((s) => `<button class="sub" data-sub="${s.id}" aria-current="${s.id === S.sub}"><span>${esc(s.name)}</span><span class="n">${candsWith(s.id).length}</span></button>`).join("")}</details>`).join("");
+  const picker = `<select id="subPick" aria-label="Thème">${D.themes.map((t) => `<optgroup label="${esc(t.name)}">${t.subs.map((s) => `<option value="${s.id}" ${s.id === S.sub ? "selected" : ""}>${esc(s.name)} (${candsWith(s.id).length})</option>`).join("")}</optgroup>`).join("")}</select>`;
+
+  el.innerHTML = `<div class="theme-layout">
+    <nav class="tindex" aria-label="Thèmes"><div class="eyebrow" style="margin-bottom:6px">Thèmes · candidats avec propositions</div>${index}</nav>
+    <div style="min-width:0">
+      <div class="mobile-picker">${picker}</div>
+      <div class="sec-head"><div><div class="eyebrow">${esc(theme.name)}</div><h2>${esc(sub.name)}</h2></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="askTheme">Poser une question sur ce thème</button></div></div>
+      <div class="eyebrow">Candidats inclus dans l'analyse (${sel.length})</div>
+      <div class="chips">${withP.map((c) => `<button class="chip" data-cid="${c.id}" aria-pressed="${S.themeSel.ids.has(c.id)}"><span class="ini">${initials(c.name)}</span>${esc(c.name)} ${partyLine(c, true)} <span class="cnt" title="Propositions relevées sur ce thème">${propsOf(c.id, S.sub).length}</span></button>`).join("")}</div>
+      <div class="ai" id="aiBox"></div>
+      <div class="cards">${withP.map((c) => `<article class="card"><h3><span class="ini">${initials(c.name)}</span>${esc(c.name)}</h3><div class="party">${partyLine(c)}</div>${c.pinfo?.base.startsWith("par analogie") ? `<div class="pnote">* Classement ${esc(c.pinfo.base)}.</div>` : ""}${c.pinfo?.note ? `<div class="pnote">${esc(c.pinfo.note)}</div>` : ""}
+        <ol class="props">${propsOf(c.id, S.sub).map((p) => `<li>${esc(p.text)}${p.src !== "IFRAP" ? `<a class="srcbadge" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.src)}</a>` : ""}</li>`).join("")}</ol></article>`).join("")}</div>
+      ${withP.length ? "" : `<div class="emptystate">Aucune proposition relevée sur ce thème pour l'instant.</div>`}
+      ${without.length ? `<p class="empty-cands">Aucune proposition relevée pour : ${without.map((c) => esc(c.name)).join(", ")}.</p>` : ""}
+    </div></div>`;
+
+  el.querySelectorAll("button.sub").forEach((b) => (b.onclick = () => { S.sub = b.dataset.sub; renderTheme(); }));
+  $("#subPick").onchange = (e) => { S.sub = e.target.value; renderTheme(); };
+  el.querySelectorAll(".chip").forEach((b) => (b.onclick = () => { const id = b.dataset.cid; S.themeSel.ids.has(id) ? S.themeSel.ids.delete(id) : S.themeSel.ids.add(id); renderTheme(); }));
+  $("#askTheme").onclick = () => openChat({ label: `${sub.name} · ${sel.length} candidat(s)`, cids: sel.map((c) => c.id), sids: [S.sub] });
+  setupAnalysis($("#aiBox"), { kind: "theme", cids: sel.map((c) => c.id), sids: [S.sub], label: `${sub.name} — ${sel.map((c) => c.name).join(", ")}` });
+}
+
+// ---------- analyses ----------
+function analysisKey(spec) {
+  const body = spec.kind + "|" + spec.sids.join(",") + "|" + spec.cids.join(",") + "|" + propsBlock(spec.cids, spec.sids);
+  return spec.kind + "-" + hash(body);
+}
+
+async function setupAnalysis(box, spec) {
+  const title = spec.kind === "full" ? "Analyse comparative du programme complet" : "Analyse comparative";
+  if (spec.cids.length < (spec.kind === "theme" ? 1 : 2)) {
+    box.innerHTML = `<div class="ai-head"><h3>${title}</h3></div><p class="note">Sélectionne au moins ${spec.kind === "theme" ? "un candidat" : "deux candidats"} pour lancer l'analyse.</p>`; return;
+  }
+  const key = analysisKey(spec);
+  box.innerHTML = `<div class="ai-head"><div><h3>${title}</h3><div class="note">Résumé, points communs, clivages et conséquences possibles, rédigés par Claude à partir des propositions affichées ci-dessous.</div></div>
+    <span><button class="btn primary" data-act="run">Générer l'analyse</button></span></div><div class="ai-body" data-out></div>`;
+  const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
+  const cached = await Store.getAnalysis(key);
+  if (box.isConnected && cached?.result) { showAnalysis(box, spec, cached); }
+  const sample = await getSample();
+  if (!sample) { btn.disabled = true; btn.title = "Analyse IA disponible uniquement dans Claude"; if (!cached) out.innerHTML = `<p class="note">L'analyse par Claude s'active quand la page est ouverte dans Claude.</p>`; return; }
+  btn.onclick = () => runAnalysis(box, spec, key);
+}
+
+function showAnalysis(box, spec, rec) {
+  const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
+  btn.textContent = "Régénérer"; btn.classList.remove("primary");
+  out.innerHTML = (spec.kind === "theme" ? renderThemeAnalysis(rec.result) : renderVsAnalysis(rec.result, spec))
+    + `<div class="note">Généré le ${fmtDate(rec.createdAt)} · données du ${esc(new Date(rec.dataDate).toLocaleDateString("fr-FR"))} · <button class="pinbtn" data-act="pin">Ajouter la synthèse au récap</button> · <button class="pinbtn" data-act="ask">Approfondir dans la discussion</button></div>`;
+  out.querySelector("[data-act=pin]").onclick = () => addPin(rec.result.synthese || "", spec.label);
+  out.querySelector("[data-act=ask]").onclick = () => openChat({ label: spec.label, cids: spec.cids, sids: spec.sids, analysis: rec.result });
+}
+
+async function runAnalysis(box, spec, key) {
+  const sample = await getSample();
+  const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
+  btn.disabled = true;
+  out.innerHTML = `<div class="thinking"><span class="dot"></span>Claude lit ${spec.cids.length} programme(s) et rédige l'analyse… (30 s à 2 min)</div>`;
+  const names = spec.cids.map((id) => D.candById.get(id).name);
+  const scope = spec.sids.length === 1 ? D.subById.get(spec.sids[0]).name : spec.kind === "full" ? "l'ensemble du programme" : D.themeOfSub.get(spec.sids[0]).name;
+  let fmt;
+  if (spec.kind === "theme") fmt = `Réponds uniquement avec un objet JSON de cette forme :
+{"synthese":"4 à 6 phrases factuelles résumant les grandes approches en présence",
+ "convergences":["point commun entre plusieurs candidats (nommer lesquels)"],
+ "clivages":[{"sujet":"ligne de clivage","positions":{"<Nom candidat>":"position en une phrase"}}],
+ "candidats":[{"nom":"<Nom exact>","approche":"logique générale en une phrase","mesures_cles":["2 à 4 mesures"],"effets_vises":["effet recherché selon le candidat"],"consequences_possibles":["mécanisme concret : qui paie / qui bénéficie / ordre de grandeur / délai"],"points_debattus":["objection ou limite, attribuée (ex. selon la Cour des comptes…, selon ses opposants…)"],"chiffrage":"chiffres présents dans les propositions, sinon « non chiffré dans les propositions relevées »","incertitude":"faible|moyenne|élevée","incertitude_raison":"pourquoi"}],
+ "a_savoir":["limite des données ou contexte utile"]}
+Inclure exactement ces candidats dans "candidats", dans cet ordre : ${names.join(", ")}. 2 à 4 éléments par liste.`;
+  else if (spec.kind === "vs") fmt = `Réponds uniquement avec un objet JSON de cette forme :
+{"synthese":"4 à 6 phrases factuelles sur ce qui rapproche et distingue ces candidats sur ce périmètre",
+ "par_sujet":[{"sujet":"sous-thème ou question précise","positions":{"<Nom>":"position en une phrase, ou « non précisé »"},"difference_cle":"en une phrase"}],
+ "candidats":[{"nom":"<Nom exact>","philosophie":"une phrase","consequences_possibles":["mécanisme concret"],"points_debattus":["objection attribuée"],"chiffrage":"…","incertitude":"faible|moyenne|élevée","incertitude_raison":"…"}],
+ "a_savoir":["…"]}
+Candidats, dans cet ordre : ${names.join(", ")}. 4 à 8 sujets dans par_sujet.`;
+  else fmt = `Réponds uniquement avec un objet JSON de cette forme :
+{"synthese":"5 à 7 phrases factuelles comparant les deux programmes dans leur ensemble",
+ "par_sujet":[{"sujet":"grand thème","positions":{"<Nom>":"position en une phrase, ou « non précisé »"},"difference_cle":"en une phrase"}],
+ "candidats":[{"nom":"<Nom exact>","philosophie":"logique d'ensemble en une phrase","consequences_possibles":["conséquence macro : finances publiques, pouvoir d'achat, emploi, institutions… avec mécanisme"],"points_debattus":["objection attribuée"],"chiffrage":"chiffres clés présents dans les propositions","incertitude":"faible|moyenne|élevée","incertitude_raison":"…"}],
+ "a_savoir":["…"]}
+Candidats, dans cet ordre : ${names.join(", ")}. Un élément par_sujet pour chacun des grands thèmes où au moins un des deux a des propositions (10 au maximum).`;
+  const prompt = `${RULES}\n\nTÂCHE : analyse comparative neutre des propositions de ${names.join(", ")} sur : ${scope}.\n\nPROPOSITIONS RELEVÉES :${propsBlock(spec.cids, spec.sids)}\n\n${fmt}`;
+  try {
+    const result = await sample.json(prompt, { modelTier: spec.kind === "full" ? "complex" : "default" });
+    if (!result || typeof result !== "object") throw { code: "invalid_json" };
+    const rec = { result, createdAt: Date.now(), dataDate: D.fetchedAt, kind: spec.kind, label: spec.label };
+    await Store.setAnalysis(key, rec);
+    await Store.put({ id: "an_" + key, type: "analysis", key, kind: spec.kind, label: spec.label, cids: spec.cids, sids: spec.sids, scope: S.vsScope, synthese: result.synthese || "", createdAt: Date.now() });
+    if (box.isConnected) showAnalysis(box, spec, rec);
+  } catch (e) {
+    if (box.isConnected) out.innerHTML = `<p class="err">${esc(aiErr(e))}</p>`;
+  } finally { btn.disabled = false; }
+}
+
+const li = (arr) => (Array.isArray(arr) && arr.length ? `<ul>${arr.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="note">—</p>`);
+const uncCls = (u) => norm(u).includes("elev") ? "elevee" : norm(u).includes("faib") ? "faible" : "moyenne";
+function candCards(list, names) {
+  return `<div class="cmp-grid">${(list || []).map((c, i) => `<div class="cmp" style="border-top:3px solid ${SLOT[names.indexOf(c.nom)] || "var(--line)"}">
+    <h5><span class="ini">${initials(c.nom || "?")}</span>${esc(c.nom)} ${(() => { const k = D.cands.find((x) => x.name === c.nom); return k ? partyLine(k, true) : ""; })()}</h5>
+    <div>${esc(c.approche || c.philosophie || "")}</div>
+    ${c.mesures_cles ? `<span class="lbl">Mesures clés</span>${li(c.mesures_cles)}` : ""}
+    ${c.effets_vises ? `<span class="lbl">Effets visés (selon le candidat)</span>${li(c.effets_vises)}` : ""}
+    <span class="lbl">Conséquences possibles</span>${li(c.consequences_possibles)}
+    <span class="lbl">Points débattus</span>${li(c.points_debattus)}
+    <span class="lbl">Chiffrage</span><div style="font-size:14px">${esc(c.chiffrage || "—")}</div>
+    <span class="lbl">Incertitude</span><div style="font-size:14px"><span class="unc ${uncCls(c.incertitude)}">${esc(c.incertitude || "?")}</span> ${esc(c.incertitude_raison || "")}</div>
+  </div>`).join("")}</div>`;
+}
+function posTable(rows, names, key) {
+  if (!Array.isArray(rows) || !rows.length) return "";
+  return `<div class="tablewrap"><table class="pos"><thead><tr><th>${key === "sujet" ? "Sujet" : "Clivage"}</th>${names.map((n) => `<th>${esc(n)}</th>`).join("")}${rows[0].difference_cle !== undefined ? "<th>Différence clé</th>" : ""}</tr></thead><tbody>
+    ${rows.map((r) => `<tr><td><strong>${esc(r.sujet)}</strong></td>${names.map((n) => `<td>${esc((r.positions || {})[n] || "—")}</td>`).join("")}${r.difference_cle !== undefined ? `<td>${esc(r.difference_cle)}</td>` : ""}</tr>`).join("")}
+  </tbody></table></div>`;
+}
+function renderThemeAnalysis(r) {
+  const names = (r.candidats || []).map((c) => c.nom);
+  return `<div><h4>Synthèse</h4><p>${esc(r.synthese)}</p></div>
+    <div><h4>Convergences</h4>${li(r.convergences)}</div>
+    ${r.clivages?.length ? `<div><h4>Lignes de clivage</h4>${posTable(r.clivages, names, "clivage")}</div>` : ""}
+    <div><h4>Par candidat : mesures et conséquences</h4>${candCards(r.candidats, names)}</div>
+    <div><h4>À savoir</h4>${li(r.a_savoir)}</div>`;
+}
+function renderVsAnalysis(r, spec) {
+  const names = spec.cids.map((id) => D.candById.get(id).name);
+  return `<div><h4>Synthèse</h4><p>${esc(r.synthese)}</p></div>
+    <div><h4>Positions sujet par sujet</h4>${posTable(r.par_sujet, names, "sujet")}</div>
+    <div><h4>Conséquences possibles</h4>${candCards(r.candidats, names)}</div>
+    <div><h4>À savoir</h4>${li(r.a_savoir)}</div>`;
+}
+
+// ---------- vue Face-à-face ----------
+function vsSids() {
+  if (S.vsScope === "all") return D.themes.flatMap((t) => t.subs.map((s) => s.id));
+  if (S.vsScope.startsWith("t:")) return D.themes.find((t) => t.id === S.vsScope.slice(2)).subs.map((s) => s.id);
+  return [S.vsScope.slice(2)];
+}
+function renderVs() {
+  const el = $("#view-vs");
+  const ranked = [...D.cands].sort(byLast);
+  const opt = (sel) => `<option value="">—</option>` + ranked.map((c) => `<option value="${c.id}" ${c.id === sel ? "selected" : ""}>${esc(c.name)} — ${esc(c.pinfo ? c.pinfo.sigle + ", " + c.pinfo.bloc : c.party)} (${countCand(c.id)})</option>`).join("");
+  const scopeOpts = `<option value="all" ${S.vsScope === "all" ? "selected" : ""}>Programme complet (2 candidats max.)</option>` + D.themes.map((t) => `<optgroup label="${esc(t.name)}"><option value="t:${t.id}" ${S.vsScope === "t:" + t.id ? "selected" : ""}>${esc(t.name)} — tout le thème</option>${t.subs.map((s) => `<option value="s:${s.id}" ${S.vsScope === "s:" + s.id ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</optgroup>`).join("");
+  const cids = S.vs.filter(Boolean);
+  const tooMany = S.vsScope === "all" && cids.length > 2;
+  const sids = vsSids();
+  const scopeName = S.vsScope === "all" ? "Programme complet" : S.vsScope.startsWith("t:") ? D.themes.find((t) => t.id === S.vsScope.slice(2)).name : D.subById.get(S.vsScope.slice(2)).name;
+
+  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">Face-à-face</div><h2>${esc(scopeName)}</h2></div><button class="btn" id="askVs" ${cids.length ? "" : "disabled"}>Poser une question sur ce face-à-face</button></div>
+    <div class="vs-controls">
+      ${[0, 1, 2, 3].map((i) => `<div class="field slot" style="--c:${SLOT[i]}"><label for="vs${i}">Candidat ${String.fromCharCode(65 + i)}${i > 1 ? " (facultatif)" : ""}</label><select id="vs${i}" data-i="${i}">${opt(S.vs[i])}</select></div>`).join("")}
+      <div class="field" style="flex:1 1 240px"><label for="vsScope">Périmètre</label><select id="vsScope">${scopeOpts}</select></div>
+    </div>
+    ${tooMany ? `<div class="emptystate" style="margin-bottom:16px">Le programme complet se compare à 2 candidats au maximum, pour que l'analyse reste lisible. Retire un candidat ou choisis un thème.</div>` : ""}
+    <div class="ai" id="aiVs"></div>
+    <div id="vsGrid"></div>`;
+
+  el.querySelectorAll(".vs-controls select[data-i]").forEach((s) => (s.onchange = () => {
+    const i = +s.dataset.i, v = s.value;
+    S.vs = S.vs.map((x, j) => (j !== i && x === v ? "" : x)); S.vs[i] = v; renderVs();
+  }));
+  $("#vsScope").onchange = (e) => { S.vsScope = e.target.value; renderVs(); };
+  $("#askVs").onclick = () => openChat({ label: `${cids.map((id) => D.candById.get(id).name).join(" vs ")} · ${scopeName}`, cids, sids });
+
+  if (tooMany || cids.length < 2) {
+    $("#aiVs").innerHTML = `<div class="ai-head"><h3>Analyse comparative</h3></div><p class="note">${tooMany ? "Analyse indisponible au-delà de 2 candidats sur le programme complet." : "Choisis au moins deux candidats."}</p>`;
+  } else {
+    setupAnalysis($("#aiVs"), { kind: S.vsScope === "all" ? "full" : "vs", cids, sids, label: `${cids.map((id) => D.candById.get(id).name).join(" vs ")} — ${scopeName}` });
+  }
+
+  const shown = tooMany ? cids.slice(0, 2) : cids;
+  if (!shown.length) { $("#vsGrid").innerHTML = ""; return; }
+  const cols = shown.length;
+  const rows = sids.filter((sid) => shown.some((cid) => propsOf(cid, sid).length));
+  $("#vsGrid").innerHTML = `<div class="vs-table"><div class="vs-heads"><div class="vs-row" style="--cols:${cols};margin:0">${shown.map((cid) => { const c = D.candById.get(cid); return `<div class="vs-cell" style="--c:${SLOT[S.vs.indexOf(cid)]}"><span class="ini">${initials(c.name)}</span>${esc(c.name)} ${partyLine(c)}</div>`; }).join("")}</div></div>
+    ${rows.map((sid) => `<div class="vs-sub">${esc(D.subById.get(sid).name)}${sids.length > 1 && S.vsScope === "all" ? `<span class="eyebrow">${esc(D.themeOfSub.get(sid).name)}</span>` : ""}</div>
+      <div class="vs-row" style="--cols:${cols}">${shown.map((cid) => { const ps = propsOf(cid, sid); return `<div class="vs-cell" style="--c:${SLOT[S.vs.indexOf(cid)]}">${ps.length ? `<ol>${ps.map((p) => `<li>${esc(p.text)}</li>`).join("")}</ol>` : `<span class="muted">Aucune proposition relevée.</span>`}</div>`; }).join("")}</div>`).join("")}
+    ${rows.length ? "" : `<div class="emptystate">Aucune proposition relevée pour ces candidats sur ce périmètre.</div>`}</div>`;
+}
+
+// ---------- discussion ----------
+const MAX_CTX = 60000;
+function searchProps(q, limit = 30) {
+  const words = norm(q).split(/[^a-z0-9]+/).filter((w) => w.length > 3);
+  if (!words.length) return [];
+  const hits = [];
+  for (const [k, ps] of D.props) {
+    const [cid, sid] = k.split("|");
+    for (const p of ps) { const t = norm(p.text); const sc = words.reduce((n, w) => n + (t.includes(w) ? 1 : 0), 0); if (sc) hits.push({ sc, cid, sid, text: p.text }); }
+  }
+  return hits.sort((a, b) => b.sc - a.sc).slice(0, limit);
+}
+function findCand(q) { const n = norm(q); return D.cands.find((c) => c.id === q || norm(c.name).includes(n) || norm(c.name.split(" ").slice(-1)[0]) === n); }
+
+const TOOLS = [
+  { name: "propositions_candidat", description: "Renvoie les propositions relevées d'un candidat, éventuellement filtrées par thème (nom de thème ou de sous-thème, partiel). Retourne une liste {sous_theme, propositions}.",
+    inputSchema: { type: "object", properties: { candidat: { type: "string", description: "Nom ou nom de famille" }, theme: { type: "string" } }, required: ["candidat"] },
+    execute(i) {
+      const c = findCand(String(i.candidat || "")); if (!c) throw new Error("Candidat inconnu. Candidats : " + D.cands.map((x) => x.name).join(", "));
+      const tq = norm(i.theme || "");
+      const res = [];
+      for (const t of D.themes) for (const s of t.subs) {
+        if (tq && !norm(t.name).includes(tq) && !norm(s.name).includes(tq)) continue;
+        const ps = propsOf(c.id, s.id); if (ps.length) res.push({ sous_theme: `${t.name} > ${s.name}`, propositions: ps.map((p) => p.text) });
+      }
+      return JSON.stringify({ candidat: c.name, parti: c.party, resultats: res }).slice(0, 30000);
+    } },
+  { name: "rechercher_propositions", description: "Recherche par mots-clés dans toutes les propositions de tous les candidats. Retourne jusqu'à 30 résultats {candidat, sous_theme, texte}.",
+    inputSchema: { type: "object", properties: { mots_cles: { type: "string" } }, required: ["mots_cles"] },
+    execute(i) { return searchProps(String(i.mots_cles || "")).map((h) => ({ candidat: D.candById.get(h.cid).name, sous_theme: D.subById.get(h.sid).name, texte: h.text })); } },
+];
+
+function catalog() {
+  return "CANDIDATS (nombre de propositions relevées) : " + D.cands.map((c) => `${c.name} [${partyText(c)}] (${countCand(c.id)})`).join(", ")
+    + "\nLes positions (blocs) sont celles de la grille administrative du ministère de l'Intérieur (circulaire du 2 février 2026), contestée par certains partis ; présente-les comme telles si tu les mentionnes."
+    + "\nTHÈMES : " + D.themes.map((t) => `${t.name} : ${t.subs.map((s) => s.name).join(", ")}`).join(" | ");
+}
+
+function openChat(ctx) {
+  if (ctx) {
+    if (!S.conv || S.conv.messages.length) newConversation(ctx); else { S.conv.context = ctx; }
+  } else if (!S.conv) newConversation(null);
+  $("#drawer").classList.add("open");
+  renderChat();
+  setTimeout(() => $("#chatInput").focus(), 50);
+}
+function newConversation(ctx) {
+  S.conv = { id: newId("conv"), type: "conv", title: "", context: ctx || null, messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+}
+function renderChat() {
+  const c = S.conv;
+  $("#dctx").innerHTML = c.context ? `<span class="eyebrow">Contexte</span> ${esc(c.context.label)} <button class="pinbtn" id="clearCtx">retirer</button>` : `<span class="eyebrow">Contexte</span> tout le comparateur`;
+  const cc = $("#clearCtx"); if (cc) cc.onclick = () => { c.context = null; renderChat(); };
+  const box = $("#msgs");
+  box.innerHTML = c.messages.length ? "" : `<div class="emptystate">Pose une question sur les programmes : différences entre candidats, conséquences d'une mesure, coût annoncé… Les réponses s'appuient sur les propositions relevées et restent neutres. Chaque échange est enregistré dans l'onglet Historique.</div>`;
+  c.messages.forEach((m, i) => box.appendChild(msgEl(m, i)));
+  box.scrollTop = box.scrollHeight;
+  const sug = c.context ? ["Quelles sont les principales différences ?", "Quelles conséquences pour les ménages ?", "Qu'est-ce qui est chiffré, et comment ?"] : ["Qui propose de baisser les impôts, et lesquels ?", "Compare les positions sur les retraites", "Quelles mesures sur le logement ?"];
+  $("#sugg").innerHTML = c.messages.length ? "" : sug.map((s) => `<button type="button">${esc(s)}</button>`).join("");
+  $("#sugg").querySelectorAll("button").forEach((b) => (b.onclick = () => { $("#chatInput").value = b.textContent; sendChat(); }));
+}
+function msgEl(m) {
+  const d = document.createElement("div");
+  d.className = "msg " + m.role;
+  if (m.role === "user") d.textContent = m.content;
+  else {
+    d.innerHTML = `<div class="prose">${md(m.content)}</div>${m.error ? `<div class="err">${esc(m.error)}</div>` : ""}<div class="acts"><button class="pinbtn">Ajouter au récap</button></div>`;
+    d.querySelector(".pinbtn").onclick = () => addPin(m.content, S.conv.title || "Discussion");
+  }
+  return d;
+}
+
+async function sendChat() {
+  const input = $("#chatInput"), q = input.value.trim();
+  if (!q || S.chatCtl) return;
+  const sample = await getSample();
+  if (!sample) { toast("La discussion fonctionne quand la page est ouverte dans Claude."); return; }
+  const c = S.conv;
+  input.value = "";
+  c.messages.push({ role: "user", content: q, t: Date.now() });
+  if (!c.title) c.title = q.slice(0, 90);
+  renderChat();
+  const bubble = document.createElement("div"); bubble.className = "msg assistant";
+  bubble.innerHTML = `<div class="thinking"><span class="dot"></span>Claude cherche dans les programmes…</div>`;
+  $("#msgs").appendChild(bubble); $("#msgs").scrollTop = 1e9;
+
+  let ctxText = "";
+  if (c.context) ctxText += `\nCONTEXTE SÉLECTIONNÉ PAR L'UTILISATEUR : ${c.context.label}\n${propsBlock(c.context.cids.length ? c.context.cids : D.cands.map((x) => x.id), c.context.sids)}`;
+  if (c.context?.analysis) ctxText += `\n\nANALYSE COMPARATIVE DÉJÀ AFFICHÉE À L'UTILISATEUR (JSON) :\n${JSON.stringify(c.context.analysis).slice(0, 15000)}`;
+  const hits = searchProps(q, 25);
+  if (hits.length) ctxText += `\n\nPROPOSITIONS CORRESPONDANT AUX MOTS DE LA QUESTION :\n` + hits.map((h) => `- ${D.candById.get(h.cid).name} [${D.subById.get(h.sid).name}] : ${h.text}`).join("\n");
+  ctxText = ctxText.slice(0, MAX_CTX);
+
+  const limits = await sample.limits().catch(() => null);
+  const useTools = !!limits?.tools;
+  const rules = `${RULES}\n- Réponds de façon claire et structurée (titres courts, listes), sans tableaux. Cite les candidats nommément. Termine si utile par ce qui reste incertain ou non précisé.\n${useTools ? "- Utilise les outils propositions_candidat et rechercher_propositions pour vérifier ce que disent les programmes avant d'affirmer quoi que ce soit sur un candidat." : ""}\n\n${catalog()}\n${ctxText}`;
+  const turns = [{ role: "user", content: rules }, ...c.messages.slice(-16).map((m) => ({ role: m.role, content: m.content }))];
+
+  S.chatCtl = new AbortController();
+  $("#stopChat").hidden = false; $("#sendChat").disabled = true;
+  const reply = { role: "assistant", content: "", t: Date.now() };
+  try {
+    const opts = { signal: S.chatCtl.signal, onText: ({ text }) => { bubble.innerHTML = `<div class="prose">${md(text)}</div>`; $("#msgs").scrollTop = 1e9; } };
+    if (useTools) opts.tools = TOOLS.map((t) => ({ ...t, execute: (i) => { bubble.querySelector(".thinking") && (bubble.querySelector(".thinking").lastChild.textContent = "Claude consulte les propositions…"); return t.execute(i); } }));
+    else opts.cache = false;
+    const { text, truncated } = await sample(turns, opts);
+    reply.content = text + (truncated ? "\n\n*(réponse interrompue : pose une question plus ciblée)*" : "");
+  } catch (e) {
+    reply.content = e?.text || "";
+    if (e?.code !== "cancelled") reply.error = aiErr(e);
+    if (!reply.content && e?.code === "cancelled") reply.content = "*(réponse arrêtée)*";
+    if (!reply.content) reply.content = "—";
+  } finally {
+    S.chatCtl = null; $("#stopChat").hidden = true; $("#sendChat").disabled = false;
+  }
+  c.messages.push(reply);
+  c.updatedAt = Date.now();
+  bubble.replaceWith(msgEl(reply));
+  await Store.put(JSON.parse(JSON.stringify(c)));
+  if (S.view === "history") renderHistory();
+}
+
+// ---------- récap & historique ----------
+async function addPin(text, source) {
+  if (!text) return;
+  await Store.put({ id: newId("pin"), type: "pin", text, source, createdAt: Date.now() });
+  toast("Ajouté au récap");
+  if (S.view === "recap") renderRecap();
+}
+
+function renderHistory() {
+  const el = $("#view-history");
+  const convs = Store.list("conv"), ans = Store.list("analysis");
+  const store = Store.db ? "Enregistré dans ton espace privé de cette page." : "Enregistré dans ce navigateur uniquement.";
+  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">Suivi</div><h2>Historique de nos échanges</h2></div><span class="note">${store}</span></div>
+    <div class="two"><div><h3 style="font-size:18px;margin-bottom:10px">Discussions (${convs.length})</h3>
+      <div class="list">${convs.length ? convs.map((c) => `<div class="item"><div style="min-width:0"><div class="meta">${fmtDate(c.updatedAt)} · ${c.messages.length} messages${c.context ? " · " + esc(c.context.label) : ""}</div><h4>${esc(c.title || "Sans titre")}</h4>
+        <div class="note">${esc((c.messages.find((m) => m.role === "assistant")?.content || "").replace(/[#*`]/g, "").slice(0, 160))}…</div></div>
+        <div style="display:flex;gap:6px;flex:none"><button class="btn sm" data-open="${c.id}">Reprendre</button><button class="btn sm" data-del="${c.id}" aria-label="Supprimer">Suppr.</button></div></div>`).join("")
+      : `<div class="emptystate">Aucune discussion pour l'instant. Clique sur « Poser une question » pour commencer ; chaque conversation apparaîtra ici.</div>`}</div></div>
+    <div><h3 style="font-size:18px;margin-bottom:10px">Analyses générées (${ans.length})</h3>
+      <div class="list">${ans.length ? ans.map((a) => `<div class="item"><div style="min-width:0"><div class="meta">${fmtDate(a.createdAt)} · <span class="kind">${a.kind === "theme" ? "thème" : a.kind === "full" ? "programme complet" : "face-à-face"}</span></div><h4>${esc(a.label)}</h4></div>
+        <button class="btn sm" data-goto="${a.id}" style="flex:none">Voir</button></div>`).join("") : `<div class="emptystate">Les analyses comparatives que tu lances apparaîtront ici.</div>`}</div></div></div>`;
+  el.querySelectorAll("[data-open]").forEach((b) => (b.onclick = () => { S.conv = JSON.parse(JSON.stringify(Store.items.get(b.dataset.open))); openChat(); }));
+  el.querySelectorAll("[data-del]").forEach((b) => {
+    b.onclick = async () => {
+      if (b.dataset.confirm) { await Store.del(b.dataset.del); if (S.conv?.id === b.dataset.del) S.conv = null; renderHistory(); }
+      else { b.dataset.confirm = "1"; b.textContent = "Confirmer"; }
+    };
+  });
+  el.querySelectorAll("[data-goto]").forEach((b) => (b.onclick = () => {
+    const a = Store.items.get(b.dataset.goto);
+    if (a.kind === "theme") { S.sub = a.sids[0]; S.themeSel = { sub: a.sids[0], ids: new Set(a.cids) }; setView("theme"); }
+    else { S.vs = [0, 1, 2, 3].map((i) => a.cids[i] || ""); S.vsScope = a.scope || (a.kind === "full" ? "all" : "s:" + a.sids[0]); setView("vs"); }
+  }));
+}
+
+function renderRecap() {
+  const el = $("#view-recap");
+  const pins = Store.list("pin"), recap = Store.items.get("recap");
+  const convs = Store.list("conv");
+  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">Ce que nous avons établi</div><h2>Récapitulatif</h2></div>
+    <button class="btn primary" id="genRecap" ${convs.length || pins.length ? "" : "disabled"}>${recap ? "Mettre à jour la synthèse" : "Générer la synthèse"}</button></div>
+    <div class="two"><div class="ai" style="margin:0"><div class="ai-head"><h3>Synthèse de nos échanges</h3>${recap ? `<span class="note">màj ${fmtDate(recap.updatedAt)} · ${recap.basis}</span>` : ""}</div>
+      <div class="prose" id="recapOut" style="margin-top:8px">${recap ? md(recap.text) : `<div class="emptystate">La synthèse regroupe, thème par thème, ce qui est ressorti de tes discussions et des éléments épinglés. Elle se génère à partir de l'historique (${convs.length} discussion(s), ${pins.length} élément(s) épinglé(s)).</div>`}</div></div>
+    <div><h3 style="font-size:18px;margin-bottom:10px">Éléments épinglés (${pins.length})</h3>
+      <div class="list">${pins.length ? pins.map((p) => `<div class="item" style="display:block"><div class="meta">${fmtDate(p.createdAt)} · ${esc(p.source)}</div><div class="prose" style="font-size:14px">${md(p.text.length > 700 ? p.text.slice(0, 700) + "…" : p.text)}</div><button class="pinbtn" data-unpin="${p.id}">Retirer</button></div>`).join("")
+        : `<div class="emptystate">Utilise « Ajouter au récap » sous une réponse de la discussion ou sous une analyse pour garder un point ici.</div>`}</div></div></div>`;
+  el.querySelectorAll("[data-unpin]").forEach((b) => (b.onclick = async () => { await Store.del(b.dataset.unpin); renderRecap(); }));
+  $("#genRecap").onclick = generateRecap;
+}
+
+async function generateRecap() {
+  const sample = await getSample();
+  if (!sample) { toast("La synthèse fonctionne quand la page est ouverte dans Claude."); return; }
+  const btn = $("#genRecap"), out = $("#recapOut");
+  const pins = Store.list("pin"), convs = Store.list("conv").slice(0, 40);
+  btn.disabled = true;
+  out.innerHTML = `<div class="thinking"><span class="dot"></span>Claude relit ${convs.length} discussion(s) et ${pins.length} élément(s) épinglé(s)…</div>`;
+  let material = "ÉLÉMENTS ÉPINGLÉS :\n" + (pins.map((p) => `• [${p.source}] ${p.text}`).join("\n") || "aucun");
+  material += "\n\nDISCUSSIONS :\n" + convs.map((c) => `## ${c.title} (${new Date(c.updatedAt).toLocaleDateString("fr-FR")})\n` + c.messages.map((m) => `${m.role === "user" ? "Question" : "Réponse"} : ${m.content}`).join("\n")).join("\n\n");
+  material = material.slice(0, 150000);
+  const prompt = `${RULES}\n\nTÂCHE : rédige le récapitulatif de ce que l'utilisateur et l'assistant ont dégagé ensemble dans leurs échanges sur les programmes 2027. Organise-le en Markdown :\n## Vue d'ensemble (3-4 phrases)\n## Par thème (un ### par thème abordé : constats factuels établis, différences entre candidats, conséquences évoquées)\n## Comparaisons de candidats réalisées\n## Questions restées ouvertes ou informations manquantes\nN'ajoute rien qui ne soit pas dans les échanges. Reste neutre. Pas de tableaux.\n\n${material}`;
+  try {
+    const { text } = await sample(prompt, { cache: false, onText: ({ text }) => { out.innerHTML = md(text); } });
+    await Store.put({ id: "recap", type: "recap", text, basis: `${convs.length} discussion(s), ${pins.length} épinglé(s)`, updatedAt: Date.now() });
+    renderRecap();
+  } catch (e) { out.innerHTML = `<p class="err">${esc(aiErr(e))}</p>`; btn.disabled = false; }
+}
+
+// ---------- démarrage ----------
+document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setView(b.dataset.view)));
+$("#openChat").onclick = () => openChat();
+$("#closeChat").onclick = () => $("#drawer").classList.remove("open");
+$("#newConv").onclick = () => { newConversation(null); renderChat(); };
+$("#stopChat").onclick = () => S.chatCtl?.abort();
+$("#composer").onsubmit = (e) => { e.preventDefault(); sendChat(); };
+$("#chatInput").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#drawer").classList.remove("open"); });
+
+(async () => {
+  try { await loadData(); }
+  catch { $("#srcline").textContent = "Les données n'ont pas pu être chargées. Recharge la page."; return; }
+  const fisc = D.themes.flatMap((t) => t.subs).find((s) => norm(s.name).includes("fiscalit"));
+  S.sub = (fisc || D.themes[0].subs[0]).id;
+  const alpha = [...D.cands].filter((c) => countCand(c.id)).sort(byLast);
+  S.vs = [alpha[0]?.id || "", alpha[1]?.id || "", "", ""];
+  S.vsScope = "s:" + S.sub;
+  const h = location.hash.slice(1);
+  setView(["vs", "history", "recap"].includes(h) ? h : "theme");
+  await Store.init();
+  ({ theme: renderTheme, vs: renderVs, history: renderHistory, recap: renderRecap })[S.view]();
+})();
+</script>

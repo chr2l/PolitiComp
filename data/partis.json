@@ -1,0 +1,28 @@
+{
+  "updatedAt": "2026-10-04",
+  "methode": "Position = bloc de clivage du ministère de l'Intérieur (circulaire NOR INTP2602966C du 2 février 2026, annexe 3), grille officielle utilisée pour agréger les résultats électoraux, validée par le Conseil d'État le 27 février 2026 (n° 512694). Quand le parti n'a pas de nuance propre, le classement est fait par analogie avec la nuance « divers » correspondante, et c'est indiqué. C'est un classement administratif, que certains partis contestent.",
+  "sourceUrl": "https://www.legifrance.gouv.fr/circulaire/id/45645",
+  "blocs": ["Extrême gauche", "Gauche", "Centre", "Droite", "Extrême droite"],
+  "candidats": {
+    "10620": { "parti": "Lutte ouvrière", "sigle": "LO", "bloc": "Extrême gauche", "nuance": "EXG", "base": "nuance officielle" },
+    "7804":  { "parti": "Renaissance", "sigle": "RE", "bloc": "Centre", "nuance": "REN", "base": "nuance officielle" },
+    "53":    { "parti": "Candidat indépendant (membre des Républicains)", "sigle": "IND", "bloc": "Droite", "nuance": "DVD", "base": "par analogie : candidature déclarée hors investiture LR (août 2026)" },
+    "10361": { "parti": "La Convention", "sigle": "LC", "bloc": "Gauche", "nuance": "DVG", "base": "par analogie : parti sans nuance propre, fondé après son départ du PS en 2022" },
+    "10536": { "parti": "Debout la France", "sigle": "DLF", "bloc": "Droite", "nuance": "DSV", "base": "nuance officielle (droite souverainiste)" },
+    "10357": { "parti": "Parti socialiste", "sigle": "PS", "bloc": "Gauche", "nuance": "SOC", "base": "nuance officielle" },
+    "7806":  { "parti": "Place publique", "sigle": "PP", "bloc": "Gauche", "nuance": "PLP", "base": "nuance officielle" },
+    "8413":  { "parti": "Parti socialiste", "sigle": "PS", "bloc": "Gauche", "nuance": "SOC", "base": "nuance officielle" },
+    "37":    { "parti": "Parti socialiste", "sigle": "PS", "bloc": "Gauche", "nuance": "SOC", "base": "nuance officielle" },
+    "8254":  { "parti": "Rassemblement national", "sigle": "RN", "bloc": "Extrême droite", "nuance": "RN", "base": "nuance officielle", "note": "Le RN conteste le qualificatif d'extrême droite." },
+    "8039":  { "parti": "Nouvelle Énergie", "sigle": "NE", "bloc": "Droite", "nuance": "DVD", "base": "par analogie : parti sans nuance propre (départ de LR le 31 mars 2026)" },
+    "10767": { "parti": "Gauche républicaine et socialiste", "sigle": "GRS", "bloc": "Gauche", "nuance": "DVG", "base": "par analogie : parti sans nuance propre" },
+    "65":    { "parti": "La France insoumise", "sigle": "LFI", "bloc": "Extrême gauche", "nuance": "FI", "base": "nuance officielle", "note": "Classée à gauche jusqu'en 2024, à l'extrême gauche depuis la circulaire de 2026 ; LFI, qui se définit comme « gauche radicale », a contesté ce classement (recours rejeté par le Conseil d'État)." },
+    "7805":  { "parti": "Horizons", "sigle": "HOR", "bloc": "Centre", "nuance": "HOR", "base": "nuance officielle" },
+    "7803":  { "parti": "Les Républicains", "sigle": "LR", "bloc": "Droite", "nuance": "LR", "base": "nuance officielle" },
+    "14":    { "parti": "Parti communiste français", "sigle": "PCF", "bloc": "Gauche", "nuance": "COM", "base": "nuance officielle" },
+    "10360": { "parti": "Parti socialiste", "sigle": "PS", "bloc": "Gauche", "nuance": "SOC", "base": "nuance officielle" },
+    "8455":  { "parti": "Debout !", "sigle": "Debout !", "bloc": "Gauche", "nuance": "DVG", "base": "nuance officielle de liste « divers gauche » (Debout ! y est cité nommément)" },
+    "8038":  { "parti": "Les Écologistes", "sigle": "LE", "bloc": "Gauche", "nuance": "VEC", "base": "nuance officielle" },
+    "8298":  { "parti": "Reconquête", "sigle": "REC", "bloc": "Extrême droite", "nuance": "REC", "base": "nuance officielle" }
+  }
+}

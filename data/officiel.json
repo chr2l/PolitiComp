@@ -1,0 +1,11 @@
+{
+  "updatedAt": "2026-10-04",
+  "note": "Propositions complémentaires issues uniquement de sources officielles (programme publié par le candidat ou son parti, site officiel de campagne, Conseil constitutionnel, CNCCFP). Chaque entrée : candidateId et subId (identifiants de data/ifrap.json), text, source, url, date.",
+  "sources": [
+    { "name": "Fondation IFRAP – comparateur Présidentielles 2027", "url": "https://www.ifrap.org/comparateurs/presidentielles-2027" },
+    { "name": "Conseil constitutionnel – élection présidentielle (liste officielle des candidats, parrainages)", "url": "https://www.conseil-constitutionnel.fr" },
+    { "name": "CNCCFP – comptes de campagne", "url": "https://www.cnccfp.fr" },
+    { "name": "Sites et programmes officiels publiés par les candidats et leurs partis", "url": "" }
+  ],
+  "items": []
+}
