@@ -5,6 +5,10 @@ Contexte à relire en début de session. À tenir à jour.
 ## En bref
 Comparateur politique : site statique (site/), données JSON (data/), scripts.
 
+## Déploiement
+Auto sur le serveur (dépôt chr2l/serveur) : chaque commit sur `main` est déployé en moins de 5 min.
+Adresse : http://[adresse interne retirée] — tuile « * PolitiComp ».
+
 ## Branches
 - `main` : version stable / déployée.
 - `dev` : travail en cours. Merge `dev` → `main` quand c'est testé.
