@@ -32,3 +32,43 @@ Thumbs.db
 .idea/
 .claude/settings.local.json
 
+
+# --- Infos sensibles (filet de sécurité, même en dépôt privé) ---
+# Variables d environnement et secrets
+.env
+.env.*
+*.env
+!.env.example
+!*.env.example
+secrets.*
+*secret*.json
+*secret*.txt
+*credentials*
+*.local.json
+.npmrc
+.pypirc
+.netrc
+# Clés et certificats
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.jks
+*.keystore
+*.ppk
+id_rsa*
+id_ed25519*
+*.kdbx
+# Bases, sauvegardes et exports de données
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz
+*.backup*
+*.bak
+# Journaux
+*.log
