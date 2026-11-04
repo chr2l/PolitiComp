@@ -32,3 +32,4 @@ Rien de sensible repéré.
 - 2026-11-04 : bouton « Connecter mon IA » (IA locale ou clé d'API, directement depuis le navigateur).
 - 2026-11-04 : clés d'API retirées ; « Connecter mon IA » lance une IA gratuite dans le navigateur (WebLLM).
 - 2026-11-04 : connecteur MCP (/mcp) pour brancher Claude / ChatGPT sans clé.
+- 2026-11-04 : boutons « Ajouter à Claude / ChatGPT » (lien claude.ai pré-rempli non officiel + adresse copiée).

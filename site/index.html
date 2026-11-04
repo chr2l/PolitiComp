@@ -58,6 +58,8 @@ dialog.llm .acts { display: flex; gap: 8px; justify-content: flex-end; flex-wrap
 main { padding-block: 20px 60px }
 .btn { border: 1px solid var(--line); background: var(--surface); padding: 7px 12px; border-radius: 8px; cursor: pointer; font-weight: 500 }
 .btn:hover { border-color: var(--muted) }
+a.btn { text-decoration: none; color: var(--ink); display: inline-block }
+a.btn.primary { color: var(--accent-ink) }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
 .btn:disabled { opacity: .5; cursor: not-allowed }
 .btn.sm { padding: 4px 9px; font-size: 13px }
@@ -229,16 +231,18 @@ table.pos tr:last-child td { border-bottom: 0 }
 <dialog class="llm" id="llmDlg">
   <form method="dialog" id="llmForm">
     <h3>Connecter mon IA</h3>
-    <p class="help">Gratuit, sans compte et sans clé. L'IA tourne sur ton ordinateur, dans ton navigateur. Tes questions ne quittent pas ta machine et rien ne passe par ce site.</p>
-    <div class="acts" style="justify-content:flex-start"><button type="button" class="btn primary" id="webGo">Lancer l'IA dans mon navigateur</button></div>
-    <p class="help" id="webInfo">Au premier lancement, le modèle (environ 2 Go) est téléchargé une seule fois, puis gardé par ton navigateur. Il faut un ordinateur assez récent et Chrome ou Edge à jour. Les réponses sont plus simples que celles des grandes IA en ligne.</p>
-    <progress id="webProg" max="1" value="0" hidden style="width:100%"></progress>
-    <p class="help" id="webStatus" role="status"></p>
-    <details id="llmMcp"><summary class="help" style="cursor:pointer">J'utilise Claude ou ChatGPT : l'ajouter comme connecteur</summary>
-      <p class="help">Tu poses tes questions dans ton IA habituelle, qui va lire les propositions sur ce site. Dans ses réglages, ouvre « Connecteurs », choisis « Ajouter un connecteur personnalisé » et colle cette adresse :</p>
-      <div class="acts" style="justify-content:flex-start;align-items:center"><code id="mcpUrl"></code><button type="button" class="btn sm" id="mcpCopy">Copier</button></div>
+    <p class="help">Gratuit, sans clé, sans compte chez nous.</p>
+    <details id="llmMcp" open><summary style="cursor:pointer;font-weight:600">Avec mon Claude ou mon ChatGPT (le plus simple)</summary>
+      <p class="help">Tu poses tes questions dans ton IA habituelle, qui vient lire les propositions sur ce site. Clique, puis valide « Ajouter » dans ton IA.</p>
+      <div class="acts" style="justify-content:flex-start"><a class="btn primary" id="mcpClaude" target="_blank" rel="noopener noreferrer">Ajouter à Claude</a><a class="btn" id="mcpGpt" target="_blank" rel="noopener noreferrer">Ajouter à ChatGPT</a></div>
+      <p class="help">L'adresse du connecteur est copiée en même temps. Si le formulaire s'ouvre vide, colle-la dans le champ « URL » : <code id="mcpUrl"></code> <button type="button" class="btn sm" id="mcpCopy">Copier</button></p>
       <p class="help">Ni compte ni clé chez nous. Selon ton offre Claude ou ChatGPT, les connecteurs personnalisés peuvent ne pas être disponibles.</p>
     </details>
+    <p style="font-weight:600;margin:14px 0 0">Ou sans compte, dans mon navigateur</p>
+    <div class="acts" style="justify-content:flex-start"><button type="button" class="btn primary" id="webGo">Lancer l'IA dans mon navigateur</button></div>
+    <p class="help" id="webInfo">L'IA tourne sur ton ordinateur : tes questions ne quittent pas ta machine. Au premier lancement, le modèle (environ 2 Go) est téléchargé une seule fois, puis gardé par ton navigateur. Il faut un ordinateur assez récent et Chrome ou Edge à jour. Les réponses sont plus simples que celles des grandes IA en ligne.</p>
+    <progress id="webProg" max="1" value="0" hidden style="width:100%"></progress>
+    <p class="help" id="webStatus" role="status"></p>
     <details id="llmAdv"><summary class="help" style="cursor:pointer">J'ai déjà Ollama ou LM Studio sur mon ordinateur</summary>
       <label for="llmKind">Logiciel</label>
       <select id="llmKind"><option value="ollama">Ollama</option><option value="lmstudio">LM Studio</option></select>
@@ -989,8 +993,14 @@ $("#webGo").onclick = async () => {
     $("#llmDlg").close(); await setLlm({ kind: "web" }); toast("IA prête, sur ta machine.");
   } catch (e) { prog.hidden = true; go.disabled = false; st.textContent = aiErr(e); }
 };
-$("#mcpUrl").textContent = location.origin + "/mcp";
-$("#mcpCopy").onclick = () => copyForLLM(location.origin + "/mcp");
+// Liens qui ouvrent l'ajout de connecteur. Le pré-remplissage de Claude n'est pas documenté officiellement :
+// on passe les deux variantes de paramètres connues, et on copie l'adresse au cas où.
+const MCP_URL = location.origin + "/mcp";
+$("#mcpUrl").textContent = MCP_URL;
+$("#mcpClaude").href = "https://claude.ai/customize/connectors?" + new URLSearchParams({ modal: "add-custom-connector", connectorName: "PolitiComp", connectorUrl: MCP_URL, mcpName: "PolitiComp", mcpServerUrl: MCP_URL });
+$("#mcpGpt").href = "https://chatgpt.com/#settings/Connectors";
+const copyMcp = () => copyForLLM(MCP_URL);
+$("#mcpCopy").onclick = copyMcp; $("#mcpClaude").addEventListener("click", copyMcp); $("#mcpGpt").addEventListener("click", copyMcp);
 $("#llmKind").onchange = (e) => llmFormKind(e.target.value);
 $("#llmTest").onclick = llmTest;
 $("#llmCancel").onclick = () => $("#llmDlg").close();
