@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conditions et confidentialité</title>
+<style>
+:root { --paper: #F3F4F6; --surface: #FFFFFF; --ink: #172030; --muted: #5A6476; --line: #D9DDE5; --accent: #2647A8; --ok: #2F7A3E; }
+@media (prefers-color-scheme: dark) { :root { --paper: #10141B; --surface: #171C26; --ink: #E5E8EE; --muted: #9AA3B3; --line: #2A3242; --accent: #8FA9F3; --ok: #6CC27D; color-scheme: dark } }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif }
+main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px }
+h1 { font-size: 28px; margin: 0 0 4px }
+h2 { font-size: 19px; margin: 32px 0 8px }
+a { color: var(--accent) }
+.muted { color: var(--muted); font-size: 14px }
+.box { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--ok); border-radius: 10px; padding: 14px 18px; margin: 20px 0 }
+.box p { margin: 0 }
+ul { padding-left: 22px }
+li { margin: 4px 0 }
+</style>
+</head>
+<body>
+<main>
+  <p class="muted"><a href="/">← Retour au comparateur</a></p>
+  <h1>Conditions d'utilisation et confidentialité</h1>
+  <p class="muted">PolitiComp · comparateur des programmes de la présidentielle 2027 · mise à jour le 4 novembre 2026</p>
+
+  <div class="box"><p><strong>En bref : nous ne récupérons rien. Aucune donnée, aucune question, aucune conversation.</strong> Pas de compte, pas de cookie, pas de mesure d'audience, pas de publicité, pas de traceur.</p></div>
+
+  <h2>1. Ce que fait ce site</h2>
+  <p>PolitiComp met à disposition, gratuitement, les propositions publiées par les candidats à l'élection présidentielle de 2027, classées par thème, avec leurs sources. Il héberge seulement ce comparateur et ces données.</p>
+  <p>Le site n'appelle aucune intelligence artificielle. Si vous voulez poser des questions à une IA, vous utilisez <strong>votre propre IA</strong> (ChatGPT, Claude, Mistral, Gemini, un modèle installé chez vous…), avec votre propre compte, et vous lui donnez l'adresse <a href="/llms.txt">/llms.txt</a> ou vous collez le texte copié depuis le comparateur.</p>
+
+  <h2>2. Données personnelles : rien n'est collecté</h2>
+  <ul>
+    <li>Pas de formulaire, pas d'inscription, pas de compte.</li>
+    <li>Pas de cookie, pas de mesure d'audience (aucun Google Analytics ou équivalent), pas de publicité, pas de pixel ni de traceur.</li>
+    <li>Aucune ressource n'est chargée depuis un autre site (pas de polices, scripts ou images externes) : votre navigateur ne contacte que ce site.</li>
+    <li>Vos questions, vos sélections et vos discussions ne sont jamais envoyées à notre serveur.</li>
+    <li>Comme pour toute page web, votre navigateur doit envoyer son adresse IP au serveur pour recevoir la page. Nous ne l'enregistrons pas et nous ne gardons aucun journal de visites.</li>
+  </ul>
+
+  <h2>3. Ce qui reste dans votre navigateur</h2>
+  <p>L'historique et le récapitulatif du comparateur sont enregistrés <strong>uniquement dans votre navigateur</strong> (stockage local), sur votre appareil. Ils ne quittent jamais votre appareil et nous n'y avons pas accès. Vous pouvez les effacer à tout moment depuis le comparateur ou en vidant les données du site dans votre navigateur.</p>
+
+  <h2>4. Votre IA, vos règles</h2>
+  <p>Quand vous utilisez une IA avec ce comparateur, l'échange se fait directement entre vous et le service d'IA que vous avez choisi. Il ne passe pas par notre serveur. Ce sont alors les conditions et la politique de confidentialité de ce service qui s'appliquent ; lisez-les. Nous ne stockons aucune clé d'API, aucun identifiant et aucun mot de passe.</p>
+  <p>Si vous ouvrez le comparateur à l'intérieur de Claude (claude.ai), les fonctions d'analyse utilisent votre propre compte Claude et vos discussions sont enregistrées dans votre espace Claude, selon les conditions d'Anthropic. Nous n'y avons pas accès.</p>
+
+  <h2>5. Neutralité et sources</h2>
+  <ul>
+    <li>Le comparateur ne soutient aucun candidat, parti ou courant, et ne donne aucune consigne de vote.</li>
+    <li>La source principale est le <a href="https://www.ifrap.org/comparateurs/presidentielles-2027" rel="noopener">comparateur de la Fondation IFRAP</a> (think tank d'orientation libérale). Des propositions issues de sources officielles des candidats peuvent s'y ajouter, chacune avec son lien.</li>
+    <li>La position des partis suit le <a href="https://www.legifrance.gouv.fr/circulaire/id/45645" rel="noopener">classement officiel du ministère de l'Intérieur (2026)</a>, que certains partis contestent ; c'est indiqué quand c'est le cas.</li>
+    <li>Les IA qui lisent ce site reçoivent des <a href="/llms.txt">consignes</a> : rester impartiales, s'appuyer sur les propositions publiées, citer leurs sources et dire quand une information manque.</li>
+  </ul>
+
+  <h2>6. Limites</h2>
+  <p>Les relevés peuvent être incomplets ou dater ; la date de chaque relevé est affichée. Les réponses d'une IA peuvent contenir des erreurs : vérifiez toujours dans le programme officiel du candidat. Le site est fourni tel quel, sans garantie. Nous ne sommes pas responsables des réponses produites par l'IA que vous utilisez.</p>
+
+  <h2>7. Réutilisation des données</h2>
+  <p>Les données du comparateur sont en lecture libre, sans clé : <a href="/llms-full.txt">texte complet</a>, <a href="/data.json">propositions (JSON)</a>, <a href="/partis.json">partis (JSON)</a>, <a href="/officiel.json">sources officielles (JSON)</a>. Merci de citer les sources d'origine indiquées dans chaque fichier.</p>
+</main>
+</body>
+</html>

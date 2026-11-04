@@ -1,0 +1,3 @@
+# Lecture libre pour tous, y compris les IA. Consignes pour les IA : /llms.txt
+User-agent: *
+Allow: /

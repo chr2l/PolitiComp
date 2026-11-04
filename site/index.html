@@ -1,6 +1,4 @@
 <title>Programmes 2027</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout : barre d'onglets en haut ; vue Thème = index des thèmes à gauche + fiches candidats ; tiroir de discussion à droite. */
 :root {
@@ -44,6 +42,8 @@ nav.tabs button[aria-selected="true"] { background: var(--accent-soft); color: v
 .chat-btn { border: 0; background: var(--accent); color: var(--accent-ink); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 600 }
 .srcline { font-size: 12px; color: var(--muted); padding-block: 6px; border-top: 1px solid var(--line) }
 .srcline a { color: inherit }
+.foot { font-size: 12px; color: var(--muted); padding-block: 24px 40px; border-top: 1px solid var(--line); margin-top: 32px }
+.foot a { color: inherit }
 
 main { padding-block: 20px 60px }
 .btn { border: 1px solid var(--line); background: var(--surface); padding: 7px 12px; border-radius: 8px; cursor: pointer; font-weight: 500 }
@@ -214,6 +214,7 @@ table.pos tr:last-child td { border-bottom: 0 }
       <span><button type="button" class="btn sm" id="stopChat" hidden>Arrêter</button> <button class="btn primary sm" id="sendChat">Envoyer</button></span></div>
   </form>
 </aside>
+<footer class="wrap foot">Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne. · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a></footer>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -372,6 +373,18 @@ function propsBlock(cids, sids) {
   return lines.join("\n");
 }
 
+// ---------- IA du visiteur (le site n'appelle aucune IA lui-même) ----------
+function llmText(spec, task) {
+  const cids = spec.cids?.length ? spec.cids : D.cands.map((c) => c.id);
+  const block = spec.block ?? propsBlock(cids, spec.sids || []);
+  return `${RULES}\n\nConsignes complètes : ${location.origin}/llms.txt · toutes les propositions : ${location.origin}/llms-full.txt\n\n${task}\n\nPÉRIMÈTRE : ${spec.label || "toutes les propositions"}\nPROPOSITIONS RELEVÉES (source : PolitiComp) :${block.slice(0, 80000)}\n\nRAPPEL — ${task}`;
+}
+async function copyForLLM(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); } catch {} t.remove(); }
+  toast("Copié : colle-le dans l'IA de ton choix.");
+}
+
 // ---------- état ----------
 const S = { view: "theme", sub: null, themeSel: null, vs: [], vsScope: "", chatCtx: null, conv: null, chatCtl: null };
 
@@ -436,7 +449,13 @@ async function setupAnalysis(box, spec) {
   const cached = await Store.getAnalysis(key);
   if (box.isConnected && cached?.result) { showAnalysis(box, spec, cached); }
   const sample = await getSample();
-  if (!sample) { btn.disabled = true; btn.title = "Analyse IA disponible uniquement dans Claude"; if (!cached) out.innerHTML = `<p class="note">L'analyse par Claude s'active quand la page est ouverte dans Claude.</p>`; return; }
+  if (!sample) {
+    btn.textContent = "Copier pour mon IA"; btn.title = "Copie les consignes de neutralité et les propositions affichées";
+    if (!cached) out.innerHTML = `<p class="note">Ce site n'appelle aucune IA. Ce bouton copie les consignes de neutralité et les propositions affichées ; colle-les dans l'IA de ton choix (ChatGPT, Claude, Mistral…). Rien n'est envoyé à ce site.</p>`;
+    const sids = spec.sids?.length ? spec.sids : D.themes.flatMap((t) => t.subs.map((s) => s.id));
+    btn.onclick = () => copyForLLM(llmText({ ...spec, sids }, `TÂCHE : analyse comparative neutre de ces propositions : synthèse factuelle, points communs, clivages, puis pour chaque candidat les conséquences possibles (mécanismes, qui paie, qui bénéficie) et les points débattus, toujours attribués.`));
+    return;
+  }
   btn.onclick = () => runAnalysis(box, spec, key);
 }
 
@@ -649,7 +668,12 @@ async function sendChat() {
   const input = $("#chatInput"), q = input.value.trim();
   if (!q || S.chatCtl) return;
   const sample = await getSample();
-  if (!sample) { toast("La discussion fonctionne quand la page est ouverte dans Claude."); return; }
+  if (!sample) {
+    const hits = searchProps(q, 40);
+    const ctx = S.conv?.context || { label: "propositions qui contiennent les mots de la question (le reste est dans llms-full.txt)",
+      block: hits.length ? "\n" + hits.map((h) => `- ${D.candById.get(h.cid).name} [${D.subById.get(h.sid).name}] : ${h.text}`).join("\n") : "\n(aucune proposition ne contient ces mots : consulte llms-full.txt)" };
+    return copyForLLM(llmText(ctx, `QUESTION : ${q}`));
+  }
   const c = S.conv;
   input.value = "";
   c.messages.push({ role: "user", content: q, t: Date.now() });
@@ -747,7 +771,7 @@ function renderRecap() {
 
 async function generateRecap() {
   const sample = await getSample();
-  if (!sample) { toast("La synthèse fonctionne quand la page est ouverte dans Claude."); return; }
+  if (!sample) { toast("La synthèse fonctionne avec une IA intégrée. Ici, utilise « Copier pour mon IA »."); return; }
   const btn = $("#genRecap"), out = $("#recapOut");
   const pins = Store.list("pin"), convs = Store.list("conv").slice(0, 40);
   btn.disabled = true;
@@ -784,6 +808,10 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#drawer
   const h = location.hash.slice(1);
   setView(["vs", "history", "recap"].includes(h) ? h : "theme");
   await Store.init();
+  if (!(await getSample())) {
+    $("#sendChat").textContent = "Copier pour mon IA";
+    $("#chatNote").textContent = "Ce site n'appelle aucune IA : ta question et les propositions sont copiées, à coller dans ton IA.";
+  }
   ({ theme: renderTheme, vs: renderVs, history: renderHistory, recap: renderRecap })[S.view]();
 })();
 </script>
