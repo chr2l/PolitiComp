@@ -8,6 +8,7 @@ Comparateur politique : site statique (site/), données JSON (data/), scripts.
 ## Ouverture aux IA (PR claude/public-llm-access)
 - Le site n'appelle aucune IA : chaque visiteur branche la sienne. Bouton « Connecter mon IA » : gratuit, sans clé ni compte (demande de l'utilisateur : pas d'API payante). Par défaut l'IA tourne dans le navigateur (WebLLM 0.2.84 depuis jsdelivr, modèle Qwen2.5-3B ~2 Go, WebGPU requis : Chrome/Edge récent). Option avancée : Ollama / LM Studio (localhost). Sans IA : « Copier pour mon IA ».
 - Ollama doit autoriser le site : OLLAMA_ORIGINS=<adresse du site>. LM Studio : « Enable CORS ».
+- Connecteur MCP : `scripts/mcp.js`, branché sur /mcp dans serve.js (sans dépendance, sans état, sans journal). Le vrai serveur doit faire tourner ce code Node pour que /mcp marche.
 - Futur domaine public : Élie.place (pas encore en place).
 - `site/llms.txt` = README pour les IA (neutralité, sources). Aussi servi en /README.md.
 - `site/llms-full.txt` = toutes les propositions en texte, régénéré par `node scripts/build-llms.js` (lancé aussi par fetch-ifrap.js).
@@ -30,3 +31,4 @@ Rien de sensible repéré.
 - 2026-11-04 : ouverture aux IA des visiteurs (llms.txt, llms-full.txt, conditions, bouton « Copier pour mon IA »), Google Fonts retiré.
 - 2026-11-04 : bouton « Connecter mon IA » (IA locale ou clé d'API, directement depuis le navigateur).
 - 2026-11-04 : clés d'API retirées ; « Connecter mon IA » lance une IA gratuite dans le navigateur (WebLLM).
+- 2026-11-04 : connecteur MCP (/mcp) pour brancher Claude / ChatGPT sans clé.

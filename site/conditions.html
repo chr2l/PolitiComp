@@ -34,6 +34,7 @@ li { margin: 4px 0 }
   <ul>
     <li>le bouton <strong>« Connecter mon IA »</strong> : une IA gratuite tourne directement dans votre navigateur, sur votre ordinateur, sans compte ni clé. Vous pouvez aussi utiliser une IA déjà installée chez vous (Ollama, LM Studio) ;</li>
     <li>le bouton <strong>« Copier pour mon IA »</strong>, puis vous collez le texte dans l'IA de votre choix ;</li>
+    <li>le <strong>connecteur</strong> (adresse <code>/mcp</code>) à ajouter dans Claude, ChatGPT ou une autre IA compatible : vous posez vos questions dans votre IA, qui vient lire les propositions sur ce site ;</li>
     <li>ou vous donnez à votre IA l'adresse <a href="/llms.txt">/llms.txt</a>.</li>
   </ul>
 
@@ -42,7 +43,7 @@ li { margin: 4px 0 }
     <li>Pas de formulaire, pas d'inscription, pas de compte.</li>
     <li>Pas de cookie, pas de mesure d'audience (aucun Google Analytics ou équivalent), pas de publicité, pas de pixel ni de traceur.</li>
     <li>Aucune ressource n'est chargée depuis un autre site (pas de polices, scripts ou images externes) : votre navigateur ne contacte que ce site. Seule exception, si vous la demandez : le téléchargement de l'IA locale (voir point 4).</li>
-    <li>Vos questions, vos sélections et vos discussions ne sont jamais envoyées à notre serveur.</li>
+    <li>Vos questions, vos sélections et vos discussions ne sont jamais envoyées à notre serveur. (Avec le connecteur, seuls les mots de recherche de votre IA lui parviennent, sans être enregistrés : voir point 4.)</li>
     <li>Comme pour toute page web, votre navigateur doit envoyer son adresse IP au serveur pour recevoir la page. Nous ne l'enregistrons pas et nous ne gardons aucun journal de visites.</li>
   </ul>
 
@@ -53,6 +54,7 @@ li { margin: 4px 0 }
   <h2>4. Votre IA, vos règles</h2>
   <p>Avec « Connecter mon IA », l'IA tourne sur votre ordinateur : vos questions et ses réponses ne quittent pas votre machine et ne passent pas par notre serveur. C'est gratuit, sans compte et sans clé.</p>
   <p>Le seul échange avec l'extérieur a lieu quand vous cliquez sur « Lancer l'IA dans mon navigateur » : votre navigateur télécharge le programme d'IA (WebLLM, depuis cdn.jsdelivr.net) et le modèle Qwen (depuis huggingface.co et raw.githubusercontent.com). Ces sites voient alors votre adresse IP, comme pour tout téléchargement, mais ne reçoivent aucune question. Sans ce clic, rien n'est téléchargé.</p>
+  <p>Avec le connecteur, c'est votre IA qui interroge notre serveur pour lire les propositions. Notre serveur reçoit alors uniquement ce qu'elle demande pour cela (par exemple un nom de candidat, un thème ou des mots-clés comme « dette »), pas votre conversation. Ces demandes sont traitées puis oubliées : rien n'est enregistré. Le reste de l'échange se fait entre vous et votre IA, selon ses conditions.</p>
   <p>Si vous collez le texte copié dans une IA en ligne (ChatGPT, Claude, Mistral…), ce sont les conditions de ce service qui s'appliquent. Nous ne recevons et ne stockons aucun identifiant, aucune clé et aucun mot de passe.</p>
   <p>Si vous ouvrez le comparateur à l'intérieur de Claude (claude.ai), les fonctions d'analyse utilisent votre propre compte Claude et vos discussions sont enregistrées dans votre espace Claude, selon les conditions d'Anthropic. Nous n'y avons pas accès.</p>
 

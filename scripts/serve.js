@@ -2,6 +2,7 @@
 // Ne journalise rien et ne dépose aucun cookie (voir site/conditions.html).
 const http = require("http"), fs = require("fs"), path = require("path");
 const root = path.join(__dirname, "..");
+const { mcpHandler } = require("./mcp"); // connecteur MCP pour Claude, ChatGPT… (adresse : /mcp)
 const map = {
   "/": "site/index.html",
   "/data.json": "data/ifrap.json", "/officiel.json": "data/officiel.json", "/partis.json": "data/partis.json",
@@ -10,6 +11,7 @@ const map = {
 };
 const types = { ".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".md": "text/plain; charset=utf-8" };
 http.createServer((req, res) => {
+  if (req.url.split("?")[0] === "/mcp") return mcpHandler(req, res);
   const f = map[req.url.split("?")[0]];
   if (!f) { res.writeHead(404); return res.end(); }
   let body = fs.readFileSync(path.join(root, f), "utf8");

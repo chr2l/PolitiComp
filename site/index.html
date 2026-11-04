@@ -234,6 +234,11 @@ table.pos tr:last-child td { border-bottom: 0 }
     <p class="help" id="webInfo">Au premier lancement, le modèle (environ 2 Go) est téléchargé une seule fois, puis gardé par ton navigateur. Il faut un ordinateur assez récent et Chrome ou Edge à jour. Les réponses sont plus simples que celles des grandes IA en ligne.</p>
     <progress id="webProg" max="1" value="0" hidden style="width:100%"></progress>
     <p class="help" id="webStatus" role="status"></p>
+    <details id="llmMcp"><summary class="help" style="cursor:pointer">J'utilise Claude ou ChatGPT : l'ajouter comme connecteur</summary>
+      <p class="help">Tu poses tes questions dans ton IA habituelle, qui va lire les propositions sur ce site. Dans ses réglages, ouvre « Connecteurs », choisis « Ajouter un connecteur personnalisé » et colle cette adresse :</p>
+      <div class="acts" style="justify-content:flex-start;align-items:center"><code id="mcpUrl"></code><button type="button" class="btn sm" id="mcpCopy">Copier</button></div>
+      <p class="help">Ni compte ni clé chez nous. Selon ton offre Claude ou ChatGPT, les connecteurs personnalisés peuvent ne pas être disponibles.</p>
+    </details>
     <details id="llmAdv"><summary class="help" style="cursor:pointer">J'ai déjà Ollama ou LM Studio sur mon ordinateur</summary>
       <label for="llmKind">Logiciel</label>
       <select id="llmKind"><option value="ollama">Ollama</option><option value="lmstudio">LM Studio</option></select>
@@ -984,6 +989,8 @@ $("#webGo").onclick = async () => {
     $("#llmDlg").close(); await setLlm({ kind: "web" }); toast("IA prête, sur ta machine.");
   } catch (e) { prog.hidden = true; go.disabled = false; st.textContent = aiErr(e); }
 };
+$("#mcpUrl").textContent = location.origin + "/mcp";
+$("#mcpCopy").onclick = () => copyForLLM(location.origin + "/mcp");
 $("#llmKind").onchange = (e) => llmFormKind(e.target.value);
 $("#llmTest").onclick = llmTest;
 $("#llmCancel").onclick = () => $("#llmDlg").close();
