@@ -235,7 +235,10 @@ table.pos tr:last-child td { border-bottom: 0 }
   <form method="dialog" id="llmForm">
     <h3>Connecter mon IA</h3>
     <p class="help">Gratuit, sans clé, sans compte chez nous.</p>
-    <details id="llmMcp" open><summary style="cursor:pointer;font-weight:600">Avec mon Claude ou mon ChatGPT (le plus simple)</summary>
+    <p style="font-weight:600;margin:14px 0 4px">Avec mon compte Claude (même gratuit)</p>
+    <p class="help">Le comparateur s'ouvre dans Claude : tu discutes sur la page avec ton propre Claude. Même contenu, mêmes consignes de neutralité.</p>
+    <div class="acts" style="justify-content:flex-start"><a class="btn primary" id="openInClaude" href="https://claude.ai/artifact/QSVU2Q25hGSzaSjKdcw3p3" target="_blank" rel="noopener noreferrer">Ouvrir dans Claude</a></div>
+    <details id="llmMcp"><summary class="help" style="cursor:pointer">Ou ajouter PolitiComp comme connecteur dans Claude ou ChatGPT</summary>
       <p class="help">Tu poses tes questions dans ton IA habituelle, qui vient lire les propositions sur ce site. Clique, puis valide « Ajouter » dans ton IA.</p>
       <div class="acts" style="justify-content:flex-start"><a class="btn primary" id="mcpClaude" target="_blank" rel="noopener noreferrer">Ajouter à Claude</a><a class="btn" id="mcpGpt" target="_blank" rel="noopener noreferrer">Ajouter à ChatGPT</a></div>
       <p class="help">L'adresse du connecteur est copiée en même temps. Si le formulaire s'ouvre vide, colle-la dans le champ « URL » : <code id="mcpUrl"></code> <button type="button" class="btn sm" id="mcpCopy">Copier</button></p>
