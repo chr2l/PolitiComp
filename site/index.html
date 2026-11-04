@@ -236,6 +236,8 @@ table.pos tr:last-child td { border-bottom: 0 }
       <p class="help">Tu poses tes questions dans ton IA habituelle, qui vient lire les propositions sur ce site. Clique, puis valide « Ajouter » dans ton IA.</p>
       <div class="acts" style="justify-content:flex-start"><a class="btn primary" id="mcpClaude" target="_blank" rel="noopener noreferrer">Ajouter à Claude</a><a class="btn" id="mcpGpt" target="_blank" rel="noopener noreferrer">Ajouter à ChatGPT</a></div>
       <p class="help">L'adresse du connecteur est copiée en même temps. Si le formulaire s'ouvre vide, colle-la dans le champ « URL » : <code id="mcpUrl"></code> <button type="button" class="btn sm" id="mcpCopy">Copier</button></p>
+      <p class="help"><strong>Ensuite, pose tes questions dans Claude ou ChatGPT, pas ici.</strong> Ce site ne voit pas ton connecteur (c'est voulu : rien ne remonte jusqu'à nous), donc ce bouton ne change pas d'état.</p>
+      <div class="acts" style="justify-content:flex-start"><a class="btn" id="mcpTry" target="_blank" rel="noopener noreferrer">Essayer dans Claude</a></div>
       <p class="help">Ni compte ni clé chez nous. Selon ton offre Claude ou ChatGPT, les connecteurs personnalisés peuvent ne pas être disponibles.</p>
     </details>
     <p style="font-weight:600;margin:14px 0 0">Ou sans compte, dans mon navigateur</p>
@@ -999,6 +1001,7 @@ const MCP_URL = location.origin + "/mcp";
 $("#mcpUrl").textContent = MCP_URL;
 $("#mcpClaude").href = "https://claude.ai/customize/connectors?" + new URLSearchParams({ modal: "add-custom-connector", connectorName: "PolitiComp", connectorUrl: MCP_URL, mcpName: "PolitiComp", mcpServerUrl: MCP_URL });
 $("#mcpGpt").href = "https://chatgpt.com/#settings/Connectors";
+$("#mcpTry").href = "https://claude.ai/new?" + new URLSearchParams({ q: "Avec le connecteur PolitiComp, compare de façon neutre ce que proposent les candidats sur les retraites." });
 const copyMcp = () => copyForLLM(MCP_URL);
 $("#mcpCopy").onclick = copyMcp; $("#mcpClaude").addEventListener("click", copyMcp); $("#mcpGpt").addEventListener("click", copyMcp);
 $("#llmKind").onchange = (e) => llmFormKind(e.target.value);
