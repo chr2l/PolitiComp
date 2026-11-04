@@ -1,6 +1,4 @@
 <title>Programmes 2027</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout : barre d'onglets en haut ; vue Thème = index des thèmes à gauche + fiches candidats ; tiroir de discussion à droite. */
 :root {
@@ -44,10 +42,24 @@ nav.tabs button[aria-selected="true"] { background: var(--accent-soft); color: v
 .chat-btn { border: 0; background: var(--accent); color: var(--accent-ink); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 600 }
 .srcline { font-size: 12px; color: var(--muted); padding-block: 6px; border-top: 1px solid var(--line) }
 .srcline a { color: inherit }
+.llm-btn { border: 1px solid var(--accent); background: transparent; color: var(--accent); padding: 7px 13px; border-radius: 999px; cursor: pointer; font-weight: 600 }
+.llm-btn.on { background: var(--accent-soft) }
+dialog.llm { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 20px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px) }
+dialog.llm::backdrop { background: rgba(0,0,0,.45) }
+dialog.llm h3 { margin: 0 0 6px }
+dialog.llm label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px }
+dialog.llm input, dialog.llm select { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: inherit }
+dialog.llm .help { font-size: 13px; color: var(--muted); margin: 6px 0 0 }
+dialog.llm code { font-size: 12px; background: var(--sunk); padding: 1px 4px; border-radius: 4px; word-break: break-all }
+dialog.llm .acts { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 16px }
+.foot { font-size: 12px; color: var(--muted); padding-block: 24px 40px; border-top: 1px solid var(--line); margin-top: 32px }
+.foot a { color: inherit }
 
 main { padding-block: 20px 60px }
 .btn { border: 1px solid var(--line); background: var(--surface); padding: 7px 12px; border-radius: 8px; cursor: pointer; font-weight: 500 }
 .btn:hover { border-color: var(--muted) }
+a.btn { text-decoration: none; color: var(--ink); display: inline-block }
+a.btn.primary { color: var(--accent-ink) }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
 .btn:disabled { opacity: .5; cursor: not-allowed }
 .btn.sm { padding: 4px 9px; font-size: 13px }
@@ -187,6 +199,7 @@ table.pos tr:last-child td { border-bottom: 0 }
       <button role="tab" data-view="history" aria-selected="false">Historique</button>
       <button role="tab" data-view="recap" aria-selected="false">Récap</button>
     </nav>
+    <button class="llm-btn" id="llmBtn">Connecter mon IA</button>
     <button class="chat-btn" id="openChat">Poser une question</button>
   </div>
   <div class="wrap srcline" id="srcline">Chargement des données…</div>
@@ -214,6 +227,37 @@ table.pos tr:last-child td { border-bottom: 0 }
       <span><button type="button" class="btn sm" id="stopChat" hidden>Arrêter</button> <button class="btn primary sm" id="sendChat">Envoyer</button></span></div>
   </form>
 </aside>
+<footer class="wrap foot">Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne. · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
+<dialog class="llm" id="llmDlg">
+  <form method="dialog" id="llmForm">
+    <h3>Connecter mon IA</h3>
+    <p class="help">Gratuit, sans clé, sans compte chez nous.</p>
+    <details id="llmMcp" open><summary style="cursor:pointer;font-weight:600">Avec mon Claude ou mon ChatGPT (le plus simple)</summary>
+      <p class="help">Tu poses tes questions dans ton IA habituelle, qui vient lire les propositions sur ce site. Clique, puis valide « Ajouter » dans ton IA.</p>
+      <div class="acts" style="justify-content:flex-start"><a class="btn primary" id="mcpClaude" target="_blank" rel="noopener noreferrer">Ajouter à Claude</a><a class="btn" id="mcpGpt" target="_blank" rel="noopener noreferrer">Ajouter à ChatGPT</a></div>
+      <p class="help">L'adresse du connecteur est copiée en même temps. Si le formulaire s'ouvre vide, colle-la dans le champ « URL » : <code id="mcpUrl"></code> <button type="button" class="btn sm" id="mcpCopy">Copier</button></p>
+      <p class="help">Ni compte ni clé chez nous. Selon ton offre Claude ou ChatGPT, les connecteurs personnalisés peuvent ne pas être disponibles.</p>
+    </details>
+    <p style="font-weight:600;margin:14px 0 0">Ou sans compte, dans mon navigateur</p>
+    <div class="acts" style="justify-content:flex-start"><button type="button" class="btn primary" id="webGo">Lancer l'IA dans mon navigateur</button></div>
+    <p class="help" id="webInfo">L'IA tourne sur ton ordinateur : tes questions ne quittent pas ta machine. Au premier lancement, le modèle (environ 2 Go) est téléchargé une seule fois, puis gardé par ton navigateur. Il faut un ordinateur assez récent et Chrome ou Edge à jour. Les réponses sont plus simples que celles des grandes IA en ligne.</p>
+    <progress id="webProg" max="1" value="0" hidden style="width:100%"></progress>
+    <p class="help" id="webStatus" role="status"></p>
+    <details id="llmAdv"><summary class="help" style="cursor:pointer">J'ai déjà Ollama ou LM Studio sur mon ordinateur</summary>
+      <label for="llmKind">Logiciel</label>
+      <select id="llmKind"><option value="ollama">Ollama</option><option value="lmstudio">LM Studio</option></select>
+      <label for="llmUrl">Adresse</label><input id="llmUrl" autocomplete="off" spellcheck="false">
+      <label for="llmModel">Modèle</label><input id="llmModel" list="llmModels" autocomplete="off" spellcheck="false"><datalist id="llmModels"></datalist>
+      <p class="help" id="llmHelp"></p>
+      <p class="help" id="llmStatus" role="status"></p>
+      <div class="acts"><button type="button" class="btn" id="llmTest">Tester</button><button type="submit" class="btn" id="llmSave">Connecter</button></div>
+    </details>
+    <div class="acts">
+      <button type="button" class="btn" id="llmOff">Déconnecter</button>
+      <button type="button" class="btn" id="llmCancel">Fermer</button>
+    </div>
+  </form>
+</dialog>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -340,10 +384,121 @@ const Store = {
 const newId = (p) => p + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 // ---------- IA ----------
+// IA du visiteur, gratuite et sans clé : le navigateur fait tourner le modèle (WebLLM, WebGPU),
+// ou parle à Ollama / LM Studio sur sa machine. Aucune donnée ne passe par ce site.
+const WEBLLM_URL = "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.84/+esm";
+const WEB_MODEL = "Qwen2.5-3B-Instruct-q4f16_1-MLC"; // ~2 Go, bon en français, tient sur un ordinateur récent
+const WEB_CTX = 16384;                               // tokens ; on garde les invites sous ~45 000 caractères
+const WEB_MAX_CHARS = 45000;
+const LOCAL_PRESETS = {
+  ollama:   { name: "Ollama", url: "http://localhost:11434/v1",
+    help: () => `Lance Ollama en autorisant ce site : <code>OLLAMA_ORIGINS=${esc(location.origin)} ollama serve</code>, puis « Tester ».` },
+  lmstudio: { name: "LM Studio", url: "http://localhost:1234/v1",
+    help: () => "Dans LM Studio : onglet Developer, démarre le serveur et active « Enable CORS », puis « Tester »." },
+};
+const LLM_KEY = "pc27-llm";
+let LLM = null;   // { kind: "web" } ou { kind: "ollama"|"lmstudio", url, model }
+let webEngine = null;
+try { const c = JSON.parse(localStorage.getItem(LLM_KEY) || "null"); if (c && LOCAL_PRESETS[c.kind]) LLM = c; } catch {}
+const llmName = () => (window.claude?.use ? "Claude" : !LLM ? "" : LLM.kind === "web" ? "Qwen, dans ton navigateur" : `${LOCAL_PRESETS[LLM.kind].name}${LLM.model ? " · " + LLM.model : ""}`);
+const aiShort = () => (window.claude?.use ? "Claude" : LLM?.kind === "web" ? "L'IA du navigateur" : LOCAL_PRESETS[LLM?.kind]?.name || "L'IA");
+
+// Les petits modèles locaux ont une fenêtre limitée : on garde le début (consignes) et la fin (question/format).
+function fitTurns(turns, max) {
+  const out = turns.map((t) => ({ ...t }));
+  const total = () => out.reduce((n, t) => n + t.content.length, 0);
+  while (total() > max && out.length > 2) out.splice(1, 1);           // plus vieux échanges d'abord
+  const over = total() - max;
+  if (over > 0) {
+    const c = out[0].content, keep = Math.max(2000, c.length - over - 200);
+    out[0].content = c.slice(0, Math.floor(keep * 0.75)) + "\n[… extrait raccourci pour tenir dans la mémoire de l'IA locale …]\n" + c.slice(c.length - Math.floor(keep * 0.25));
+  }
+  return out;
+}
+// Premier message = consignes : en « system », pour que les tours user/assistant alternent ensuite.
+function toChat(input) {
+  const turns = typeof input === "string" ? [{ role: "user", content: input }] : input;
+  if (turns.length > 1 && turns[0].role === "user" && turns[1].role === "user") return [{ role: "system", content: turns[0].content }, ...turns.slice(1)];
+  return turns;
+}
+
+async function llmFetch(cfg, path, body, signal) {
+  let r;
+  try { r = await fetch(cfg.url.replace(/\/+$/, "") + path, { method: body ? "POST" : "GET", headers: { "content-type": "application/json" }, body: body && JSON.stringify(body), signal, referrerPolicy: "no-referrer", credentials: "omit" }); }
+  catch (e) { if (e?.name === "AbortError") throw { code: "cancelled" }; throw { code: "unreachable" }; }
+  if (!r.ok) { let m = ""; try { const j = await r.json(); m = j?.error?.message || j?.error || ""; } catch {} throw { code: r.status === 404 ? "bad_model" : "http", detail: `${r.status} ${m}`.trim() }; }
+  return r;
+}
+async function llmModels(cfg) { const j = await (await llmFetch(cfg, "/models")).json(); return (j.data || j.models || []).map((m) => m.id || m.name).filter(Boolean); }
+
+// Flux de texte commun (Ollama/LM Studio via SSE compatible OpenAI, ou WebLLM)
+async function* localStream(cfg, messages, signal) {
+  const r = await llmFetch(cfg, "/chat/completions", { model: cfg.model, stream: true, temperature: 0.3, messages }, signal);
+  const rd = r.body.getReader(), dec = new TextDecoder(); let buf = "";
+  for (;;) {
+    const { done, value } = await rd.read(); if (done) return;
+    buf += dec.decode(value, { stream: true }); const lines = buf.split("\n"); buf = lines.pop();
+    for (const l of lines) { const d = l.startsWith("data:") ? l.slice(5).trim() : ""; if (!d || d === "[DONE]") continue; try { yield JSON.parse(d).choices?.[0] || {}; } catch {} }
+  }
+}
+async function* webStream(messages, signal) {
+  const stop = () => webEngine.interruptGenerate();
+  signal?.addEventListener("abort", stop);
+  try {
+    const chunks = await webEngine.chat.completions.create({ messages, stream: true, temperature: 0.3, max_tokens: 2500 });
+    for await (const ch of chunks) { if (signal?.aborted) throw { code: "cancelled" }; yield ch.choices?.[0] || {}; }
+  } finally { signal?.removeEventListener("abort", stop); }
+}
+function makeSample(cfg) {
+  const run = async (input, opts = {}) => {
+    let messages = toChat(input);
+    const max = cfg.kind === "web" ? WEB_MAX_CHARS : 200000;
+    if (typeof input === "string" && input.length > max) throw { code: "prompt_too_large" };
+    messages = fitTurns(messages, max);
+    let text = "", truncated = false;
+    try {
+      for await (const c of cfg.kind === "web" ? webStream(messages, opts.signal) : localStream(cfg, messages, opts.signal)) {
+        const piece = c.delta?.content || "";
+        if (c.finish_reason === "length") truncated = true;
+        if (piece) { text += piece; opts.onText?.({ text }); }
+      }
+    } catch (e) {
+      if (e?.name === "AbortError" || e?.code === "cancelled") throw { code: "cancelled", text };
+      throw e?.code ? { ...e, text } : { code: "http", detail: String(e?.message || e).slice(0, 160), text };
+    }
+    if (opts.signal?.aborted) throw { code: "cancelled", text };
+    if (!text) throw { code: "empty_completion" };
+    return { text, truncated };
+  };
+  run.json = async (prompt, opts) => {
+    const { text } = await run(prompt, opts);
+    const a = text.indexOf("{"), b = text.lastIndexOf("}");
+    try { return JSON.parse(text.slice(a, b + 1)); } catch { throw { code: "invalid_json" }; }
+  };
+  run.limits = async () => ({ tools: false });
+  return run;
+}
+async function startWebLLM(onProgress) {
+  if (!navigator.gpu || !(await navigator.gpu.requestAdapter().catch(() => null))) throw { code: "no_webgpu" };
+  let webllm;
+  try { webllm = await import(WEBLLM_URL); } catch { throw { code: "unreachable_web" }; }
+  try {
+    webEngine = await webllm.CreateMLCEngine(WEB_MODEL, { initProgressCallback: (r) => onProgress(r.progress || 0, r.text || "") }, { context_window_size: WEB_CTX });
+  } catch (e) { webEngine = null; throw { code: "web_failed", detail: String(e?.message || e) }; }
+}
+
 let samplePromise = null;
-const getSample = () => (samplePromise ||= (window.claude?.use ? claude.use("sample").catch(() => null) : Promise.resolve(null)));
+const getSample = () => (samplePromise ||= (window.claude?.use ? claude.use("sample").catch(() => null) : Promise.resolve(LLM ? makeSample(LLM) : null)));
 const AI_ERR = { not_granted: "L'accès à Claude n'a pas été autorisé pour cette page.", sampling_disabled: "Claude n'est pas disponible pour ce compte.", rate_limited: "Trop de demandes pour le moment, réessaie dans quelques minutes.", session_expired: "Session expirée : reconnecte-toi.", prompt_too_large: "Trop de données à analyser d'un coup : réduis le nombre de candidats ou choisis un thème.", invalid_json: "La réponse n'a pas pu être lue. Réessaie.", refused: "Claude n'a pas pu répondre à cette demande.", empty_completion: "Réponse vide. Réessaie." };
-const aiErr = (e) => AI_ERR[e?.code] || "Erreur passagère. Réessaie.";
+Object.assign(AI_ERR, {
+  no_webgpu: "Ton navigateur ne peut pas faire tourner l'IA (WebGPU absent). Essaie Chrome ou Edge à jour sur ordinateur, ou utilise « Copier pour mon IA ».",
+  unreachable_web: "Téléchargement impossible. Vérifie ta connexion et réessaie.",
+  web_failed: "L'IA n'a pas pu démarrer (mémoire graphique insuffisante ?). Ferme d'autres onglets et réessaie, ou utilise « Copier pour mon IA ».",
+  bad_model: "Modèle introuvable. Choisis-en un autre dans « Connecter mon IA ».",
+  unreachable: "Impossible de joindre ton IA. Est-elle lancée, et autorise-t-elle ce site (CORS) ? Voir « Connecter mon IA ».",
+  http: "Ton IA a renvoyé une erreur. Réessaie ou change de modèle.",
+});
+const aiErr = (e) => (AI_ERR[e?.code] || "Erreur passagère. Réessaie.") + (e?.detail ? ` (${e.detail.slice(0, 160)})` : "");
 
 const RULES = `Tu es l'assistant d'un comparateur des programmes de l'élection présidentielle française de 2027. Réponds en français.
 RÈGLES DE NEUTRALITÉ (obligatoires) :
@@ -370,6 +525,18 @@ function propsBlock(cids, sids) {
     if (!any) lines.push("- Aucune proposition relevée sur ce périmètre.");
   }
   return lines.join("\n");
+}
+
+// ---------- IA du visiteur (le site n'appelle aucune IA lui-même) ----------
+function llmText(spec, task) {
+  const cids = spec.cids?.length ? spec.cids : D.cands.map((c) => c.id);
+  const block = spec.block ?? propsBlock(cids, spec.sids || []);
+  return `${RULES}\n\nConsignes complètes : ${location.origin}/llms.txt · toutes les propositions : ${location.origin}/llms-full.txt\n\n${task}\n\nPÉRIMÈTRE : ${spec.label || "toutes les propositions"}\nPROPOSITIONS RELEVÉES (source : PolitiComp) :${block.slice(0, 80000)}\n\nRAPPEL — ${task}`;
+}
+async function copyForLLM(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); } catch {} t.remove(); }
+  toast("Copié : colle-le dans l'IA de ton choix.");
 }
 
 // ---------- état ----------
@@ -430,13 +597,19 @@ async function setupAnalysis(box, spec) {
     box.innerHTML = `<div class="ai-head"><h3>${title}</h3></div><p class="note">Sélectionne au moins ${spec.kind === "theme" ? "un candidat" : "deux candidats"} pour lancer l'analyse.</p>`; return;
   }
   const key = analysisKey(spec);
-  box.innerHTML = `<div class="ai-head"><div><h3>${title}</h3><div class="note">Résumé, points communs, clivages et conséquences possibles, rédigés par Claude à partir des propositions affichées ci-dessous.</div></div>
+  box.innerHTML = `<div class="ai-head"><div><h3>${title}</h3><div class="note">Résumé, points communs, clivages et conséquences possibles, rédigés par ton IA à partir des propositions affichées ci-dessous.</div></div>
     <span><button class="btn primary" data-act="run">Générer l'analyse</button></span></div><div class="ai-body" data-out></div>`;
   const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
   const cached = await Store.getAnalysis(key);
   if (box.isConnected && cached?.result) { showAnalysis(box, spec, cached); }
   const sample = await getSample();
-  if (!sample) { btn.disabled = true; btn.title = "Analyse IA disponible uniquement dans Claude"; if (!cached) out.innerHTML = `<p class="note">L'analyse par Claude s'active quand la page est ouverte dans Claude.</p>`; return; }
+  if (!sample) {
+    btn.textContent = "Copier pour mon IA"; btn.title = "Copie les consignes de neutralité et les propositions affichées";
+    if (!cached) out.innerHTML = `<p class="note">Branche ton IA avec « Connecter mon IA » (en haut) pour générer l'analyse ici. Ou copie les consignes de neutralité et les propositions affichées, et colle-les dans l'IA de ton choix. Rien n'est envoyé à ce site.</p>`;
+    const sids = spec.sids?.length ? spec.sids : D.themes.flatMap((t) => t.subs.map((s) => s.id));
+    btn.onclick = () => copyForLLM(llmText({ ...spec, sids }, `TÂCHE : analyse comparative neutre de ces propositions : synthèse factuelle, points communs, clivages, puis pour chaque candidat les conséquences possibles (mécanismes, qui paie, qui bénéficie) et les points débattus, toujours attribués.`));
+    return;
+  }
   btn.onclick = () => runAnalysis(box, spec, key);
 }
 
@@ -453,7 +626,7 @@ async function runAnalysis(box, spec, key) {
   const sample = await getSample();
   const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
   btn.disabled = true;
-  out.innerHTML = `<div class="thinking"><span class="dot"></span>Claude lit ${spec.cids.length} programme(s) et rédige l'analyse… (30 s à 2 min)</div>`;
+  out.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} lit ${spec.cids.length} programme(s) et rédige l'analyse… (30 s à 2 min)</div>`;
   const names = spec.cids.map((id) => D.candById.get(id).name);
   const scope = spec.sids.length === 1 ? D.subById.get(spec.sids[0]).name : spec.kind === "full" ? "l'ensemble du programme" : D.themeOfSub.get(spec.sids[0]).name;
   let fmt;
@@ -649,14 +822,19 @@ async function sendChat() {
   const input = $("#chatInput"), q = input.value.trim();
   if (!q || S.chatCtl) return;
   const sample = await getSample();
-  if (!sample) { toast("La discussion fonctionne quand la page est ouverte dans Claude."); return; }
+  if (!sample) {
+    const hits = searchProps(q, 40);
+    const ctx = S.conv?.context || { label: "propositions qui contiennent les mots de la question (le reste est dans llms-full.txt)",
+      block: hits.length ? "\n" + hits.map((h) => `- ${D.candById.get(h.cid).name} [${D.subById.get(h.sid).name}] : ${h.text}`).join("\n") : "\n(aucune proposition ne contient ces mots : consulte llms-full.txt)" };
+    return copyForLLM(llmText(ctx, `QUESTION : ${q}`));
+  }
   const c = S.conv;
   input.value = "";
   c.messages.push({ role: "user", content: q, t: Date.now() });
   if (!c.title) c.title = q.slice(0, 90);
   renderChat();
   const bubble = document.createElement("div"); bubble.className = "msg assistant";
-  bubble.innerHTML = `<div class="thinking"><span class="dot"></span>Claude cherche dans les programmes…</div>`;
+  bubble.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} cherche dans les programmes…</div>`;
   $("#msgs").appendChild(bubble); $("#msgs").scrollTop = 1e9;
 
   let ctxText = "";
@@ -747,11 +925,11 @@ function renderRecap() {
 
 async function generateRecap() {
   const sample = await getSample();
-  if (!sample) { toast("La synthèse fonctionne quand la page est ouverte dans Claude."); return; }
+  if (!sample) { toast("Connecte d'abord ton IA (bouton « Connecter mon IA » en haut)."); return; }
   const btn = $("#genRecap"), out = $("#recapOut");
   const pins = Store.list("pin"), convs = Store.list("conv").slice(0, 40);
   btn.disabled = true;
-  out.innerHTML = `<div class="thinking"><span class="dot"></span>Claude relit ${convs.length} discussion(s) et ${pins.length} élément(s) épinglé(s)…</div>`;
+  out.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} relit ${convs.length} discussion(s) et ${pins.length} élément(s) épinglé(s)…</div>`;
   let material = "ÉLÉMENTS ÉPINGLÉS :\n" + (pins.map((p) => `• [${p.source}] ${p.text}`).join("\n") || "aucun");
   material += "\n\nDISCUSSIONS :\n" + convs.map((c) => `## ${c.title} (${new Date(c.updatedAt).toLocaleDateString("fr-FR")})\n` + c.messages.map((m) => `${m.role === "user" ? "Question" : "Réponse"} : ${m.content}`).join("\n")).join("\n\n");
   material = material.slice(0, 150000);
@@ -762,6 +940,79 @@ async function generateRecap() {
     renderRecap();
   } catch (e) { out.innerHTML = `<p class="err">${esc(aiErr(e))}</p>`; btn.disabled = false; }
 }
+
+// ---------- dialogue « Connecter mon IA » ----------
+async function refreshLlmUi() {
+  const on = !!(await getSample());
+  const b = $("#llmBtn");
+  if (window.claude?.use) b.hidden = true;
+  b.textContent = on ? "IA : " + llmName() : "Connecter mon IA";
+  b.classList.toggle("on", on);
+  $("#sendChat").textContent = on ? "Envoyer" : "Copier pour mon IA";
+  $("#chatNote").textContent = on ? `Réponses de ${llmName()}, sur ta machine, à partir des propositions relevées.` : "Aucune IA connectée : ta question et les propositions sont copiées, à coller dans ton IA. Ou « Connecter mon IA ».";
+}
+async function setLlm(cfg) {
+  LLM = cfg; samplePromise = null;
+  try { if (cfg && cfg.kind !== "web") localStorage.setItem(LLM_KEY, JSON.stringify(cfg)); else localStorage.removeItem(LLM_KEY); } catch {}
+  await refreshLlmUi(); setView(S.view);
+}
+const llmFormCfg = () => { const kind = $("#llmKind").value; return { kind, url: $("#llmUrl").value.trim() || LOCAL_PRESETS[kind].url, model: $("#llmModel").value.trim() }; };
+function llmFormKind(kind, keep) {
+  $("#llmKind").value = kind;
+  $("#llmUrl").value = keep?.url || LOCAL_PRESETS[kind].url;
+  $("#llmModel").value = keep?.model || "";
+  $("#llmHelp").innerHTML = LOCAL_PRESETS[kind].help();
+  $("#llmStatus").textContent = "";
+}
+async function llmTest() {
+  const cfg = llmFormCfg(), st = $("#llmStatus");
+  st.textContent = "Test en cours…";
+  try {
+    const models = await llmModels(cfg);
+    $("#llmModels").innerHTML = models.map((m) => `<option value="${esc(m)}">`).join("");
+    if (!cfg.model && models.length) { $("#llmModel").value = models[0]; cfg.model = models[0]; }
+    if (!cfg.model) { st.textContent = "Connexion OK, mais aucun modèle installé."; return false; }
+    await makeSample(cfg)("Réponds seulement : OK");
+    st.textContent = `Connexion OK avec ${cfg.model}.`;
+    return true;
+  } catch (e) { st.textContent = aiErr(e); return false; }
+}
+$("#llmBtn").onclick = () => {
+  llmFormKind(LLM && LOCAL_PRESETS[LLM.kind] ? LLM.kind : "ollama", LLM && LOCAL_PRESETS[LLM.kind] ? LLM : null);
+  $("#llmAdv").open = !!(LLM && LOCAL_PRESETS[LLM.kind]);
+  $("#webGo").textContent = webEngine ? "IA du navigateur prête" : "Lancer l'IA dans mon navigateur";
+  $("#webGo").disabled = !!webEngine;
+  $("#llmDlg").showModal();
+};
+$("#webGo").onclick = async () => {
+  const go = $("#webGo"), prog = $("#webProg"), st = $("#webStatus");
+  go.disabled = true; prog.hidden = false; prog.value = 0; st.textContent = "Préparation…";
+  try {
+    await startWebLLM((p, t) => { prog.value = p; st.textContent = /cache/i.test(t) ? `Chargement depuis ton navigateur… ${Math.round(p * 100)} %` : `Téléchargement et préparation… ${Math.round(p * 100)} % (une seule fois)`; });
+    prog.hidden = true; st.textContent = "";
+    $("#llmDlg").close(); await setLlm({ kind: "web" }); toast("IA prête, sur ta machine.");
+  } catch (e) { prog.hidden = true; go.disabled = false; st.textContent = aiErr(e); }
+};
+// Liens qui ouvrent l'ajout de connecteur. Le pré-remplissage de Claude n'est pas documenté officiellement :
+// on passe les deux variantes de paramètres connues, et on copie l'adresse au cas où.
+const MCP_URL = location.origin + "/mcp";
+$("#mcpUrl").textContent = MCP_URL;
+$("#mcpClaude").href = "https://claude.ai/customize/connectors?" + new URLSearchParams({ modal: "add-custom-connector", connectorName: "PolitiComp", connectorUrl: MCP_URL, mcpName: "PolitiComp", mcpServerUrl: MCP_URL });
+$("#mcpGpt").href = "https://chatgpt.com/#settings/Connectors";
+const copyMcp = () => copyForLLM(MCP_URL);
+$("#mcpCopy").onclick = copyMcp; $("#mcpClaude").addEventListener("click", copyMcp); $("#mcpGpt").addEventListener("click", copyMcp);
+$("#llmKind").onchange = (e) => llmFormKind(e.target.value);
+$("#llmTest").onclick = llmTest;
+$("#llmCancel").onclick = () => $("#llmDlg").close();
+$("#llmOff").onclick = async () => {
+  try { await webEngine?.unload(); } catch {}
+  webEngine = null; $("#llmDlg").close(); await setLlm(null); toast("IA déconnectée.");
+};
+$("#llmForm").onsubmit = async (e) => {
+  e.preventDefault();
+  if (!(await llmTest())) return;
+  $("#llmDlg").close(); await setLlm(llmFormCfg()); toast("IA connectée : " + llmName());
+};
 
 // ---------- démarrage ----------
 document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setView(b.dataset.view)));
@@ -784,6 +1035,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#drawer
   const h = location.hash.slice(1);
   setView(["vs", "history", "recap"].includes(h) ? h : "theme");
   await Store.init();
+  refreshLlmUi();
   ({ theme: renderTheme, vs: renderVs, history: renderHistory, recap: renderRecap })[S.view]();
 })();
 </script>

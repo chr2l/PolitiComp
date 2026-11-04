@@ -62,5 +62,6 @@ const strip = (html) =>
   fs.writeFileSync(OUT, JSON.stringify(data));
   const changed = !previous || JSON.stringify(previous.themes) !== JSON.stringify(themes)
     || JSON.stringify(previous.candidates) !== JSON.stringify(candidates);
+  require("./build-llms")(); // met à jour site/llms-full.txt
   console.log(`${candidates.length} candidats, ${themes.length} thèmes, ${total} propositions — ${changed ? "MODIFIÉ" : "inchangé"}`);
 })();
