@@ -6,7 +6,7 @@ Contexte à relire en début de session. À tenir à jour.
 Comparateur politique : site statique (site/), données JSON (data/), scripts.
 
 ## Ouverture aux IA (PR claude/public-llm-access)
-- Le site n'appelle aucune IA : chaque visiteur branche la sienne. Bouton « Connecter mon IA » : le navigateur appelle directement Ollama / LM Studio (localhost) ou une API (Anthropic, OpenAI, Mistral, compatible OpenAI) ; config et clé en sessionStorage (localStorage si « se souvenir »). Sans IA : « Copier pour mon IA ».
+- Le site n'appelle aucune IA : chaque visiteur branche la sienne. Bouton « Connecter mon IA » : gratuit, sans clé ni compte (demande de l'utilisateur : pas d'API payante). Par défaut l'IA tourne dans le navigateur (WebLLM 0.2.84 depuis jsdelivr, modèle Qwen2.5-3B ~2 Go, WebGPU requis : Chrome/Edge récent). Option avancée : Ollama / LM Studio (localhost). Sans IA : « Copier pour mon IA ».
 - Ollama doit autoriser le site : OLLAMA_ORIGINS=<adresse du site>. LM Studio : « Enable CORS ».
 - Futur domaine public : Élie.place (pas encore en place).
 - `site/llms.txt` = README pour les IA (neutralité, sources). Aussi servi en /README.md.
@@ -29,3 +29,4 @@ Rien de sensible repéré.
 - 2026-10-08 : passage sur Git (dépôt privé chr2l/PolitiComp), audit sécurité OK, .gitignore.
 - 2026-11-04 : ouverture aux IA des visiteurs (llms.txt, llms-full.txt, conditions, bouton « Copier pour mon IA »), Google Fonts retiré.
 - 2026-11-04 : bouton « Connecter mon IA » (IA locale ou clé d'API, directement depuis le navigateur).
+- 2026-11-04 : clés d'API retirées ; « Connecter mon IA » lance une IA gratuite dans le navigateur (WebLLM).

@@ -49,8 +49,6 @@ dialog.llm::backdrop { background: rgba(0,0,0,.45) }
 dialog.llm h3 { margin: 0 0 6px }
 dialog.llm label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px }
 dialog.llm input, dialog.llm select { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: inherit }
-dialog.llm .chk { display: flex; gap: 8px; align-items: center; font-weight: 400 }
-dialog.llm .chk input { width: auto }
 dialog.llm .help { font-size: 13px; color: var(--muted); margin: 6px 0 0 }
 dialog.llm code { font-size: 12px; background: var(--sunk); padding: 1px 4px; border-radius: 4px; word-break: break-all }
 dialog.llm .acts { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 16px }
@@ -231,27 +229,23 @@ table.pos tr:last-child td { border-bottom: 0 }
 <dialog class="llm" id="llmDlg">
   <form method="dialog" id="llmForm">
     <h3>Connecter mon IA</h3>
-    <p class="help">Ton navigateur parle directement à ton IA. Rien ne passe par ce site : ni tes questions, ni les réponses, ni ta clé.</p>
-    <label for="llmKind">Mon IA</label>
-    <select id="llmKind">
-      <option value="ollama">IA sur mon ordinateur : Ollama</option>
-      <option value="lmstudio">IA sur mon ordinateur : LM Studio</option>
-      <option value="anthropic">Claude (clé d'API Anthropic)</option>
-      <option value="openai">ChatGPT (clé d'API OpenAI)</option>
-      <option value="mistral">Mistral (clé d'API)</option>
-      <option value="custom">Autre service compatible OpenAI</option>
-    </select>
-    <div id="llmUrlRow"><label for="llmUrl">Adresse</label><input id="llmUrl" autocomplete="off" spellcheck="false"></div>
-    <div id="llmKeyRow"><label for="llmKey">Clé d'API</label><input id="llmKey" type="password" autocomplete="off" spellcheck="false" placeholder="Reste dans ton navigateur"></div>
-    <label for="llmModel">Modèle</label><input id="llmModel" list="llmModels" autocomplete="off" spellcheck="false"><datalist id="llmModels"></datalist>
-    <p class="help" id="llmHelp"></p>
-    <label class="chk"><input type="checkbox" id="llmRemember"> Se souvenir sur cet appareil (sinon tout est oublié en fermant l'onglet)</label>
-    <p class="help" id="llmStatus" role="status"></p>
+    <p class="help">Gratuit, sans compte et sans clé. L'IA tourne sur ton ordinateur, dans ton navigateur. Tes questions ne quittent pas ta machine et rien ne passe par ce site.</p>
+    <div class="acts" style="justify-content:flex-start"><button type="button" class="btn primary" id="webGo">Lancer l'IA dans mon navigateur</button></div>
+    <p class="help" id="webInfo">Au premier lancement, le modèle (environ 2 Go) est téléchargé une seule fois, puis gardé par ton navigateur. Il faut un ordinateur assez récent et Chrome ou Edge à jour. Les réponses sont plus simples que celles des grandes IA en ligne.</p>
+    <progress id="webProg" max="1" value="0" hidden style="width:100%"></progress>
+    <p class="help" id="webStatus" role="status"></p>
+    <details id="llmAdv"><summary class="help" style="cursor:pointer">J'ai déjà Ollama ou LM Studio sur mon ordinateur</summary>
+      <label for="llmKind">Logiciel</label>
+      <select id="llmKind"><option value="ollama">Ollama</option><option value="lmstudio">LM Studio</option></select>
+      <label for="llmUrl">Adresse</label><input id="llmUrl" autocomplete="off" spellcheck="false">
+      <label for="llmModel">Modèle</label><input id="llmModel" list="llmModels" autocomplete="off" spellcheck="false"><datalist id="llmModels"></datalist>
+      <p class="help" id="llmHelp"></p>
+      <p class="help" id="llmStatus" role="status"></p>
+      <div class="acts"><button type="button" class="btn" id="llmTest">Tester</button><button type="submit" class="btn" id="llmSave">Connecter</button></div>
+    </details>
     <div class="acts">
       <button type="button" class="btn" id="llmOff">Déconnecter</button>
-      <button type="button" class="btn" id="llmTest">Tester</button>
       <button type="button" class="btn" id="llmCancel">Fermer</button>
-      <button type="submit" class="btn primary" id="llmSave">Connecter</button>
     </div>
   </form>
 </dialog>
@@ -381,74 +375,89 @@ const Store = {
 const newId = (p) => p + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 // ---------- IA ----------
-// IA connectée par le visiteur : le navigateur appelle directement son IA (locale ou par clé d'API).
-// Aucune donnée ne passe par ce site. La config reste en mémoire, ou dans ce navigateur si « se souvenir ».
-const LLM_PRESETS = {
-  ollama:    { name: "Ollama", url: "http://localhost:11434/v1", key: false, model: "",
-    help: () => `Lance Ollama en autorisant ce site : <code>OLLAMA_ORIGINS=${esc(location.origin)} ollama serve</code>. Puis « Tester » pour choisir un modèle.` },
-  lmstudio:  { name: "LM Studio", url: "http://localhost:1234/v1", key: false, model: "",
-    help: () => "Dans LM Studio : onglet Developer, démarre le serveur et active « Enable CORS ». Puis « Tester » pour choisir un modèle." },
-  anthropic: { name: "Claude", url: "https://api.anthropic.com/v1", key: true, model: "claude-sonnet-5-5",
-    help: () => "Clé à créer sur console.anthropic.com (usage payant). Un abonnement Claude Pro ne donne pas de clé." },
-  openai:    { name: "ChatGPT", url: "https://api.openai.com/v1", key: true, model: "gpt-4o",
-    help: () => "Clé à créer sur platform.openai.com (usage payant). Un abonnement ChatGPT Plus ne donne pas de clé." },
-  mistral:   { name: "Mistral", url: "https://api.mistral.ai/v1", key: true, model: "mistral-large-latest",
-    help: () => "Clé à créer sur console.mistral.ai." },
-  custom:    { name: "IA", url: "", key: true, model: "",
-    help: () => "Adresse de base d'un service compatible OpenAI (se termine souvent par /v1). Clé facultative selon le service." },
+// IA du visiteur, gratuite et sans clé : le navigateur fait tourner le modèle (WebLLM, WebGPU),
+// ou parle à Ollama / LM Studio sur sa machine. Aucune donnée ne passe par ce site.
+const WEBLLM_URL = "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.84/+esm";
+const WEB_MODEL = "Qwen2.5-3B-Instruct-q4f16_1-MLC"; // ~2 Go, bon en français, tient sur un ordinateur récent
+const WEB_CTX = 16384;                               // tokens ; on garde les invites sous ~45 000 caractères
+const WEB_MAX_CHARS = 45000;
+const LOCAL_PRESETS = {
+  ollama:   { name: "Ollama", url: "http://localhost:11434/v1",
+    help: () => `Lance Ollama en autorisant ce site : <code>OLLAMA_ORIGINS=${esc(location.origin)} ollama serve</code>, puis « Tester ».` },
+  lmstudio: { name: "LM Studio", url: "http://localhost:1234/v1",
+    help: () => "Dans LM Studio : onglet Developer, démarre le serveur et active « Enable CORS », puis « Tester »." },
 };
 const LLM_KEY = "pc27-llm";
-let LLM = null;
-try { LLM = JSON.parse(localStorage.getItem(LLM_KEY) || sessionStorage.getItem(LLM_KEY) || "null"); } catch {}
-const llmName = () => (window.claude?.use ? "Claude" : LLM ? `${LLM_PRESETS[LLM.kind]?.name || "IA"}${LLM.model ? " · " + LLM.model : ""}` : "");
-const aiShort = () => (window.claude?.use ? "Claude" : LLM_PRESETS[LLM?.kind]?.name || "L'IA");
+let LLM = null;   // { kind: "web" } ou { kind: "ollama"|"lmstudio", url, model }
+let webEngine = null;
+try { const c = JSON.parse(localStorage.getItem(LLM_KEY) || "null"); if (c && LOCAL_PRESETS[c.kind]) LLM = c; } catch {}
+const llmName = () => (window.claude?.use ? "Claude" : !LLM ? "" : LLM.kind === "web" ? "Qwen, dans ton navigateur" : `${LOCAL_PRESETS[LLM.kind].name}${LLM.model ? " · " + LLM.model : ""}`);
+const aiShort = () => (window.claude?.use ? "Claude" : LLM?.kind === "web" ? "L'IA du navigateur" : LOCAL_PRESETS[LLM?.kind]?.name || "L'IA");
+
+// Les petits modèles locaux ont une fenêtre limitée : on garde le début (consignes) et la fin (question/format).
+function fitTurns(turns, max) {
+  const out = turns.map((t) => ({ ...t }));
+  const total = () => out.reduce((n, t) => n + t.content.length, 0);
+  while (total() > max && out.length > 2) out.splice(1, 1);           // plus vieux échanges d'abord
+  const over = total() - max;
+  if (over > 0) {
+    const c = out[0].content, keep = Math.max(2000, c.length - over - 200);
+    out[0].content = c.slice(0, Math.floor(keep * 0.75)) + "\n[… extrait raccourci pour tenir dans la mémoire de l'IA locale …]\n" + c.slice(c.length - Math.floor(keep * 0.25));
+  }
+  return out;
+}
+// Premier message = consignes : en « system », pour que les tours user/assistant alternent ensuite.
+function toChat(input) {
+  const turns = typeof input === "string" ? [{ role: "user", content: input }] : input;
+  if (turns.length > 1 && turns[0].role === "user" && turns[1].role === "user") return [{ role: "system", content: turns[0].content }, ...turns.slice(1)];
+  return turns;
+}
 
 async function llmFetch(cfg, path, body, signal) {
-  const base = cfg.url.replace(/\/+$/, "");
-  const h = { "content-type": "application/json" };
-  if (cfg.kind === "anthropic") Object.assign(h, { "x-api-key": cfg.key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" });
-  else if (cfg.key) h.authorization = "Bearer " + cfg.key;
   let r;
-  try { r = await fetch(base + path, { method: body ? "POST" : "GET", headers: h, body: body && JSON.stringify(body), signal, referrerPolicy: "no-referrer", credentials: "omit" }); }
+  try { r = await fetch(cfg.url.replace(/\/+$/, "") + path, { method: body ? "POST" : "GET", headers: { "content-type": "application/json" }, body: body && JSON.stringify(body), signal, referrerPolicy: "no-referrer", credentials: "omit" }); }
   catch (e) { if (e?.name === "AbortError") throw { code: "cancelled" }; throw { code: "unreachable" }; }
-  if (!r.ok) {
-    let msg = ""; try { const j = await r.json(); msg = j?.error?.message || j?.message || ""; } catch {}
-    throw { code: r.status === 401 || r.status === 403 ? "bad_key" : r.status === 429 ? "rate_limited" : r.status === 404 ? "bad_model" : "http", detail: `${r.status} ${msg}`.trim() };
-  }
+  if (!r.ok) { let m = ""; try { const j = await r.json(); m = j?.error?.message || j?.error || ""; } catch {} throw { code: r.status === 404 ? "bad_model" : "http", detail: `${r.status} ${m}`.trim() }; }
   return r;
 }
-async function llmModels(cfg) {
-  const r = await llmFetch(cfg, "/models");
-  const j = await r.json();
-  return (j.data || j.models || []).map((m) => m.id || m.name).filter(Boolean);
+async function llmModels(cfg) { const j = await (await llmFetch(cfg, "/models")).json(); return (j.data || j.models || []).map((m) => m.id || m.name).filter(Boolean); }
+
+// Flux de texte commun (Ollama/LM Studio via SSE compatible OpenAI, ou WebLLM)
+async function* localStream(cfg, messages, signal) {
+  const r = await llmFetch(cfg, "/chat/completions", { model: cfg.model, stream: true, temperature: 0.3, messages }, signal);
+  const rd = r.body.getReader(), dec = new TextDecoder(); let buf = "";
+  for (;;) {
+    const { done, value } = await rd.read(); if (done) return;
+    buf += dec.decode(value, { stream: true }); const lines = buf.split("\n"); buf = lines.pop();
+    for (const l of lines) { const d = l.startsWith("data:") ? l.slice(5).trim() : ""; if (!d || d === "[DONE]") continue; try { yield JSON.parse(d).choices?.[0] || {}; } catch {} }
+  }
+}
+async function* webStream(messages, signal) {
+  const stop = () => webEngine.interruptGenerate();
+  signal?.addEventListener("abort", stop);
+  try {
+    const chunks = await webEngine.chat.completions.create({ messages, stream: true, temperature: 0.3, max_tokens: 2500 });
+    for await (const ch of chunks) { if (signal?.aborted) throw { code: "cancelled" }; yield ch.choices?.[0] || {}; }
+  } finally { signal?.removeEventListener("abort", stop); }
 }
 function makeSample(cfg) {
   const run = async (input, opts = {}) => {
-    const turns = typeof input === "string" ? [{ role: "user", content: input }] : input;
-    const anth = cfg.kind === "anthropic";
-    const body = anth ? { model: cfg.model, max_tokens: 8000, stream: true, messages: turns }
-                      : { model: cfg.model, stream: true, messages: turns };
-    const r = await llmFetch(cfg, anth ? "/messages" : "/chat/completions", body, opts.signal);
-    const rd = r.body.getReader(), dec = new TextDecoder();
-    let buf = "", text = "", truncated = false;
+    let messages = toChat(input);
+    const max = cfg.kind === "web" ? WEB_MAX_CHARS : 200000;
+    if (typeof input === "string" && input.length > max) throw { code: "prompt_too_large" };
+    messages = fitTurns(messages, max);
+    let text = "", truncated = false;
     try {
-      for (;;) {
-        const { done, value } = await rd.read();
-        if (done) break;
-        buf += dec.decode(value, { stream: true });
-        const lines = buf.split("\n"); buf = lines.pop();
-        for (const l of lines) {
-          if (!l.startsWith("data:")) continue;
-          const d = l.slice(5).trim();
-          if (!d || d === "[DONE]") continue;
-          let ev; try { ev = JSON.parse(d); } catch { continue; }
-          let piece = "";
-          if (anth) { if (ev.type === "content_block_delta") piece = ev.delta?.text || ""; if (ev.delta?.stop_reason === "max_tokens") truncated = true; if (ev.type === "error") throw { code: "http", detail: ev.error?.message }; }
-          else { piece = ev.choices?.[0]?.delta?.content || ""; if (ev.choices?.[0]?.finish_reason === "length") truncated = true; }
-          if (piece) { text += piece; opts.onText?.({ text }); }
-        }
+      for await (const c of cfg.kind === "web" ? webStream(messages, opts.signal) : localStream(cfg, messages, opts.signal)) {
+        const piece = c.delta?.content || "";
+        if (c.finish_reason === "length") truncated = true;
+        if (piece) { text += piece; opts.onText?.({ text }); }
       }
-    } catch (e) { if (e?.name === "AbortError") throw { code: "cancelled", text }; throw e?.code ? { ...e, text } : { code: "http", text }; }
+    } catch (e) {
+      if (e?.name === "AbortError" || e?.code === "cancelled") throw { code: "cancelled", text };
+      throw e?.code ? { ...e, text } : { code: "http", detail: String(e?.message || e).slice(0, 160), text };
+    }
+    if (opts.signal?.aborted) throw { code: "cancelled", text };
     if (!text) throw { code: "empty_completion" };
     return { text, truncated };
   };
@@ -460,12 +469,22 @@ function makeSample(cfg) {
   run.limits = async () => ({ tools: false });
   return run;
 }
+async function startWebLLM(onProgress) {
+  if (!navigator.gpu || !(await navigator.gpu.requestAdapter().catch(() => null))) throw { code: "no_webgpu" };
+  let webllm;
+  try { webllm = await import(WEBLLM_URL); } catch { throw { code: "unreachable_web" }; }
+  try {
+    webEngine = await webllm.CreateMLCEngine(WEB_MODEL, { initProgressCallback: (r) => onProgress(r.progress || 0, r.text || "") }, { context_window_size: WEB_CTX });
+  } catch (e) { webEngine = null; throw { code: "web_failed", detail: String(e?.message || e) }; }
+}
 
 let samplePromise = null;
 const getSample = () => (samplePromise ||= (window.claude?.use ? claude.use("sample").catch(() => null) : Promise.resolve(LLM ? makeSample(LLM) : null)));
 const AI_ERR = { not_granted: "L'accès à Claude n'a pas été autorisé pour cette page.", sampling_disabled: "Claude n'est pas disponible pour ce compte.", rate_limited: "Trop de demandes pour le moment, réessaie dans quelques minutes.", session_expired: "Session expirée : reconnecte-toi.", prompt_too_large: "Trop de données à analyser d'un coup : réduis le nombre de candidats ou choisis un thème.", invalid_json: "La réponse n'a pas pu être lue. Réessaie.", refused: "Claude n'a pas pu répondre à cette demande.", empty_completion: "Réponse vide. Réessaie." };
 Object.assign(AI_ERR, {
-  bad_key: "Clé refusée par le service d'IA. Vérifie-la dans « Connecter mon IA ».",
+  no_webgpu: "Ton navigateur ne peut pas faire tourner l'IA (WebGPU absent). Essaie Chrome ou Edge à jour sur ordinateur, ou utilise « Copier pour mon IA ».",
+  unreachable_web: "Téléchargement impossible. Vérifie ta connexion et réessaie.",
+  web_failed: "L'IA n'a pas pu démarrer (mémoire graphique insuffisante ?). Ferme d'autres onglets et réessaie, ou utilise « Copier pour mon IA ».",
   bad_model: "Modèle introuvable. Choisis-en un autre dans « Connecter mon IA ».",
   unreachable: "Impossible de joindre ton IA. Est-elle lancée, et autorise-t-elle ce site (CORS) ? Voir « Connecter mon IA ».",
   http: "Ton IA a renvoyé une erreur. Réessaie ou change de modèle.",
@@ -921,55 +940,61 @@ async function refreshLlmUi() {
   b.textContent = on ? "IA : " + llmName() : "Connecter mon IA";
   b.classList.toggle("on", on);
   $("#sendChat").textContent = on ? "Envoyer" : "Copier pour mon IA";
-  $("#chatNote").textContent = on ? `Réponses de ${llmName()}, à partir des propositions relevées. Rien ne passe par ce site.` : "Aucune IA connectée : ta question et les propositions sont copiées, à coller dans ton IA. Ou « Connecter mon IA ».";
+  $("#chatNote").textContent = on ? `Réponses de ${llmName()}, sur ta machine, à partir des propositions relevées.` : "Aucune IA connectée : ta question et les propositions sont copiées, à coller dans ton IA. Ou « Connecter mon IA ».";
 }
-function llmFormCfg() {
-  const kind = $("#llmKind").value, pr = LLM_PRESETS[kind];
-  return { kind, url: ($("#llmUrl").value.trim() || pr.url), key: $("#llmKey").value.trim(), model: $("#llmModel").value.trim() };
+async function setLlm(cfg) {
+  LLM = cfg; samplePromise = null;
+  try { if (cfg && cfg.kind !== "web") localStorage.setItem(LLM_KEY, JSON.stringify(cfg)); else localStorage.removeItem(LLM_KEY); } catch {}
+  await refreshLlmUi(); setView(S.view);
 }
+const llmFormCfg = () => { const kind = $("#llmKind").value; return { kind, url: $("#llmUrl").value.trim() || LOCAL_PRESETS[kind].url, model: $("#llmModel").value.trim() }; };
 function llmFormKind(kind, keep) {
-  const pr = LLM_PRESETS[kind];
   $("#llmKind").value = kind;
-  $("#llmUrl").value = keep?.url || pr.url;
-  $("#llmUrlRow").hidden = kind === "anthropic" || kind === "openai" || kind === "mistral";
-  $("#llmKeyRow").hidden = !pr.key;
-  $("#llmKey").value = keep?.key || "";
-  $("#llmModel").value = keep?.model || pr.model;
-  $("#llmHelp").innerHTML = pr.help();
+  $("#llmUrl").value = keep?.url || LOCAL_PRESETS[kind].url;
+  $("#llmModel").value = keep?.model || "";
+  $("#llmHelp").innerHTML = LOCAL_PRESETS[kind].help();
   $("#llmStatus").textContent = "";
 }
 async function llmTest() {
   const cfg = llmFormCfg(), st = $("#llmStatus");
   st.textContent = "Test en cours…";
   try {
-    const models = await llmModels(cfg).catch((e) => { if (e.code === "unreachable" || e.code === "bad_key") throw e; return []; });
+    const models = await llmModels(cfg);
     $("#llmModels").innerHTML = models.map((m) => `<option value="${esc(m)}">`).join("");
     if (!cfg.model && models.length) { $("#llmModel").value = models[0]; cfg.model = models[0]; }
-    if (!cfg.model) { st.textContent = "Connexion OK, mais choisis un modèle."; return false; }
+    if (!cfg.model) { st.textContent = "Connexion OK, mais aucun modèle installé."; return false; }
     await makeSample(cfg)("Réponds seulement : OK");
-    st.textContent = `Connexion OK avec ${cfg.model}.` + (models.length > 1 ? ` ${models.length} modèles disponibles.` : "");
+    st.textContent = `Connexion OK avec ${cfg.model}.`;
     return true;
   } catch (e) { st.textContent = aiErr(e); return false; }
 }
-$("#llmBtn").onclick = () => { llmFormKind(LLM?.kind || "ollama", LLM); $("#llmRemember").checked = !!LLM?.remember; $("#llmDlg").showModal(); };
+$("#llmBtn").onclick = () => {
+  llmFormKind(LLM && LOCAL_PRESETS[LLM.kind] ? LLM.kind : "ollama", LLM && LOCAL_PRESETS[LLM.kind] ? LLM : null);
+  $("#llmAdv").open = !!(LLM && LOCAL_PRESETS[LLM.kind]);
+  $("#webGo").textContent = webEngine ? "IA du navigateur prête" : "Lancer l'IA dans mon navigateur";
+  $("#webGo").disabled = !!webEngine;
+  $("#llmDlg").showModal();
+};
+$("#webGo").onclick = async () => {
+  const go = $("#webGo"), prog = $("#webProg"), st = $("#webStatus");
+  go.disabled = true; prog.hidden = false; prog.value = 0; st.textContent = "Préparation…";
+  try {
+    await startWebLLM((p, t) => { prog.value = p; st.textContent = /cache/i.test(t) ? `Chargement depuis ton navigateur… ${Math.round(p * 100)} %` : `Téléchargement et préparation… ${Math.round(p * 100)} % (une seule fois)`; });
+    prog.hidden = true; st.textContent = "";
+    $("#llmDlg").close(); await setLlm({ kind: "web" }); toast("IA prête, sur ta machine.");
+  } catch (e) { prog.hidden = true; go.disabled = false; st.textContent = aiErr(e); }
+};
 $("#llmKind").onchange = (e) => llmFormKind(e.target.value);
 $("#llmTest").onclick = llmTest;
 $("#llmCancel").onclick = () => $("#llmDlg").close();
-$("#llmOff").onclick = () => {
-  LLM = null; samplePromise = null;
-  try { localStorage.removeItem(LLM_KEY); sessionStorage.removeItem(LLM_KEY); } catch {}
-  $("#llmDlg").close(); refreshLlmUi(); setView(S.view); toast("IA déconnectée, clé effacée.");
+$("#llmOff").onclick = async () => {
+  try { await webEngine?.unload(); } catch {}
+  webEngine = null; $("#llmDlg").close(); await setLlm(null); toast("IA déconnectée.");
 };
 $("#llmForm").onsubmit = async (e) => {
   e.preventDefault();
   if (!(await llmTest())) return;
-  LLM = { ...llmFormCfg(), remember: $("#llmRemember").checked };
-  samplePromise = null;
-  try {
-    localStorage.removeItem(LLM_KEY); sessionStorage.removeItem(LLM_KEY);
-    (LLM.remember ? localStorage : sessionStorage).setItem(LLM_KEY, JSON.stringify(LLM));
-  } catch {}
-  $("#llmDlg").close(); await refreshLlmUi(); setView(S.view); toast("IA connectée : " + llmName());
+  $("#llmDlg").close(); await setLlm(llmFormCfg()); toast("IA connectée : " + llmName());
 };
 
 // ---------- démarrage ----------

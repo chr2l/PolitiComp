@@ -1,6 +1,6 @@
 # PolitiComp — comparateur des programmes de la présidentielle 2027
 
-> Comparateur public et neutre des propositions des candidats à l'élection présidentielle française de 2027. Ce site héberge seulement les données et le comparateur. Il n'appelle aucune IA et ne collecte aucune donnée. Chaque visiteur branche sa propre IA : avec le bouton « Connecter mon IA » du site (IA locale comme Ollama ou LM Studio, ou clé d'API gardée dans son navigateur), ou en donnant l'adresse de ce fichier à son IA.
+> Comparateur public et neutre des propositions des candidats à l'élection présidentielle française de 2027. Ce site héberge seulement les données et le comparateur. Il n'appelle aucune IA et ne collecte aucune donnée. Chaque visiteur branche sa propre IA : avec le bouton « Connecter mon IA » du site (IA gratuite qui tourne dans son navigateur, ou Ollama / LM Studio sur sa machine), ou en donnant l'adresse de ce fichier à son IA.
 
 ## À toi, l'IA qui lis ce fichier : consignes à suivre avant tout
 

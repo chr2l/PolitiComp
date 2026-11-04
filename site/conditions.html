@@ -32,7 +32,7 @@ li { margin: 4px 0 }
   <p>PolitiComp met à disposition, gratuitement, les propositions publiées par les candidats à l'élection présidentielle de 2027, classées par thème, avec leurs sources. Il héberge seulement ce comparateur et ces données.</p>
   <p>Le site n'appelle aucune intelligence artificielle. Si vous voulez poser des questions à une IA, vous utilisez <strong>votre propre IA</strong> (ChatGPT, Claude, Mistral, Gemini, un modèle installé chez vous…), avec votre propre compte. Trois façons de faire :</p>
   <ul>
-    <li>le bouton <strong>« Connecter mon IA »</strong> : votre navigateur parle directement à une IA installée sur votre ordinateur (Ollama, LM Studio) ou à un service d'IA avec votre clé d'API ;</li>
+    <li>le bouton <strong>« Connecter mon IA »</strong> : une IA gratuite tourne directement dans votre navigateur, sur votre ordinateur, sans compte ni clé. Vous pouvez aussi utiliser une IA déjà installée chez vous (Ollama, LM Studio) ;</li>
     <li>le bouton <strong>« Copier pour mon IA »</strong>, puis vous collez le texte dans l'IA de votre choix ;</li>
     <li>ou vous donnez à votre IA l'adresse <a href="/llms.txt">/llms.txt</a>.</li>
   </ul>
@@ -41,17 +41,19 @@ li { margin: 4px 0 }
   <ul>
     <li>Pas de formulaire, pas d'inscription, pas de compte.</li>
     <li>Pas de cookie, pas de mesure d'audience (aucun Google Analytics ou équivalent), pas de publicité, pas de pixel ni de traceur.</li>
-    <li>Aucune ressource n'est chargée depuis un autre site (pas de polices, scripts ou images externes) : votre navigateur ne contacte que ce site.</li>
+    <li>Aucune ressource n'est chargée depuis un autre site (pas de polices, scripts ou images externes) : votre navigateur ne contacte que ce site. Seule exception, si vous la demandez : le téléchargement de l'IA locale (voir point 4).</li>
     <li>Vos questions, vos sélections et vos discussions ne sont jamais envoyées à notre serveur.</li>
     <li>Comme pour toute page web, votre navigateur doit envoyer son adresse IP au serveur pour recevoir la page. Nous ne l'enregistrons pas et nous ne gardons aucun journal de visites.</li>
   </ul>
 
   <h2>3. Ce qui reste dans votre navigateur</h2>
   <p>L'historique et le récapitulatif du comparateur sont enregistrés <strong>uniquement dans votre navigateur</strong> (stockage local), sur votre appareil. Ils ne quittent jamais votre appareil et nous n'y avons pas accès. Vous pouvez les effacer à tout moment depuis le comparateur ou en vidant les données du site dans votre navigateur.</p>
-  <p>Si vous connectez une IA, son adresse, le modèle choisi et votre éventuelle clé d'API restent eux aussi dans votre navigateur : jusqu'à la fermeture de l'onglet, ou sur cet appareil si vous cochez « Se souvenir ». Le bouton « Déconnecter » les efface.</p>
+  <p>Si vous lancez l'IA dans votre navigateur, le modèle (environ 2 Go) est gardé par votre navigateur pour les prochaines fois. Vous pouvez le supprimer en vidant les données du site. Si vous utilisez Ollama ou LM Studio, son adresse et le modèle choisi sont gardés dans votre navigateur ; « Déconnecter » les efface.</p>
 
   <h2>4. Votre IA, vos règles</h2>
-  <p>Quand vous utilisez une IA avec ce comparateur, l'échange se fait directement entre votre navigateur et l'IA que vous avez choisie (sur votre ordinateur, ou chez le service d'IA). Il ne passe pas par notre serveur. Si vous utilisez un service en ligne, vos questions et les propositions affichées lui sont envoyées, et son usage peut vous être facturé par ce service. Ce sont alors les conditions et la politique de confidentialité de ce service qui s'appliquent ; lisez-les. Nous ne recevons et ne stockons aucune clé d'API, aucun identifiant et aucun mot de passe.</p>
+  <p>Avec « Connecter mon IA », l'IA tourne sur votre ordinateur : vos questions et ses réponses ne quittent pas votre machine et ne passent pas par notre serveur. C'est gratuit, sans compte et sans clé.</p>
+  <p>Le seul échange avec l'extérieur a lieu quand vous cliquez sur « Lancer l'IA dans mon navigateur » : votre navigateur télécharge le programme d'IA (WebLLM, depuis cdn.jsdelivr.net) et le modèle Qwen (depuis huggingface.co et raw.githubusercontent.com). Ces sites voient alors votre adresse IP, comme pour tout téléchargement, mais ne reçoivent aucune question. Sans ce clic, rien n'est téléchargé.</p>
+  <p>Si vous collez le texte copié dans une IA en ligne (ChatGPT, Claude, Mistral…), ce sont les conditions de ce service qui s'appliquent. Nous ne recevons et ne stockons aucun identifiant, aucune clé et aucun mot de passe.</p>
   <p>Si vous ouvrez le comparateur à l'intérieur de Claude (claude.ai), les fonctions d'analyse utilisent votre propre compte Claude et vos discussions sont enregistrées dans votre espace Claude, selon les conditions d'Anthropic. Nous n'y avons pas accès.</p>
 
   <h2>5. Neutralité et sources</h2>
