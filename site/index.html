@@ -42,6 +42,18 @@ nav.tabs button[aria-selected="true"] { background: var(--accent-soft); color: v
 .chat-btn { border: 0; background: var(--accent); color: var(--accent-ink); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 600 }
 .srcline { font-size: 12px; color: var(--muted); padding-block: 6px; border-top: 1px solid var(--line) }
 .srcline a { color: inherit }
+.llm-btn { border: 1px solid var(--accent); background: transparent; color: var(--accent); padding: 7px 13px; border-radius: 999px; cursor: pointer; font-weight: 600 }
+.llm-btn.on { background: var(--accent-soft) }
+dialog.llm { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 20px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px) }
+dialog.llm::backdrop { background: rgba(0,0,0,.45) }
+dialog.llm h3 { margin: 0 0 6px }
+dialog.llm label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px }
+dialog.llm input, dialog.llm select { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: inherit }
+dialog.llm .chk { display: flex; gap: 8px; align-items: center; font-weight: 400 }
+dialog.llm .chk input { width: auto }
+dialog.llm .help { font-size: 13px; color: var(--muted); margin: 6px 0 0 }
+dialog.llm code { font-size: 12px; background: var(--sunk); padding: 1px 4px; border-radius: 4px; word-break: break-all }
+dialog.llm .acts { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 16px }
 .foot { font-size: 12px; color: var(--muted); padding-block: 24px 40px; border-top: 1px solid var(--line); margin-top: 32px }
 .foot a { color: inherit }
 
@@ -187,6 +199,7 @@ table.pos tr:last-child td { border-bottom: 0 }
       <button role="tab" data-view="history" aria-selected="false">Historique</button>
       <button role="tab" data-view="recap" aria-selected="false">Récap</button>
     </nav>
+    <button class="llm-btn" id="llmBtn">Connecter mon IA</button>
     <button class="chat-btn" id="openChat">Poser une question</button>
   </div>
   <div class="wrap srcline" id="srcline">Chargement des données…</div>
@@ -215,6 +228,33 @@ table.pos tr:last-child td { border-bottom: 0 }
   </form>
 </aside>
 <footer class="wrap foot">Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne. · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a></footer>
+<dialog class="llm" id="llmDlg">
+  <form method="dialog" id="llmForm">
+    <h3>Connecter mon IA</h3>
+    <p class="help">Ton navigateur parle directement à ton IA. Rien ne passe par ce site : ni tes questions, ni les réponses, ni ta clé.</p>
+    <label for="llmKind">Mon IA</label>
+    <select id="llmKind">
+      <option value="ollama">IA sur mon ordinateur : Ollama</option>
+      <option value="lmstudio">IA sur mon ordinateur : LM Studio</option>
+      <option value="anthropic">Claude (clé d'API Anthropic)</option>
+      <option value="openai">ChatGPT (clé d'API OpenAI)</option>
+      <option value="mistral">Mistral (clé d'API)</option>
+      <option value="custom">Autre service compatible OpenAI</option>
+    </select>
+    <div id="llmUrlRow"><label for="llmUrl">Adresse</label><input id="llmUrl" autocomplete="off" spellcheck="false"></div>
+    <div id="llmKeyRow"><label for="llmKey">Clé d'API</label><input id="llmKey" type="password" autocomplete="off" spellcheck="false" placeholder="Reste dans ton navigateur"></div>
+    <label for="llmModel">Modèle</label><input id="llmModel" list="llmModels" autocomplete="off" spellcheck="false"><datalist id="llmModels"></datalist>
+    <p class="help" id="llmHelp"></p>
+    <label class="chk"><input type="checkbox" id="llmRemember"> Se souvenir sur cet appareil (sinon tout est oublié en fermant l'onglet)</label>
+    <p class="help" id="llmStatus" role="status"></p>
+    <div class="acts">
+      <button type="button" class="btn" id="llmOff">Déconnecter</button>
+      <button type="button" class="btn" id="llmTest">Tester</button>
+      <button type="button" class="btn" id="llmCancel">Fermer</button>
+      <button type="submit" class="btn primary" id="llmSave">Connecter</button>
+    </div>
+  </form>
+</dialog>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -341,10 +381,96 @@ const Store = {
 const newId = (p) => p + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 // ---------- IA ----------
+// IA connectée par le visiteur : le navigateur appelle directement son IA (locale ou par clé d'API).
+// Aucune donnée ne passe par ce site. La config reste en mémoire, ou dans ce navigateur si « se souvenir ».
+const LLM_PRESETS = {
+  ollama:    { name: "Ollama", url: "http://localhost:11434/v1", key: false, model: "",
+    help: () => `Lance Ollama en autorisant ce site : <code>OLLAMA_ORIGINS=${esc(location.origin)} ollama serve</code>. Puis « Tester » pour choisir un modèle.` },
+  lmstudio:  { name: "LM Studio", url: "http://localhost:1234/v1", key: false, model: "",
+    help: () => "Dans LM Studio : onglet Developer, démarre le serveur et active « Enable CORS ». Puis « Tester » pour choisir un modèle." },
+  anthropic: { name: "Claude", url: "https://api.anthropic.com/v1", key: true, model: "claude-sonnet-5-5",
+    help: () => "Clé à créer sur console.anthropic.com (usage payant). Un abonnement Claude Pro ne donne pas de clé." },
+  openai:    { name: "ChatGPT", url: "https://api.openai.com/v1", key: true, model: "gpt-4o",
+    help: () => "Clé à créer sur platform.openai.com (usage payant). Un abonnement ChatGPT Plus ne donne pas de clé." },
+  mistral:   { name: "Mistral", url: "https://api.mistral.ai/v1", key: true, model: "mistral-large-latest",
+    help: () => "Clé à créer sur console.mistral.ai." },
+  custom:    { name: "IA", url: "", key: true, model: "",
+    help: () => "Adresse de base d'un service compatible OpenAI (se termine souvent par /v1). Clé facultative selon le service." },
+};
+const LLM_KEY = "pc27-llm";
+let LLM = null;
+try { LLM = JSON.parse(localStorage.getItem(LLM_KEY) || sessionStorage.getItem(LLM_KEY) || "null"); } catch {}
+const llmName = () => (window.claude?.use ? "Claude" : LLM ? `${LLM_PRESETS[LLM.kind]?.name || "IA"}${LLM.model ? " · " + LLM.model : ""}` : "");
+const aiShort = () => (window.claude?.use ? "Claude" : LLM_PRESETS[LLM?.kind]?.name || "L'IA");
+
+async function llmFetch(cfg, path, body, signal) {
+  const base = cfg.url.replace(/\/+$/, "");
+  const h = { "content-type": "application/json" };
+  if (cfg.kind === "anthropic") Object.assign(h, { "x-api-key": cfg.key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" });
+  else if (cfg.key) h.authorization = "Bearer " + cfg.key;
+  let r;
+  try { r = await fetch(base + path, { method: body ? "POST" : "GET", headers: h, body: body && JSON.stringify(body), signal, referrerPolicy: "no-referrer", credentials: "omit" }); }
+  catch (e) { if (e?.name === "AbortError") throw { code: "cancelled" }; throw { code: "unreachable" }; }
+  if (!r.ok) {
+    let msg = ""; try { const j = await r.json(); msg = j?.error?.message || j?.message || ""; } catch {}
+    throw { code: r.status === 401 || r.status === 403 ? "bad_key" : r.status === 429 ? "rate_limited" : r.status === 404 ? "bad_model" : "http", detail: `${r.status} ${msg}`.trim() };
+  }
+  return r;
+}
+async function llmModels(cfg) {
+  const r = await llmFetch(cfg, "/models");
+  const j = await r.json();
+  return (j.data || j.models || []).map((m) => m.id || m.name).filter(Boolean);
+}
+function makeSample(cfg) {
+  const run = async (input, opts = {}) => {
+    const turns = typeof input === "string" ? [{ role: "user", content: input }] : input;
+    const anth = cfg.kind === "anthropic";
+    const body = anth ? { model: cfg.model, max_tokens: 8000, stream: true, messages: turns }
+                      : { model: cfg.model, stream: true, messages: turns };
+    const r = await llmFetch(cfg, anth ? "/messages" : "/chat/completions", body, opts.signal);
+    const rd = r.body.getReader(), dec = new TextDecoder();
+    let buf = "", text = "", truncated = false;
+    try {
+      for (;;) {
+        const { done, value } = await rd.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const lines = buf.split("\n"); buf = lines.pop();
+        for (const l of lines) {
+          if (!l.startsWith("data:")) continue;
+          const d = l.slice(5).trim();
+          if (!d || d === "[DONE]") continue;
+          let ev; try { ev = JSON.parse(d); } catch { continue; }
+          let piece = "";
+          if (anth) { if (ev.type === "content_block_delta") piece = ev.delta?.text || ""; if (ev.delta?.stop_reason === "max_tokens") truncated = true; if (ev.type === "error") throw { code: "http", detail: ev.error?.message }; }
+          else { piece = ev.choices?.[0]?.delta?.content || ""; if (ev.choices?.[0]?.finish_reason === "length") truncated = true; }
+          if (piece) { text += piece; opts.onText?.({ text }); }
+        }
+      }
+    } catch (e) { if (e?.name === "AbortError") throw { code: "cancelled", text }; throw e?.code ? { ...e, text } : { code: "http", text }; }
+    if (!text) throw { code: "empty_completion" };
+    return { text, truncated };
+  };
+  run.json = async (prompt, opts) => {
+    const { text } = await run(prompt, opts);
+    const a = text.indexOf("{"), b = text.lastIndexOf("}");
+    try { return JSON.parse(text.slice(a, b + 1)); } catch { throw { code: "invalid_json" }; }
+  };
+  run.limits = async () => ({ tools: false });
+  return run;
+}
+
 let samplePromise = null;
-const getSample = () => (samplePromise ||= (window.claude?.use ? claude.use("sample").catch(() => null) : Promise.resolve(null)));
+const getSample = () => (samplePromise ||= (window.claude?.use ? claude.use("sample").catch(() => null) : Promise.resolve(LLM ? makeSample(LLM) : null)));
 const AI_ERR = { not_granted: "L'accès à Claude n'a pas été autorisé pour cette page.", sampling_disabled: "Claude n'est pas disponible pour ce compte.", rate_limited: "Trop de demandes pour le moment, réessaie dans quelques minutes.", session_expired: "Session expirée : reconnecte-toi.", prompt_too_large: "Trop de données à analyser d'un coup : réduis le nombre de candidats ou choisis un thème.", invalid_json: "La réponse n'a pas pu être lue. Réessaie.", refused: "Claude n'a pas pu répondre à cette demande.", empty_completion: "Réponse vide. Réessaie." };
-const aiErr = (e) => AI_ERR[e?.code] || "Erreur passagère. Réessaie.";
+Object.assign(AI_ERR, {
+  bad_key: "Clé refusée par le service d'IA. Vérifie-la dans « Connecter mon IA ».",
+  bad_model: "Modèle introuvable. Choisis-en un autre dans « Connecter mon IA ».",
+  unreachable: "Impossible de joindre ton IA. Est-elle lancée, et autorise-t-elle ce site (CORS) ? Voir « Connecter mon IA ».",
+  http: "Ton IA a renvoyé une erreur. Réessaie ou change de modèle.",
+});
+const aiErr = (e) => (AI_ERR[e?.code] || "Erreur passagère. Réessaie.") + (e?.detail ? ` (${e.detail.slice(0, 160)})` : "");
 
 const RULES = `Tu es l'assistant d'un comparateur des programmes de l'élection présidentielle française de 2027. Réponds en français.
 RÈGLES DE NEUTRALITÉ (obligatoires) :
@@ -443,7 +569,7 @@ async function setupAnalysis(box, spec) {
     box.innerHTML = `<div class="ai-head"><h3>${title}</h3></div><p class="note">Sélectionne au moins ${spec.kind === "theme" ? "un candidat" : "deux candidats"} pour lancer l'analyse.</p>`; return;
   }
   const key = analysisKey(spec);
-  box.innerHTML = `<div class="ai-head"><div><h3>${title}</h3><div class="note">Résumé, points communs, clivages et conséquences possibles, rédigés par Claude à partir des propositions affichées ci-dessous.</div></div>
+  box.innerHTML = `<div class="ai-head"><div><h3>${title}</h3><div class="note">Résumé, points communs, clivages et conséquences possibles, rédigés par ton IA à partir des propositions affichées ci-dessous.</div></div>
     <span><button class="btn primary" data-act="run">Générer l'analyse</button></span></div><div class="ai-body" data-out></div>`;
   const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
   const cached = await Store.getAnalysis(key);
@@ -451,7 +577,7 @@ async function setupAnalysis(box, spec) {
   const sample = await getSample();
   if (!sample) {
     btn.textContent = "Copier pour mon IA"; btn.title = "Copie les consignes de neutralité et les propositions affichées";
-    if (!cached) out.innerHTML = `<p class="note">Ce site n'appelle aucune IA. Ce bouton copie les consignes de neutralité et les propositions affichées ; colle-les dans l'IA de ton choix (ChatGPT, Claude, Mistral…). Rien n'est envoyé à ce site.</p>`;
+    if (!cached) out.innerHTML = `<p class="note">Branche ton IA avec « Connecter mon IA » (en haut) pour générer l'analyse ici. Ou copie les consignes de neutralité et les propositions affichées, et colle-les dans l'IA de ton choix. Rien n'est envoyé à ce site.</p>`;
     const sids = spec.sids?.length ? spec.sids : D.themes.flatMap((t) => t.subs.map((s) => s.id));
     btn.onclick = () => copyForLLM(llmText({ ...spec, sids }, `TÂCHE : analyse comparative neutre de ces propositions : synthèse factuelle, points communs, clivages, puis pour chaque candidat les conséquences possibles (mécanismes, qui paie, qui bénéficie) et les points débattus, toujours attribués.`));
     return;
@@ -472,7 +598,7 @@ async function runAnalysis(box, spec, key) {
   const sample = await getSample();
   const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
   btn.disabled = true;
-  out.innerHTML = `<div class="thinking"><span class="dot"></span>Claude lit ${spec.cids.length} programme(s) et rédige l'analyse… (30 s à 2 min)</div>`;
+  out.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} lit ${spec.cids.length} programme(s) et rédige l'analyse… (30 s à 2 min)</div>`;
   const names = spec.cids.map((id) => D.candById.get(id).name);
   const scope = spec.sids.length === 1 ? D.subById.get(spec.sids[0]).name : spec.kind === "full" ? "l'ensemble du programme" : D.themeOfSub.get(spec.sids[0]).name;
   let fmt;
@@ -680,7 +806,7 @@ async function sendChat() {
   if (!c.title) c.title = q.slice(0, 90);
   renderChat();
   const bubble = document.createElement("div"); bubble.className = "msg assistant";
-  bubble.innerHTML = `<div class="thinking"><span class="dot"></span>Claude cherche dans les programmes…</div>`;
+  bubble.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} cherche dans les programmes…</div>`;
   $("#msgs").appendChild(bubble); $("#msgs").scrollTop = 1e9;
 
   let ctxText = "";
@@ -771,11 +897,11 @@ function renderRecap() {
 
 async function generateRecap() {
   const sample = await getSample();
-  if (!sample) { toast("La synthèse fonctionne avec une IA intégrée. Ici, utilise « Copier pour mon IA »."); return; }
+  if (!sample) { toast("Connecte d'abord ton IA (bouton « Connecter mon IA » en haut)."); return; }
   const btn = $("#genRecap"), out = $("#recapOut");
   const pins = Store.list("pin"), convs = Store.list("conv").slice(0, 40);
   btn.disabled = true;
-  out.innerHTML = `<div class="thinking"><span class="dot"></span>Claude relit ${convs.length} discussion(s) et ${pins.length} élément(s) épinglé(s)…</div>`;
+  out.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} relit ${convs.length} discussion(s) et ${pins.length} élément(s) épinglé(s)…</div>`;
   let material = "ÉLÉMENTS ÉPINGLÉS :\n" + (pins.map((p) => `• [${p.source}] ${p.text}`).join("\n") || "aucun");
   material += "\n\nDISCUSSIONS :\n" + convs.map((c) => `## ${c.title} (${new Date(c.updatedAt).toLocaleDateString("fr-FR")})\n` + c.messages.map((m) => `${m.role === "user" ? "Question" : "Réponse"} : ${m.content}`).join("\n")).join("\n\n");
   material = material.slice(0, 150000);
@@ -786,6 +912,65 @@ async function generateRecap() {
     renderRecap();
   } catch (e) { out.innerHTML = `<p class="err">${esc(aiErr(e))}</p>`; btn.disabled = false; }
 }
+
+// ---------- dialogue « Connecter mon IA » ----------
+async function refreshLlmUi() {
+  const on = !!(await getSample());
+  const b = $("#llmBtn");
+  if (window.claude?.use) b.hidden = true;
+  b.textContent = on ? "IA : " + llmName() : "Connecter mon IA";
+  b.classList.toggle("on", on);
+  $("#sendChat").textContent = on ? "Envoyer" : "Copier pour mon IA";
+  $("#chatNote").textContent = on ? `Réponses de ${llmName()}, à partir des propositions relevées. Rien ne passe par ce site.` : "Aucune IA connectée : ta question et les propositions sont copiées, à coller dans ton IA. Ou « Connecter mon IA ».";
+}
+function llmFormCfg() {
+  const kind = $("#llmKind").value, pr = LLM_PRESETS[kind];
+  return { kind, url: ($("#llmUrl").value.trim() || pr.url), key: $("#llmKey").value.trim(), model: $("#llmModel").value.trim() };
+}
+function llmFormKind(kind, keep) {
+  const pr = LLM_PRESETS[kind];
+  $("#llmKind").value = kind;
+  $("#llmUrl").value = keep?.url || pr.url;
+  $("#llmUrlRow").hidden = kind === "anthropic" || kind === "openai" || kind === "mistral";
+  $("#llmKeyRow").hidden = !pr.key;
+  $("#llmKey").value = keep?.key || "";
+  $("#llmModel").value = keep?.model || pr.model;
+  $("#llmHelp").innerHTML = pr.help();
+  $("#llmStatus").textContent = "";
+}
+async function llmTest() {
+  const cfg = llmFormCfg(), st = $("#llmStatus");
+  st.textContent = "Test en cours…";
+  try {
+    const models = await llmModels(cfg).catch((e) => { if (e.code === "unreachable" || e.code === "bad_key") throw e; return []; });
+    $("#llmModels").innerHTML = models.map((m) => `<option value="${esc(m)}">`).join("");
+    if (!cfg.model && models.length) { $("#llmModel").value = models[0]; cfg.model = models[0]; }
+    if (!cfg.model) { st.textContent = "Connexion OK, mais choisis un modèle."; return false; }
+    await makeSample(cfg)("Réponds seulement : OK");
+    st.textContent = `Connexion OK avec ${cfg.model}.` + (models.length > 1 ? ` ${models.length} modèles disponibles.` : "");
+    return true;
+  } catch (e) { st.textContent = aiErr(e); return false; }
+}
+$("#llmBtn").onclick = () => { llmFormKind(LLM?.kind || "ollama", LLM); $("#llmRemember").checked = !!LLM?.remember; $("#llmDlg").showModal(); };
+$("#llmKind").onchange = (e) => llmFormKind(e.target.value);
+$("#llmTest").onclick = llmTest;
+$("#llmCancel").onclick = () => $("#llmDlg").close();
+$("#llmOff").onclick = () => {
+  LLM = null; samplePromise = null;
+  try { localStorage.removeItem(LLM_KEY); sessionStorage.removeItem(LLM_KEY); } catch {}
+  $("#llmDlg").close(); refreshLlmUi(); setView(S.view); toast("IA déconnectée, clé effacée.");
+};
+$("#llmForm").onsubmit = async (e) => {
+  e.preventDefault();
+  if (!(await llmTest())) return;
+  LLM = { ...llmFormCfg(), remember: $("#llmRemember").checked };
+  samplePromise = null;
+  try {
+    localStorage.removeItem(LLM_KEY); sessionStorage.removeItem(LLM_KEY);
+    (LLM.remember ? localStorage : sessionStorage).setItem(LLM_KEY, JSON.stringify(LLM));
+  } catch {}
+  $("#llmDlg").close(); await refreshLlmUi(); setView(S.view); toast("IA connectée : " + llmName());
+};
 
 // ---------- démarrage ----------
 document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setView(b.dataset.view)));
@@ -808,10 +993,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#drawer
   const h = location.hash.slice(1);
   setView(["vs", "history", "recap"].includes(h) ? h : "theme");
   await Store.init();
-  if (!(await getSample())) {
-    $("#sendChat").textContent = "Copier pour mon IA";
-    $("#chatNote").textContent = "Ce site n'appelle aucune IA : ta question et les propositions sont copiées, à coller dans ton IA.";
-  }
+  refreshLlmUi();
   ({ theme: renderTheme, vs: renderVs, history: renderHistory, recap: renderRecap })[S.view]();
 })();
 </script>
