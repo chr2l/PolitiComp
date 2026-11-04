@@ -13,7 +13,7 @@ Comparateur politique : site statique (site/), données JSON (data/), scripts.
 - `site/llms.txt` = README pour les IA (neutralité, sources). Aussi servi en /README.md.
 - `site/llms-full.txt` = toutes les propositions en texte, régénéré par `node scripts/build-llms.js` (lancé aussi par fetch-ifrap.js).
 - `site/conditions.html` : aucune collecte. Le site ne charge plus rien d'externe (Google Fonts retiré).
-- Le serveur (dépôt chr2l/serveur) doit servir ces chemins et ne garder aucun journal d'accès.
+- En ligne : https://politicomp.elie.place (app publique du portail elie.place, Cloudflare devant). Le conteneur `politicomp` (dépôt chr2l/serveur) fait tourner `node --watch scripts/serve.js` (plus nginx), sans journal d'accès.
 
 ## Déploiement
 Auto sur le serveur (dépôt chr2l/serveur) : chaque commit sur `main` est déployé en moins de 5 min.
