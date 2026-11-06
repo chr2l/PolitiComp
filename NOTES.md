@@ -45,3 +45,4 @@ Rien de sensible repéré.
 - 2026-11-06 : face-à-face : en-tête des candidats n'est plus collant (il mangeait le texte) ; chaque case rappelle le nom du candidat.
 - 2026-11-06 : boutons « Copier le lien », « Poser une question », « Précédent/Suivant » remplacés par des symboles (bulle d'explication au survol).
 - 2026-11-06 : titre de l'onglet : « PolitiComp ».
+- 2026-11-06 : boutons de blocs du panneau remplacés par la petite barre de position (G à gauche, D à droite, bulle au survol).

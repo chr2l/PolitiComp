@@ -109,9 +109,16 @@ a.btn.primary { color: var(--accent-ink) }
 .cside-h { display: flex; justify-content: space-between; align-items: center; gap: 8px }
 .cside .row2 { display: flex; gap: 6px; flex-wrap: wrap }
 .cside input[type=search] { width: 100%; padding: 6px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper) }
-.blocs { display: flex; gap: 4px; flex-wrap: wrap }
-.blocs button { border: 1px solid var(--line); background: var(--paper); border-radius: 999px; font-size: 11.5px; padding: 2px 8px; cursor: pointer; color: var(--muted) }
-.blocs button.full { border-color: var(--accent); color: var(--accent); background: var(--accent-soft) }
+.blocs { display: flex; gap: 4px; align-items: center }
+.blocs .gd { font: 600 11px/1 var(--f-body); color: var(--muted); padding: 0 2px }
+.blocs { position: relative }
+.blocs button::after { content: attr(data-tip); position: absolute; top: calc(100% + 7px); left: 0; right: 0; z-index: 30; background: var(--ink); color: var(--paper); font: 500 12px/1.35 var(--f-body); padding: 5px 9px; border-radius: 8px; pointer-events: none; opacity: 0; transform: translateY(-3px); transition: opacity .12s, transform .12s; text-align: left }
+.blocs button:hover::after, .blocs button:focus-visible::after { opacity: 1; transform: none }
+@media (prefers-reduced-motion: reduce) { .blocs button::after { transition: none } }
+.blocs button { flex: 1; border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 5px 0; cursor: pointer; line-height: 0 }
+.blocs button .pos5 { margin: 0 } .blocs button:hover { border-color: var(--muted) }
+.blocs button.full { border-color: var(--accent); background: var(--accent-soft) }
+.blocs button.full .pos5 i.on { background: var(--accent) }
 .tog { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 8px; cursor: pointer }
 .tog:hover { background: var(--sunk) }
 .tog .nm { font-size: 14px; line-height: 1.25; min-width: 0 }
@@ -701,7 +708,7 @@ function renderTheme() {
   const cq = norm(S.cq);
   const list = D.cands.filter((c) => !cq || norm(c.name + " " + (c.pinfo?.sigle || "") + " " + (c.party || "")).includes(cq));
   const blocBtns = (D.blocs || []).map((b) => { const ids = D.cands.filter((c) => c.pinfo?.bloc === b).map((c) => c.id); if (!ids.length) return "";
-    const full = ids.every((id) => S.on.has(id)); return `<button data-bloc="${esc(b)}" class="${full ? "full" : ""}" title="${full ? "Cacher" : "Afficher"} : ${esc(b)} (${ids.length})">${esc(b)}</button>`; }).join("");
+    const full = ids.every((id) => S.on.has(id)); return `<button data-bloc="${esc(b)}" class="${full ? "full" : ""}" data-tip="${esc(b)} · ${ids.length} candidat${ids.length > 1 ? "s" : ""}. Clic pour ${full ? "les cacher" : "les afficher"}." aria-label="${full ? "Cacher" : "Afficher"} : ${esc(b)}" aria-pressed="${full}">${posScale(b)}</button>`; }).join("");
   const { words, hits } = findProps(S.q);
   const hitsHtml = S.q.trim() ? `<div class="hits">${hits.length ? `<div class="note">${hits.length} proposition${hits.length > 1 ? "s" : ""} trouvée${hits.length > 1 ? "s" : ""}${hits.length > 40 ? " (40 premières affichées)" : ""}. Clique pour ouvrir le sous-thème.</div>` + hits.slice(0, 40).map((h) => `<button class="hit" data-go="${h.sb.id}" data-cid="${h.c.id}"><span class="where">${esc(h.c.name)} · ${esc(h.t.name)} › ${esc(h.sb.name)}</span><span>${hl(h.text, words)}</span></button>`).join("") : `<div class="note">Aucune proposition ne contient « ${esc(S.q)} ».</div>`}</div>` : "";
 
@@ -713,7 +720,7 @@ function renderTheme() {
     <aside class="cside" aria-label="Candidats">
       <div class="cside-h"><div class="eyebrow">Candidats affichés</div><span class="mono note">${S.on.size}/${D.cands.length}</span></div>
       <div class="row2"><button class="btn sm" data-all="all" title="Touche T">Tous</button><button class="btn sm" data-all="none" title="Touche A">Aucun</button><button class="btn sm" data-all="here" title="Touche P">Avec propositions ici</button></div>
-      <div class="blocs" title="Afficher ou cacher un bloc entier (classement du ministère de l'Intérieur)">${blocBtns}</div>
+      <div class="blocs" role="group" aria-label="Blocs politiques, de gauche à droite (classement du ministère de l'Intérieur)"><span class="gd" title="Gauche" aria-hidden="true">G</span>${blocBtns}<span class="gd" title="Droite" aria-hidden="true">D</span></div>
       <input type="search" id="cq" placeholder="Chercher un candidat (C)" value="${esc(S.cq)}" aria-label="Chercher un candidat">
       <div>${list.map((c) => { const n = propsOf(c.id, S.sub).length; return `<label class="tog${n ? "" : " zero"}"><input type="checkbox" class="sw" data-cid="${c.id}" ${S.on.has(c.id) ? "checked" : ""}><span class="nm"><span>${esc(c.name)}</span>${partyLine(c, "tiny")}</span><button type="button" class="solo" data-solo="${c.id}" title="N'afficher que ce candidat">seul</button><span class="n0" title="Propositions sur ce sous-thème">${n}</span></label>`; }).join("") || `<p class="note">Aucun candidat ne correspond.</p>`}</div>
       <p class="note">Ordre alphabétique. Le chiffre : propositions sur le sous-thème affiché. Touche <kbd>?</kbd> : raccourcis.</p>
