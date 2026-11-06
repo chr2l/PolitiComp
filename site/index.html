@@ -111,7 +111,7 @@ a.btn.primary { color: var(--accent-ink) }
 .tog { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 8px; cursor: pointer }
 .tog:hover { background: var(--sunk) }
 .tog .nm { font-size: 14px; line-height: 1.25; min-width: 0 }
-.tog .nm .ptag { display: block; font-size: 11px }
+.tog .nm .ptag { display: block; font-size: 11px; line-height: 1.4 }
 .tog.zero .nm > span:first-child { color: var(--muted) }
 .tog .solo { border: 0; background: none; color: var(--accent); font-size: 11.5px; cursor: pointer; padding: 2px 4px; opacity: 0 }
 .tog:hover .solo, .tog .solo:focus-visible { opacity: 1 }
@@ -159,11 +159,18 @@ ol.props li::marker { font-family: var(--f-mono); font-size: 12px; color: var(--
 .srcbadge { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-left: 4px; white-space: nowrap }
 .empty-cands { margin-top: 14px; font-size: 13px; color: var(--muted) }
 .ptag { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-weight: 400; white-space: nowrap; cursor: help }
-.pos5 { display: inline-flex; gap: 2px; vertical-align: 1px }
-.pos5 i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--muted); opacity: .6 }
-.pos5 i.on { background: var(--ink); border-color: var(--ink); opacity: 1 }
+.pos5 { display: inline-flex; gap: 1px; vertical-align: 1px; margin-inline: 2px }
+.pos5 i { width: 7px; height: 5px; background: var(--line); }
+.pos5 i:first-child { border-radius: 3px 0 0 3px } .pos5 i:last-child { border-radius: 0 3px 3px 0 }
+.pos5 i.on { background: var(--ink) }
+.ptag .bl { font-size: 11px }
 .cnt { font: 500 11px var(--f-mono); background: var(--sunk); color: var(--ink); border-radius: 999px; padding: 1px 7px; margin-left: 2px }
-.pnote { font-size: 12px; color: var(--muted); margin-top: 4px }
+.card .party { display: flex; flex-wrap: wrap; align-items: center; gap: 4px }
+details.pnote { display: inline; font-size: 12px; color: var(--muted) }
+details.pnote summary { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; border: 1px solid var(--muted); font: italic 600 10px/1 Georgia, serif; cursor: pointer; list-style: none }
+details.pnote summary::-webkit-details-marker { display: none }
+details.pnote[open] { display: block; flex-basis: 100% }
+details.pnote[open] summary { margin-bottom: 4px }
 
 /* Analyse IA */
 .ai { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; margin-bottom: 18px }
@@ -415,11 +422,19 @@ function posScale(bloc) {
   if (i < 0) return "";
   return `<span class="pos5" aria-hidden="true">${D.blocs.map((_, j) => `<i class="${j === i ? "on" : ""}"></i>`).join("")}</span>`;
 }
+// Nom court du bloc, pour tenir sur une ligne
+// Précision sur le classement (contesté, ou fait par analogie) : repliée derrière un petit « i »
+function pinfoNote(c) {
+  const p = c.pinfo; if (!p) return "";
+  const t = [p.base.startsWith("par analogie") ? "Classement " + p.base + "." : "", p.note || ""].filter(Boolean).join(" ");
+  return t ? `<details class="pnote"><summary title="Précision sur ce classement">i</summary><div>${esc(t)}</div></details>` : "";
+}
+const blocShort = (b) => String(b || "").replace(/^Extrême /, "ext. ").toLowerCase();
 function partyLine(c, short) {
   const p = c.pinfo;
   if (!p) return esc(c.party || "Parti non renseigné");
   const tip = [p.parti, "Position : " + p.bloc + " (bloc du ministère de l'Intérieur)", "Base : " + p.base, p.note || ""].filter(Boolean).join("\n");
-  return `<span class="ptag" title="${esc(tip)}">${esc(short ? p.sigle : p.parti)} · ${posScale(p.bloc)} ${esc(p.bloc)}${!short && p.base.startsWith("par analogie") ? "*" : ""}</span>`;
+  return `<span class="ptag" title="${esc(tip)}">${esc(short ? p.sigle : p.parti)} ${posScale(p.bloc)}${short === "tiny" ? "" : ` <span class="bl">${esc(blocShort(p.bloc))}</span>`}</span>`;
 }
 const byLast = (a, b) => a.name.split(" ").slice(1).join(" ").localeCompare(b.name.split(" ").slice(1).join(" "), "fr");
 const partyText = (c) => c.pinfo ? `${c.pinfo.parti}, ${c.pinfo.bloc}` : (c.party || "parti non renseigné");
@@ -683,7 +698,7 @@ function renderTheme() {
       <div class="row2"><button class="btn sm" data-all="all" title="Touche T">Tous</button><button class="btn sm" data-all="none" title="Touche A">Aucun</button><button class="btn sm" data-all="here" title="Touche P">Avec propositions ici</button></div>
       <div class="blocs" title="Afficher ou cacher un bloc entier (classement du ministère de l'Intérieur)">${blocBtns}</div>
       <input type="search" id="cq" placeholder="Chercher un candidat (C)" value="${esc(S.cq)}" aria-label="Chercher un candidat">
-      <div>${list.map((c) => { const n = propsOf(c.id, S.sub).length; return `<label class="tog${n ? "" : " zero"}"><input type="checkbox" class="sw" data-cid="${c.id}" ${S.on.has(c.id) ? "checked" : ""}><span class="nm"><span>${esc(c.name)}</span>${partyLine(c, true)}</span><button type="button" class="solo" data-solo="${c.id}" title="N'afficher que ce candidat">seul</button><span class="n0" title="Propositions sur ce sous-thème">${n}</span></label>`; }).join("") || `<p class="note">Aucun candidat ne correspond.</p>`}</div>
+      <div>${list.map((c) => { const n = propsOf(c.id, S.sub).length; return `<label class="tog${n ? "" : " zero"}"><input type="checkbox" class="sw" data-cid="${c.id}" ${S.on.has(c.id) ? "checked" : ""}><span class="nm"><span>${esc(c.name)}</span>${partyLine(c, "tiny")}</span><button type="button" class="solo" data-solo="${c.id}" title="N'afficher que ce candidat">seul</button><span class="n0" title="Propositions sur ce sous-thème">${n}</span></label>`; }).join("") || `<p class="note">Aucun candidat ne correspond.</p>`}</div>
       <p class="note">Ordre alphabétique. Le chiffre : propositions sur le sous-thème affiché. Touche <kbd>?</kbd> : raccourcis.</p>
     </aside>
     <div style="min-width:0">
@@ -693,7 +708,7 @@ function renderTheme() {
         <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn candBtn" id="candBtn">Candidats (${S.on.size})</button><button class="btn" id="copyLink" title="Touche L">Copier le lien</button><button class="btn" id="askTheme" title="Touche Q">Poser une question sur ce thème</button></div></div>
       <div class="subs">${theme.subs.map((s) => `<button data-sub="${s.id}" aria-current="${s.id === S.sub}">${esc(s.name)}<span class="n">${candsWith(s.id).filter((c) => S.on.has(c.id)).length}</span></button>`).join("")}</div>
       <div class="ai" id="aiBox"></div>
-      <div class="cards">${shown.map((c) => `<article class="card"><h3><span class="ini">${initials(c.name)}</span>${esc(c.name)}<button class="hide" data-hide="${c.id}" title="Cacher ce candidat" aria-label="Cacher ${esc(c.name)}">×</button></h3><div class="party">${partyLine(c)}</div>${c.pinfo?.base.startsWith("par analogie") ? `<div class="pnote">* Classement ${esc(c.pinfo.base)}.</div>` : ""}${c.pinfo?.note ? `<div class="pnote">${esc(c.pinfo.note)}</div>` : ""}
+      <div class="cards">${shown.map((c) => `<article class="card"><h3><span class="ini">${initials(c.name)}</span>${esc(c.name)}<button class="hide" data-hide="${c.id}" title="Cacher ce candidat" aria-label="Cacher ${esc(c.name)}">×</button></h3><div class="party">${partyLine(c, true)}${pinfoNote(c)}</div>
         <ol class="props">${propsOf(c.id, S.sub).map((p) => `<li>${esc(p.text)}${p.src !== "IFRAP" ? `<a class="srcbadge" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.src)}</a>` : ""}</li>`).join("")}</ol></article>`).join("")}</div>
       ${!withP.length ? `<div class="emptystate">Aucune proposition relevée sur ce sous-thème pour l'instant.</div>` : !shown.length ? `<div class="emptystate">Aucun des candidats affichés n'a de proposition relevée ici. <button class="btn sm" data-all="here">Afficher ceux qui en ont (${withP.length})</button></div>` : ""}
       ${hiddenP.length && shown.length ? `<p class="empty-cands">Cachés, avec des propositions ici : ${hiddenP.map((c) => `<button class="pinbtn" data-show="${c.id}">${esc(c.name)}</button>`).join(", ")}.</p>` : ""}
