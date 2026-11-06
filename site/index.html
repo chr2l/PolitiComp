@@ -215,8 +215,9 @@ table.pos tr:last-child td { border-bottom: 0 }
 .vs-cell { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; min-width: 0 }
 .vs-cell ol { margin: 0; padding-left: 18px; display: grid; gap: 5px }
 /* En-tête des candidats : collé juste sous la barre du haut (hauteur réelle dans --hdr), fin pour ne pas cacher les propositions */
-.vs-heads { position: sticky; top: var(--hdr, 96px); z-index: 5; background: var(--paper); padding-block: 4px 6px; box-shadow: 0 6px 8px -6px rgba(0, 0, 0, .35) }
-.vs-heads .vs-cell { font: 600 14px var(--f-display); display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-top-width: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.vs-heads { padding-block: 4px 6px }
+.vs-who { font: 600 11.5px var(--f-mono); color: var(--muted); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.vs-heads .vs-cell { font: 600 14px var(--f-display); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 7px 10px; border-top-width: 3px }
 .vs-heads .ini { width: 22px; height: 22px; font-size: 10px }
 .vs-cell.vs-empty { background: transparent; border-style: dashed; border-top-style: solid; padding-block: 7px; font-size: 13px }
 
@@ -915,9 +916,9 @@ function renderVs() {
   if (!shown.length) { $("#vsGrid").innerHTML = ""; return; }
   const cols = shown.length;
   const rows = sids.filter((sid) => shown.some((cid) => propsOf(cid, sid).length));
-  $("#vsGrid").innerHTML = `<div class="vs-table"><div class="vs-heads"><div class="vs-row" style="--cols:${cols};margin:0">${shown.map((cid) => { const c = D.candById.get(cid); return `<div class="vs-cell" style="--c:${SLOT[S.vs.indexOf(cid)]}"><span class="ini">${initials(c.name)}</span>${esc(c.name)} ${partyLine(c)}</div>`; }).join("")}</div></div>
+  $("#vsGrid").innerHTML = `<div class="vs-table"><div class="vs-heads"><div class="vs-row" style="--cols:${cols};margin:0">${shown.map((cid) => { const c = D.candById.get(cid); return `<div class="vs-cell" style="--c:${SLOT[S.vs.indexOf(cid)]}"><span class="ini">${initials(c.name)}</span>${esc(c.name)} ${partyLine(c, true)}</div>`; }).join("")}</div></div>
     ${rows.map((sid) => `<div class="vs-sub">${esc(D.subById.get(sid).name)}${sids.length > 1 && S.vsScope === "all" ? `<span class="eyebrow">${esc(D.themeOfSub.get(sid).name)}</span>` : ""}</div>
-      <div class="vs-row" style="--cols:${cols}">${shown.map((cid) => { const ps = propsOf(cid, sid); return `<div class="vs-cell${ps.length ? "" : " vs-empty"}" style="--c:${SLOT[S.vs.indexOf(cid)]}">${ps.length ? `<ol>${ps.map((p) => `<li>${esc(p.text)}</li>`).join("")}</ol>` : `<span class="muted">Aucune proposition relevée.</span>`}</div>`; }).join("")}</div>`).join("")}
+      <div class="vs-row" style="--cols:${cols}">${shown.map((cid) => { const ps = propsOf(cid, sid); return `<div class="vs-cell${ps.length ? "" : " vs-empty"}" style="--c:${SLOT[S.vs.indexOf(cid)]}"><div class="vs-who">${esc(D.candById.get(cid).name)}</div>${ps.length ? `<ol>${ps.map((p) => `<li>${esc(p.text)}</li>`).join("")}</ol>` : `<span class="muted">Aucune proposition relevée.</span>`}</div>`; }).join("")}</div>`).join("")}
     ${rows.length ? "" : `<div class="emptystate">Aucune proposition relevée pour ces candidats sur ce périmètre.</div>`}</div>`;
 }
 
