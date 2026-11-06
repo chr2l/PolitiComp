@@ -23,6 +23,9 @@
   --ok: #6CC27D; --warn: #E2B44C; --bad: #EE8A7B; color-scheme: dark }
 
 * { box-sizing: border-box }
+/* Barres de défilement cachées partout (on peut toujours défiler à la molette, au doigt ou au clavier) */
+html, * { scrollbar-width: none; -ms-overflow-style: none }
+*::-webkit-scrollbar { display: none; width: 0; height: 0 }
 html, body { background: var(--paper); color: var(--ink) }
 body { font: 15px/1.55 var(--f-body); }
 button, select, input, textarea { font: inherit; color: inherit }
@@ -68,7 +71,7 @@ a.btn.primary { color: var(--accent-ink) }
 .note { font-size: 13px; color: var(--muted) }
 
 /* Vue Thème (maquette A) : thèmes en haut, panneau des candidats à gauche, fiches à droite */
-.tbar { display: flex; gap: 4px; overflow-x: auto; padding: 2px 0 10px; margin-bottom: 14px; border-bottom: 1px solid var(--line); scrollbar-width: thin }
+.tbar { display: flex; gap: 4px; overflow-x: auto; padding: 2px 0 10px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
 .tbar button { border: 0; background: none; white-space: nowrap; padding: 6px 12px; border-radius: 999px; cursor: pointer; color: var(--muted); font-weight: 500 }
 .tbar button:hover { background: var(--sunk); color: var(--ink) }
 .tbar button[aria-current="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600 }
