@@ -3,7 +3,7 @@
 /* Layout : barre d'onglets en haut ; vue Thème = index des thèmes à gauche + fiches candidats ; tiroir de discussion à droite. */
 :root {
   --paper: #F6F5F1; --surface: #FFFFFF; --sunk: #EFEDE7; --ink: #1F2430; --muted: #5F6470; --line: #E3E0D8;
-  --accent: #3346C4; --accent-ink: #FFFFFF; --accent-soft: #EBEDFB;
+  --accent: #3346C4; --accent-ink: #FFFFFF; --accent-soft: #EBEDFB; --pressed: #E9E6DE;
   --shadow: 0 1px 2px rgba(40, 32, 16, .05), 0 6px 18px rgba(40, 32, 16, .06);
   --s1: #0E7471; --s2: #A65B17; --s3: #6347AD; --s4: #AC3556;
   --ok: #2F7A3E; --warn: #9A6A00; --bad: #A33A2B;
@@ -14,12 +14,12 @@
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --paper: #15161B; --surface: #1D1F26; --sunk: #25272F; --ink: #ECEBE7; --muted: #A5A5AB; --line: #30323B;
-  --accent: #9DAAF5; --accent-ink: #12142A; --accent-soft: #262B47; --shadow: none;
+  --accent: #9DAAF5; --accent-ink: #12142A; --accent-soft: #262B47; --pressed: #121318; --shadow: none;
   --s1: #4FC1BC; --s2: #E4A260; --s3: #A994EC; --s4: #EC8AA6;
   --ok: #6CC27D; --warn: #E2B44C; --bad: #EE8A7B; color-scheme: dark } }
 :root[data-theme="dark"] {
   --paper: #15161B; --surface: #1D1F26; --sunk: #25272F; --ink: #ECEBE7; --muted: #A5A5AB; --line: #30323B;
-  --accent: #9DAAF5; --accent-ink: #12142A; --accent-soft: #262B47; --shadow: none;
+  --accent: #9DAAF5; --accent-ink: #12142A; --accent-soft: #262B47; --pressed: #121318; --shadow: none;
   --s1: #4FC1BC; --s2: #E4A260; --s3: #A994EC; --s4: #EC8AA6;
   --ok: #6CC27D; --warn: #E2B44C; --bad: #EE8A7B; color-scheme: dark }
 
@@ -28,21 +28,23 @@
 html, * { scrollbar-width: none; -ms-overflow-style: none }
 *::-webkit-scrollbar { display: none; width: 0; height: 0 }
 html, body { background: var(--paper); color: var(--ink) }
-body { font: 15px/1.55 var(--f-body); }
+body { font: 15px/1.55 var(--f-body); margin: 0 }
 button, select, input, textarea { font: inherit; color: inherit }
 h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.2 }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 .wrap { max-width: 1280px; margin: 0 auto; padding-inline: 16px }
 
 header.top { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20 }
-.top-in { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 12px }
+.top-in { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; min-height: 64px }
 .brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto }
 .brand h1 { font-size: 22px; letter-spacing: -0.01em }
 .brand .yr { font-family: var(--f-mono); font-size: 12px; color: var(--muted) }
-nav.tabs { display: flex; gap: 2px; flex-wrap: wrap }
-nav.tabs button { border: 0; background: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500 }
-nav.tabs button:hover { background: var(--sunk); color: var(--ink) }
-nav.tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent) }
+/* Onglets de page : style « enfoncé » sur toute la hauteur de la barre (différent des pastilles de thèmes) */
+nav.tabs { display: flex; align-self: stretch }
+nav.tabs button { border: 0; background: none; padding: 0 16px; cursor: pointer; color: var(--muted); font-weight: 500; position: relative }
+nav.tabs button:hover { color: var(--ink) }
+nav.tabs button[aria-selected="true"] { background: var(--pressed); color: var(--ink); box-shadow: inset 0 2px 5px rgba(0,0,0,.14) }
+nav.tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent) }
 .chat-btn { border: 0; background: var(--accent); color: var(--accent-ink); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 600 }
 .srcline { font-size: 12px; color: var(--muted); padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--line) }
 .srcline a { color: inherit }
@@ -275,7 +277,16 @@ table.pos tr:last-child td { border-bottom: 0 }
   .cside { display: none; position: static; max-height: none }
   .theme-layout.open .cside { display: grid }
   .candBtn { display: inline-block }
-  header.top { position: static }
+  /* Barre du haut compacte sur téléphone : marque + 2 boutons, puis les onglets sur toute la largeur */
+  .top-in { gap: 8px; min-height: 0; padding-top: 8px }
+  .brand { flex: 1 1 0; min-width: 0 }
+  .brand h1 { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis } .brand .yr, #keysBtn, .m-hide { display: none }
+  .m-cap { text-transform: capitalize }
+  .llm-btn, .chat-btn { font-size: 12.5px; padding: 6px 10px; white-space: nowrap }
+  nav.tabs { order: 9; flex-basis: calc(100% + 32px); margin-inline: -16px; height: 42px }
+  nav.tabs button { flex: 1 1 auto; padding: 0 6px; font-size: 14px; white-space: nowrap }
+  nav.tabs button[aria-selected="true"]::after { left: 8px; right: 8px }
+
   .two { grid-template-columns: minmax(0, 1fr) }
   .vs-heads { top: 0; position: static }
   .sec-head h2 { font-size: 23px }
@@ -293,7 +304,7 @@ table.pos tr:last-child td { border-bottom: 0 }
     </nav>
     <button class="keybtn" id="keysBtn" title="Raccourcis clavier (touche ?)" aria-label="Raccourcis clavier">?</button>
     <button class="llm-btn" id="llmBtn">Activer mon IA</button>
-    <button class="chat-btn" id="openChat">Poser une question</button>
+    <button class="chat-btn" id="openChat"><span class="m-hide">Poser une </span><span class="m-cap">question</span></button>
   </div>
 </header>
 
