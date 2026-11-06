@@ -67,19 +67,50 @@ a.btn.primary { color: var(--accent-ink) }
 .muted { color: var(--muted) }
 .note { font-size: 13px; color: var(--muted) }
 
-/* Vue Thème */
-.theme-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px; align-items: start }
-.tindex { position: sticky; top: 120px; max-height: calc(100vh - 140px); overflow: auto; padding-right: 4px }
-.tindex details { border-bottom: 1px solid var(--line); padding-block: 6px }
-.tindex summary { cursor: pointer; font-weight: 600; padding: 4px 2px; list-style: none; display: flex; justify-content: space-between }
-.tindex summary::-webkit-details-marker { display: none }
-.tindex summary::after { content: "+"; color: var(--muted) }
-.tindex details[open] summary::after { content: "–" }
-.tindex button.sub { display: flex; justify-content: space-between; gap: 8px; width: 100%; text-align: left; border: 0; background: none; padding: 5px 8px; border-radius: 6px; cursor: pointer; color: var(--muted); font-size: 14px }
-.tindex button.sub:hover { background: var(--sunk); color: var(--ink) }
-.tindex button.sub[aria-current="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600 }
-.tindex .n { font-family: var(--f-mono); font-size: 12px }
-.mobile-picker { display: none }
+/* Vue Thème (maquette A) : thèmes en haut, panneau des candidats à gauche, fiches à droite */
+.tbar { display: flex; gap: 4px; overflow-x: auto; padding: 2px 0 10px; margin-bottom: 14px; border-bottom: 1px solid var(--line); scrollbar-width: thin }
+.tbar button { border: 0; background: none; white-space: nowrap; padding: 6px 12px; border-radius: 999px; cursor: pointer; color: var(--muted); font-weight: 500 }
+.tbar button:hover { background: var(--sunk); color: var(--ink) }
+.tbar button[aria-current="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600 }
+.theme-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 22px; align-items: start }
+.cside { position: sticky; top: calc(var(--hdr, 96px) + 12px); max-height: calc(100vh - var(--hdr, 96px) - 24px); overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: grid; gap: 8px; align-content: start }
+.cside-h { display: flex; justify-content: space-between; align-items: center; gap: 8px }
+.cside .row2 { display: flex; gap: 6px; flex-wrap: wrap }
+.cside input[type=search] { width: 100%; padding: 6px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper) }
+.blocs { display: flex; gap: 4px; flex-wrap: wrap }
+.blocs button { border: 1px solid var(--line); background: var(--paper); border-radius: 999px; font-size: 11.5px; padding: 2px 8px; cursor: pointer; color: var(--muted) }
+.blocs button.full { border-color: var(--accent); color: var(--accent); background: var(--accent-soft) }
+.tog { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 8px; cursor: pointer }
+.tog:hover { background: var(--sunk) }
+.tog .nm { font-size: 14px; line-height: 1.25; min-width: 0 }
+.tog .nm .ptag { display: block; font-size: 11px }
+.tog.zero .nm > span:first-child { color: var(--muted) }
+.tog .solo { border: 0; background: none; color: var(--accent); font-size: 11.5px; cursor: pointer; padding: 2px 4px; opacity: 0 }
+.tog:hover .solo, .tog .solo:focus-visible { opacity: 1 }
+@media (hover: none) { .tog .solo { opacity: 1 } }
+.tog .n0 { font: 11px var(--f-mono); color: var(--muted); min-width: 16px; text-align: right }
+.sw { appearance: none; -webkit-appearance: none; width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; margin: 0; flex: none; transition: background .15s }
+.sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s }
+.sw:checked { background: var(--accent) } .sw:checked::after { transform: translateX(14px) }
+@media (prefers-reduced-motion: reduce) { .sw, .sw::after { transition: none } }
+.subs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px }
+.subs button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; cursor: pointer; font-size: 14px }
+.subs button[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600 }
+.subs .n { font: 11px var(--f-mono); color: var(--muted); margin-left: 4px }
+.card .hide { margin-left: auto; border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 4px; border-radius: 6px }
+.card .hide:hover { background: var(--sunk); color: var(--ink) }
+.pager { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px }
+.candBtn { display: none }
+.search { position: relative; margin-bottom: 12px }
+.search input { width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface) }
+.hits { display: grid; gap: 6px; margin-bottom: 16px }
+.hit { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 14px; display: grid; gap: 2px }
+.hit:hover { border-color: var(--accent) }
+.hit .where { font: 11.5px var(--f-mono); color: var(--muted) }
+.hit mark { background: var(--accent-soft); color: inherit; border-radius: 3px; padding: 0 1px }
+kbd { font: 11px var(--f-mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--paper) }
+dialog.keys table { border-collapse: collapse; font-size: 14px; width: 100% } dialog.keys td { padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top } dialog.keys td:first-child { white-space: nowrap }
+.keybtn { border: 1px solid var(--line); background: transparent; color: var(--muted); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: 700 }
 
 .sec-head { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; justify-content: space-between; margin-bottom: 14px }
 .sec-head h2 { font-size: 28px; letter-spacing: -0.015em }
@@ -184,9 +215,10 @@ table.pos tr:last-child td { border-bottom: 0 }
 
 @media (max-width: 900px) {
   .theme-layout { grid-template-columns: minmax(0, 1fr) }
-  .tindex { display: none }
-  .mobile-picker { display: block; margin-bottom: 12px }
-  .mobile-picker select { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface) }
+  .cside { display: none; position: static; max-height: none }
+  .theme-layout.open .cside { display: grid }
+  .candBtn { display: inline-block }
+  header.top { position: static }
   .two { grid-template-columns: minmax(0, 1fr) }
   .vs-heads { top: 0; position: static }
   .sec-head h2 { font-size: 23px }
@@ -202,6 +234,7 @@ table.pos tr:last-child td { border-bottom: 0 }
       <button role="tab" data-view="history" aria-selected="false">Historique</button>
       <button role="tab" data-view="recap" aria-selected="false">Récap</button>
     </nav>
+    <button class="keybtn" id="keysBtn" title="Raccourcis clavier (touche ?)" aria-label="Raccourcis clavier">?</button>
     <button class="llm-btn" id="llmBtn">Activer mon IA</button>
     <button class="chat-btn" id="openChat">Poser une question</button>
   </div>
@@ -247,6 +280,23 @@ table.pos tr:last-child td { border-bottom: 0 }
       <button type="button" class="btn" id="llmCancel">Fermer</button>
     </div>
   </form>
+</dialog>
+<dialog class="llm keys" id="keysDlg">
+  <h3>Raccourcis</h3>
+  <table>
+    <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Sous-thème précédent / suivant</td></tr>
+    <tr><td><kbd>Maj</kbd> + <kbd>←</kbd> <kbd>→</kbd></td><td>Thème précédent / suivant</td></tr>
+    <tr><td><kbd>/</kbd></td><td>Chercher dans toutes les propositions</td></tr>
+    <tr><td><kbd>C</kbd></td><td>Chercher un candidat (ouvre le panneau sur téléphone)</td></tr>
+    <tr><td><kbd>T</kbd> / <kbd>A</kbd></td><td>Tous les candidats / aucun</td></tr>
+    <tr><td><kbd>P</kbd></td><td>Seulement ceux qui ont des propositions ici</td></tr>
+    <tr><td><kbd>L</kbd></td><td>Copier le lien de cette vue</td></tr>
+    <tr><td><kbd>Q</kbd></td><td>Poser une question</td></tr>
+    <tr><td><kbd>?</kbd></td><td>Afficher cette aide</td></tr>
+    <tr><td><kbd>Échap</kbd></td><td>Fermer</td></tr>
+  </table>
+  <p class="help">Sur un candidat : « seul » n'affiche que lui. La croix sur une fiche le cache. Ta sélection est gardée dans ce navigateur pour la prochaine visite.</p>
+  <div class="acts"><button type="button" class="btn" onclick="this.closest('dialog').close()">Fermer</button></div>
 </dialog>
 <div class="toast" id="toast" hidden></div>
 
@@ -529,49 +579,117 @@ async function copyForLLM(text) {
 }
 
 // ---------- état ----------
-const S = { view: "theme", sub: null, themeSel: null, vs: [], vsScope: "", chatCtx: null, conv: null, chatCtl: null };
+const S = { view: "theme", sub: null, on: null, q: "", cq: "", panel: false, vs: [], vsScope: "", chatCtx: null, conv: null, chatCtl: null };
 
 function setView(v) {
   S.view = v;
   document.querySelectorAll("#tabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.view === v)));
   for (const k of ["theme", "vs", "history", "recap"]) $("#view-" + k).hidden = k !== v;
+  if (v !== "theme" && location.hash !== "#" + v) history.replaceState(null, "", "#" + v);
   ({ theme: renderTheme, vs: renderVs, history: renderHistory, recap: renderRecap })[v]();
   window.scrollTo({ top: 0 });
 }
 
 // ---------- vue Thème ----------
+// Sélection des candidats : la même pour tous les thèmes, gardée dans ce navigateur et dans le lien.
+const SEL_KEY = "pc27-sel";
+function saveSel() {
+  try { localStorage.setItem(SEL_KEY, JSON.stringify({ sub: S.sub, on: [...S.on] })); } catch {}
+  const all = S.on.size === D.cands.length;
+  const h = "#s=" + S.sub + (all ? "" : "&c=" + [...S.on].join("."));
+  if (S.view === "theme" && location.hash !== h) history.replaceState(null, "", h);
+}
+function loadSel() {
+  const h = new URLSearchParams(location.hash.slice(1));
+  let saved = {}; try { saved = JSON.parse(localStorage.getItem(SEL_KEY) || "{}"); } catch {}
+  const sub = h.get("s") || saved.sub;
+  if (sub && D.subById.has(sub)) S.sub = sub;
+  const ids = h.has("s") ? (h.get("c") ? h.get("c").split(".") : null) : saved.on;
+  S.on = new Set((ids || D.cands.map((c) => c.id)).filter((id) => D.candById.has(id)));
+  return h.has("s");
+}
+const allSubs = () => D.themes.flatMap((t) => t.subs);
+function stepSub(d) { const l = allSubs(), i = l.findIndex((s) => s.id === S.sub); S.sub = l[(i + d + l.length) % l.length].id; renderTheme(); }
+function stepTheme(d) { const i = D.themes.indexOf(D.themeOfSub.get(S.sub)); S.sub = D.themes[(i + d + D.themes.length) % D.themes.length].subs[0].id; renderTheme(); }
+function setOn(ids, msg) { S.on = new Set(ids); renderTheme(); if (msg) toast(msg); }
+function hl(text, words) { let h = esc(text); for (const w of words) h = h.replace(new RegExp("(" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi"), "<mark>$1</mark>"); return h; }
+function findProps(q) {
+  const words = norm(q).split(/\s+/).filter((w) => w.length > 1);
+  if (!words.length) return { words, hits: [] };
+  const hits = [];
+  for (const t of D.themes) for (const sb of t.subs) for (const c of D.cands) for (const p of propsOf(c.id, sb.id)) {
+    const n = norm(p.text); if (words.every((w) => n.includes(w))) hits.push({ c, sb, t, text: p.text });
+  }
+  return { words, hits };
+}
 function renderTheme() {
   const el = $("#view-theme");
   const sub = D.subById.get(S.sub), theme = D.themeOfSub.get(S.sub);
   const withP = candsWith(S.sub);
-  if (!S.themeSel || S.themeSel.sub !== S.sub) S.themeSel = { sub: S.sub, ids: new Set(withP.map((c) => c.id)) };
-  const sel = D.cands.filter((c) => S.themeSel.ids.has(c.id));
-  const without = D.cands.filter((c) => !propsOf(c.id, S.sub).length);
+  const shown = withP.filter((c) => S.on.has(c.id));
+  const hiddenP = withP.filter((c) => !S.on.has(c.id));
+  const without = D.cands.filter((c) => S.on.has(c.id) && !propsOf(c.id, S.sub).length);
+  const nThem = (t) => new Set(t.subs.flatMap((s) => candsWith(s.id).map((c) => c.id))).size;
+  const cq = norm(S.cq);
+  const list = D.cands.filter((c) => !cq || norm(c.name + " " + (c.pinfo?.sigle || "") + " " + (c.party || "")).includes(cq));
+  const blocBtns = (D.blocs || []).map((b) => { const ids = D.cands.filter((c) => c.pinfo?.bloc === b).map((c) => c.id); if (!ids.length) return "";
+    const full = ids.every((id) => S.on.has(id)); return `<button data-bloc="${esc(b)}" class="${full ? "full" : ""}" title="${full ? "Cacher" : "Afficher"} : ${esc(b)} (${ids.length})">${esc(b)}</button>`; }).join("");
+  const { words, hits } = findProps(S.q);
+  const hitsHtml = S.q.trim() ? `<div class="hits">${hits.length ? `<div class="note">${hits.length} proposition${hits.length > 1 ? "s" : ""} trouvée${hits.length > 1 ? "s" : ""}${hits.length > 40 ? " (40 premières affichées)" : ""}. Clique pour ouvrir le sous-thème.</div>` + hits.slice(0, 40).map((h) => `<button class="hit" data-go="${h.sb.id}" data-cid="${h.c.id}"><span class="where">${esc(h.c.name)} · ${esc(h.t.name)} › ${esc(h.sb.name)}</span><span>${hl(h.text, words)}</span></button>`).join("") : `<div class="note">Aucune proposition ne contient « ${esc(S.q)} ».</div>`}</div>` : "";
 
-  const index = D.themes.map((t) => `<details ${t.subs.some((s) => s.id === S.sub) ? "open" : ""}><summary>${esc(t.name)}</summary>
-    ${t.subs.map((s) => `<button class="sub" data-sub="${s.id}" aria-current="${s.id === S.sub}"><span>${esc(s.name)}</span><span class="n">${candsWith(s.id).length}</span></button>`).join("")}</details>`).join("");
-  const picker = `<select id="subPick" aria-label="Thème">${D.themes.map((t) => `<optgroup label="${esc(t.name)}">${t.subs.map((s) => `<option value="${s.id}" ${s.id === S.sub ? "selected" : ""}>${esc(s.name)} (${candsWith(s.id).length})</option>`).join("")}</optgroup>`).join("")}</select>`;
-
-  el.innerHTML = `<div class="theme-layout">
-    <nav class="tindex" aria-label="Thèmes"><div class="eyebrow" style="margin-bottom:6px">Thèmes · candidats avec propositions</div>${index}</nav>
+  el.innerHTML = `<nav class="tbar" aria-label="Thèmes">${D.themes.map((t) => `<button data-theme="${t.id}" aria-current="${t === theme}" title="${nThem(t)} candidats avec propositions">${esc(t.name)}</button>`).join("")}</nav>
+  <div class="theme-layout${S.panel ? " open" : ""}">
+    <aside class="cside" aria-label="Candidats">
+      <div class="cside-h"><div class="eyebrow">Candidats affichés</div><span class="mono note">${S.on.size}/${D.cands.length}</span></div>
+      <div class="row2"><button class="btn sm" data-all="all" title="Touche T">Tous</button><button class="btn sm" data-all="none" title="Touche A">Aucun</button><button class="btn sm" data-all="here" title="Touche P">Avec propositions ici</button></div>
+      <div class="blocs" title="Afficher ou cacher un bloc entier (classement du ministère de l'Intérieur)">${blocBtns}</div>
+      <input type="search" id="cq" placeholder="Chercher un candidat (C)" value="${esc(S.cq)}" aria-label="Chercher un candidat">
+      <div>${list.map((c) => { const n = propsOf(c.id, S.sub).length; return `<label class="tog${n ? "" : " zero"}"><input type="checkbox" class="sw" data-cid="${c.id}" ${S.on.has(c.id) ? "checked" : ""}><span class="nm"><span>${esc(c.name)}</span>${partyLine(c, true)}</span><button type="button" class="solo" data-solo="${c.id}" title="N'afficher que ce candidat">seul</button><span class="n0" title="Propositions sur ce sous-thème">${n}</span></label>`; }).join("") || `<p class="note">Aucun candidat ne correspond.</p>`}</div>
+      <p class="note">Ordre alphabétique. Le chiffre : propositions sur le sous-thème affiché. Touche <kbd>?</kbd> : raccourcis.</p>
+    </aside>
     <div style="min-width:0">
-      <div class="mobile-picker">${picker}</div>
+      <div class="search"><input type="search" id="pq" placeholder="Chercher dans toutes les propositions, ex. : retraite 62 ans  (touche /)" value="${esc(S.q)}" aria-label="Chercher dans les propositions"></div>
+      ${hitsHtml}
       <div class="sec-head"><div><div class="eyebrow">${esc(theme.name)}</div><h2>${esc(sub.name)}</h2></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="askTheme">Poser une question sur ce thème</button></div></div>
-      <div class="eyebrow">Candidats inclus dans l'analyse (${sel.length})</div>
-      <div class="chips">${withP.map((c) => `<button class="chip" data-cid="${c.id}" aria-pressed="${S.themeSel.ids.has(c.id)}"><span class="ini">${initials(c.name)}</span>${esc(c.name)} ${partyLine(c, true)} <span class="cnt" title="Propositions relevées sur ce thème">${propsOf(c.id, S.sub).length}</span></button>`).join("")}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn candBtn" id="candBtn">Candidats (${S.on.size})</button><button class="btn" id="copyLink" title="Touche L">Copier le lien</button><button class="btn" id="askTheme" title="Touche Q">Poser une question sur ce thème</button></div></div>
+      <div class="subs">${theme.subs.map((s) => `<button data-sub="${s.id}" aria-current="${s.id === S.sub}">${esc(s.name)}<span class="n">${candsWith(s.id).filter((c) => S.on.has(c.id)).length}</span></button>`).join("")}</div>
       <div class="ai" id="aiBox"></div>
-      <div class="cards">${withP.map((c) => `<article class="card"><h3><span class="ini">${initials(c.name)}</span>${esc(c.name)}</h3><div class="party">${partyLine(c)}</div>${c.pinfo?.base.startsWith("par analogie") ? `<div class="pnote">* Classement ${esc(c.pinfo.base)}.</div>` : ""}${c.pinfo?.note ? `<div class="pnote">${esc(c.pinfo.note)}</div>` : ""}
+      <div class="cards">${shown.map((c) => `<article class="card"><h3><span class="ini">${initials(c.name)}</span>${esc(c.name)}<button class="hide" data-hide="${c.id}" title="Cacher ce candidat" aria-label="Cacher ${esc(c.name)}">×</button></h3><div class="party">${partyLine(c)}</div>${c.pinfo?.base.startsWith("par analogie") ? `<div class="pnote">* Classement ${esc(c.pinfo.base)}.</div>` : ""}${c.pinfo?.note ? `<div class="pnote">${esc(c.pinfo.note)}</div>` : ""}
         <ol class="props">${propsOf(c.id, S.sub).map((p) => `<li>${esc(p.text)}${p.src !== "IFRAP" ? `<a class="srcbadge" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.src)}</a>` : ""}</li>`).join("")}</ol></article>`).join("")}</div>
-      ${withP.length ? "" : `<div class="emptystate">Aucune proposition relevée sur ce thème pour l'instant.</div>`}
+      ${!withP.length ? `<div class="emptystate">Aucune proposition relevée sur ce sous-thème pour l'instant.</div>` : !shown.length ? `<div class="emptystate">Aucun des candidats affichés n'a de proposition relevée ici. <button class="btn sm" data-all="here">Afficher ceux qui en ont (${withP.length})</button></div>` : ""}
+      ${hiddenP.length && shown.length ? `<p class="empty-cands">Cachés, avec des propositions ici : ${hiddenP.map((c) => `<button class="pinbtn" data-show="${c.id}">${esc(c.name)}</button>`).join(", ")}.</p>` : ""}
       ${without.length ? `<p class="empty-cands">Aucune proposition relevée pour : ${without.map((c) => esc(c.name)).join(", ")}.</p>` : ""}
+      <div class="pager"><button class="btn" id="prevSub">← Précédent</button><button class="btn" id="nextSub">Suivant →</button></div>
     </div></div>`;
 
-  el.querySelectorAll("button.sub").forEach((b) => (b.onclick = () => { S.sub = b.dataset.sub; renderTheme(); }));
-  $("#subPick").onchange = (e) => { S.sub = e.target.value; renderTheme(); };
-  el.querySelectorAll(".chip").forEach((b) => (b.onclick = () => { const id = b.dataset.cid; S.themeSel.ids.has(id) ? S.themeSel.ids.delete(id) : S.themeSel.ids.add(id); renderTheme(); }));
-  $("#askTheme").onclick = () => openChat({ label: `${sub.name} · ${sel.length} candidat(s)`, cids: sel.map((c) => c.id), sids: [S.sub] });
-  setupAnalysis($("#aiBox"), { kind: "theme", cids: sel.map((c) => c.id), sids: [S.sub], label: `${sub.name} — ${sel.map((c) => c.name).join(", ")}` });
+  el.querySelectorAll("[data-theme]").forEach((b) => (b.onclick = () => { S.sub = D.themes.find((t) => t.id === b.dataset.theme).subs[0].id; renderTheme(); }));
+  el.querySelectorAll("[data-sub]").forEach((b) => (b.onclick = () => { S.sub = b.dataset.sub; renderTheme(); }));
+  el.querySelectorAll(".sw").forEach((i) => (i.onchange = () => { i.checked ? S.on.add(i.dataset.cid) : S.on.delete(i.dataset.cid); renderTheme(); }));
+  el.querySelectorAll("[data-solo]").forEach((b) => (b.onclick = (e) => { e.preventDefault(); setOn([b.dataset.solo], "Seulement " + D.candById.get(b.dataset.solo).name); }));
+  el.querySelectorAll("[data-hide]").forEach((b) => (b.onclick = () => { S.on.delete(b.dataset.hide); renderTheme(); toast(D.candById.get(b.dataset.hide).name + " caché"); }));
+  el.querySelectorAll("[data-show]").forEach((b) => (b.onclick = () => { S.on.add(b.dataset.show); renderTheme(); }));
+  el.querySelectorAll("[data-all]").forEach((b) => (b.onclick = () => selectAll(b.dataset.all)));
+  el.querySelectorAll("[data-bloc]").forEach((b) => (b.onclick = () => { const ids = D.cands.filter((c) => c.pinfo?.bloc === b.dataset.bloc).map((c) => c.id); const full = ids.every((id) => S.on.has(id)); ids.forEach((id) => (full ? S.on.delete(id) : S.on.add(id))); renderTheme(); }));
+  el.querySelectorAll("[data-go]").forEach((b) => (b.onclick = () => { S.sub = b.dataset.go; S.on.add(b.dataset.cid); S.q = ""; renderTheme(); window.scrollTo({ top: 0 }); }));
+  const live = (id, key) => { const i = $("#" + id); i.oninput = () => { S[key] = i.value; const pos = i.selectionStart; renderTheme(); const j = $("#" + id); j.focus(); j.setSelectionRange(pos, pos); }; };
+  live("pq", "q"); live("cq", "cq");
+  $("#candBtn").onclick = () => { S.panel = !S.panel; renderTheme(); };
+  $("#prevSub").onclick = () => { stepSub(-1); window.scrollTo({ top: 0 }); };
+  $("#nextSub").onclick = () => { stepSub(1); window.scrollTo({ top: 0 }); };
+  $("#copyLink").onclick = copyLink;
+  $("#askTheme").onclick = () => openChat({ label: `${sub.name} · ${shown.length} candidat(s)`, cids: shown.map((c) => c.id), sids: [S.sub] });
+  saveSel();
+  setupAnalysis($("#aiBox"), { kind: "theme", cids: shown.map((c) => c.id), sids: [S.sub], label: `${sub.name} — ${shown.map((c) => c.name).join(", ")}` });
+}
+function selectAll(k) {
+  if (k === "all") setOn(D.cands.map((c) => c.id), "Tous les candidats");
+  else if (k === "none") setOn([], "Aucun candidat");
+  else setOn(candsWith(S.sub).map((c) => c.id), "Candidats avec propositions ici");
+}
+async function copyLink() {
+  saveSel();
+  const url = location.origin + location.pathname + "#s=" + S.sub + (S.on.size === D.cands.length ? "" : "&c=" + [...S.on].join("."));
+  try { await navigator.clipboard.writeText(url); toast("Lien copié : il ouvre ce thème avec ces candidats."); } catch { prompt("Copie ce lien :", url); }
 }
 
 // ---------- analyses ----------
@@ -895,7 +1013,7 @@ function renderHistory() {
   });
   el.querySelectorAll("[data-goto]").forEach((b) => (b.onclick = () => {
     const a = Store.items.get(b.dataset.goto);
-    if (a.kind === "theme") { S.sub = a.sids[0]; S.themeSel = { sub: a.sids[0], ids: new Set(a.cids) }; setView("theme"); }
+    if (a.kind === "theme") { S.sub = a.sids[0]; S.on = new Set(a.cids); setView("theme"); }
     else { S.vs = [0, 1, 2, 3].map((i) => a.cids[i] || ""); S.vsScope = a.scope || (a.kind === "full" ? "all" : "s:" + a.sids[0]); setView("vs"); }
   }));
 }
@@ -986,6 +1104,28 @@ $("#stopChat").onclick = () => S.chatCtl?.abort();
 $("#composer").onsubmit = (e) => { e.preventDefault(); sendChat(); };
 $("#chatInput").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#drawer").classList.remove("open"); });
+$("#keysBtn").onclick = () => $("#keysDlg").showModal();
+// Raccourcis clavier (sauf pendant la saisie d'un texte ou avec Ctrl/Cmd/Alt)
+document.addEventListener("keydown", (e) => {
+  const t = e.target;
+  if (e.ctrlKey || e.metaKey || e.altKey || document.querySelector("dialog[open]")) return;
+  if (t.closest?.("input, textarea, select, [contenteditable]")) {
+    if (e.key === "Escape" && (t.id === "pq" || t.id === "cq")) { S[t.id === "pq" ? "q" : "cq"] = ""; renderTheme(); }
+    return;
+  }
+  if (e.key === "?") { e.preventDefault(); $("#keysDlg").showModal(); return; }
+  if (e.key.toLowerCase() === "q") { e.preventDefault(); (S.view === "theme" ? $("#askTheme") : $("#openChat")).click(); return; }
+  if (S.view !== "theme" || !D.themes.length) return;
+  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  const act = {
+    ArrowRight: () => (e.shiftKey ? stepTheme(1) : stepSub(1)), ArrowLeft: () => (e.shiftKey ? stepTheme(-1) : stepSub(-1)),
+    "/": () => { const i = $("#pq"); i.focus(); i.select(); },
+    c: () => { if (!S.panel && getComputedStyle($(".cside")).display === "none") { S.panel = true; renderTheme(); } $("#cq").focus(); },
+    t: () => selectAll("all"), a: () => selectAll("none"), p: () => selectAll("here"), l: () => copyLink(),
+  }[k];
+  if (act) { e.preventDefault(); act(); }
+});
+addEventListener("hashchange", () => { if (location.hash.startsWith("#s=")) { loadSel(); setView("theme"); } });
 
 (async () => {
   try { await loadData(); }
@@ -996,6 +1136,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#drawer
   S.vs = [alpha[0]?.id || "", alpha[1]?.id || "", "", ""];
   S.vsScope = "s:" + S.sub;
   const h = location.hash.slice(1);
+  loadSel();
   setView(["vs", "history", "recap"].includes(h) ? h : "theme");
   await Store.init();
   autoDeleteWebModel().finally(refreshLlmUi);
