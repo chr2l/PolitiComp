@@ -41,3 +41,4 @@ Rien de sensible repéré.
 - 2026-11-06 : fenêtre « Activer mon IA » plus simple et accueillante ; le téléchargement continue si on la ferme (progression affichée sur le bouton) ; la discussion s'ouvre toute seule avec un message « Ton IA est prête ! ».
 - 2026-11-06 : la ligne parti + position revient à la ligne au lieu de dépasser des fiches.
 - 2026-11-06 : position sur l'échiquier plus compacte (sigle + petite barre à 5 cases + bloc court) ; précisions de classement repliées derrière un « i ».
+- 2026-11-06 : site moins froid : couleurs plus chaudes, coins plus ronds, ombres douces, boutons arrondis, encadré « Bienvenue ! » (masquable).
