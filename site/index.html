@@ -43,7 +43,7 @@ nav.tabs button { border: 0; background: none; padding: 8px 12px; border-radius:
 nav.tabs button:hover { background: var(--sunk); color: var(--ink) }
 nav.tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent) }
 .chat-btn { border: 0; background: var(--accent); color: var(--accent-ink); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 600 }
-.srcline { font-size: 12px; color: var(--muted); padding-block: 6px; border-top: 1px solid var(--line) }
+.srcline { font-size: 12px; color: var(--muted); padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--line) }
 .srcline a { color: inherit }
 .llm-btn { border: 1px solid var(--accent); background: transparent; color: var(--accent); padding: 7px 13px; border-radius: 999px; cursor: pointer; font-weight: 600 }
 .llm-btn.on { background: var(--accent-soft) }
@@ -241,7 +241,6 @@ table.pos tr:last-child td { border-bottom: 0 }
     <button class="llm-btn" id="llmBtn">Activer mon IA</button>
     <button class="chat-btn" id="openChat">Poser une question</button>
   </div>
-  <div class="wrap srcline" id="srcline">Chargement des données…</div>
 </header>
 
 <main class="wrap">
@@ -266,7 +265,7 @@ table.pos tr:last-child td { border-bottom: 0 }
       <span><button type="button" class="btn sm" id="stopChat" hidden>Arrêter</button> <button class="btn primary sm" id="sendChat">Envoyer</button></span></div>
   </form>
 </aside>
-<footer class="wrap foot">Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne. · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
+<footer class="wrap foot"><div class="srcline" id="srcline">Chargement des données…</div>Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne. · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
 <dialog class="llm" id="llmDlg">
   <form method="dialog" id="llmForm">
     <h3>Mon IA, sur mon ordinateur</h3>
@@ -1132,7 +1131,7 @@ addEventListener("hashchange", () => { if (location.hash.startsWith("#s=")) { lo
 
 (async () => {
   try { await loadData(); }
-  catch { $("#srcline").textContent = "Les données n'ont pas pu être chargées. Recharge la page."; return; }
+  catch { $("#srcline").textContent = $("#view-theme").innerHTML = "Les données n'ont pas pu être chargées. Recharge la page."; return; }
   const fisc = D.themes.flatMap((t) => t.subs).find((s) => norm(s.name).includes("fiscalit"));
   S.sub = (fisc || D.themes[0].subs[0]).id;
   const alpha = [...D.cands].filter((c) => countCand(c.id)).sort(byLast);
