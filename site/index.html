@@ -50,6 +50,31 @@ nav.tabs button[aria-selected="true"] { background: var(--accent-soft); color: v
 dialog.llm { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 20px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px) }
 dialog.llm::backdrop { background: rgba(0,0,0,.45) }
 dialog.llm h3 { margin: 0 0 6px }
+[hidden] { display: none !important }
+dialog.ia { width: min(440px, calc(100vw - 32px)); padding: 26px 24px 18px; text-align: center; position: relative }
+.ia-x { position: absolute; top: 10px; right: 12px; border: 0; background: none; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 8px }
+.ia-x:hover { background: var(--sunk); color: var(--ink) }
+.ia-hero { width: 72px; height: 72px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent) }
+dialog.ia h3 { font-size: 22px }
+.ia-sub { color: var(--muted); margin: 0 auto 16px; max-width: 34ch }
+.ia-pts { list-style: none; padding: 0; margin: 0 0 18px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+.ia-pts li { background: var(--paper); border-radius: 10px; padding: 10px 6px; display: grid; gap: 2px }
+.ia-pts b { font-family: var(--f-display); font-size: 15px } .ia-pts span { font-size: 12px; color: var(--muted); line-height: 1.3 }
+.ia-go { width: 100%; padding: 11px 16px; font-size: 16px; font-weight: 600; border-radius: 999px }
+.ia-note { font-size: 12px; color: var(--muted); margin: 8px 0 0 }
+.ia-dl { margin: 0 0 14px; text-align: left }
+.ia-bar { height: 10px; border-radius: 999px; background: var(--sunk); overflow: hidden }
+.ia-bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 999px; transition: width .3s }
+.ia-st { font-weight: 600; margin: 8px 0 2px; font-variant-numeric: tabular-nums }
+.ia-tip { font-size: 13px; color: var(--muted); margin: 0 }
+.ia-err { color: var(--bad); font-size: 14px; margin: 0 0 12px }
+.ia-set { margin-top: 16px; text-align: left; border-top: 1px solid var(--line); padding-top: 10px; font-size: 14px }
+.ia-set summary { cursor: pointer; color: var(--muted); font-size: 13px }
+.ia-set label { margin-top: 10px }
+.ia-set .btn { margin-top: 8px }
+.ready-cta { border: 1px solid var(--accent); background: var(--accent-soft); border-radius: var(--r); padding: 16px; display: grid; gap: 6px }
+.ready-cta b { font: 600 17px var(--f-display); color: var(--accent) }
+@media (prefers-reduced-motion: reduce) { .ia-bar i { transition: none } }
 dialog.llm label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px }
 dialog.llm input, dialog.llm select { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: inherit }
 dialog.llm .help { font-size: 13px; color: var(--muted); margin: 6px 0 0 }
@@ -266,21 +291,32 @@ table.pos tr:last-child td { border-bottom: 0 }
   </form>
 </aside>
 <footer class="wrap foot"><div class="srcline" id="srcline">Chargement des données…</div>Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne. · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
-<dialog class="llm" id="llmDlg">
+<dialog class="llm ia" id="llmDlg">
   <form method="dialog" id="llmForm">
-    <h3>Mon IA, sur mon ordinateur</h3>
-    <p class="help">Gratuit, sans compte et sans clé. L'IA est téléchargée dans ton navigateur et tourne sur ta machine : tes questions ne la quittent pas, et rien ne passe par ce site.</p>
-    <div class="acts" style="justify-content:flex-start"><button type="button" class="btn primary" id="webGo">Télécharger et lancer l'IA</button></div>
-    <p class="help" id="webInfo">Environ 2 Go, téléchargés une seule fois. Il faut un ordinateur assez récent et Chrome ou Edge à jour. Les réponses sont plus simples que celles des grandes IA en ligne.</p>
-    <progress id="webProg" max="1" value="0" hidden style="width:100%"></progress>
-    <p class="help" id="webStatus" role="status"></p>
-    <label for="webKeep">Effacer l'IA de mon ordinateur si je ne m'en sers pas pendant</label>
-    <select id="webKeep"><option value="7">7 jours</option><option value="30">30 jours</option><option value="0">tout de suite en fermant la page</option></select>
-    <p class="help" id="webStored"></p>
-    <div class="acts">
-      <button type="button" class="btn" id="webDel">Supprimer l'IA maintenant</button>
-      <button type="button" class="btn" id="llmCancel">Fermer</button>
+    <button type="button" class="ia-x" id="llmX" aria-label="Fermer">×</button>
+    <div class="ia-hero" aria-hidden="true"><svg viewBox="0 0 48 48" width="44" height="44"><rect x="6" y="10" width="36" height="24" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M18 40h12M24 34v6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M17 22l4 4 9-9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h3 id="iaTitle">Une IA rien que pour toi</h3>
+    <p class="ia-sub" id="iaSub">Elle s'installe dans ton navigateur et répond à tes questions sur les programmes.</p>
+    <ul class="ia-pts" id="iaPts">
+      <li><b>Gratuite</b><span>sans compte ni clé</span></li>
+      <li><b>Privée</b><span>tout reste sur ton ordi</span></li>
+      <li><b>2 Go</b><span>téléchargés une fois</span></li>
+    </ul>
+    <div class="ia-dl" id="iaDl" hidden>
+      <div class="ia-bar"><i id="webBar"></i></div>
+      <p class="ia-st" id="webStatus" role="status"></p>
+      <p class="ia-tip">Tu peux fermer cette fenêtre et continuer à lire : le téléchargement continue. On t'ouvre la discussion dès que c'est prêt.</p>
     </div>
+    <p class="ia-err" id="webErr" hidden></p>
+    <button type="button" class="btn primary ia-go" id="webGo">Télécharger mon IA</button>
+    <p class="ia-note" id="iaNote">Marche avec Chrome ou Edge à jour, sur un ordinateur assez récent.</p>
+    <details class="ia-set">
+      <summary>Réglages et suppression</summary>
+      <label for="webKeep">Effacer l'IA si je ne m'en sers pas pendant</label>
+      <select id="webKeep"><option value="7">7 jours</option><option value="30">30 jours</option><option value="0">tout de suite en fermant la page</option></select>
+      <p class="help" id="webStored"></p>
+      <button type="button" class="btn sm" id="webDel">Supprimer l'IA maintenant</button>
+    </details>
   </form>
 </dialog>
 <dialog class="llm keys" id="keysDlg">
@@ -909,10 +945,11 @@ function newConversation(ctx) {
 }
 function renderChat() {
   const c = S.conv;
+  if (c.messages.length) S.justReady = false;
   $("#dctx").innerHTML = c.context ? `<span class="eyebrow">Contexte</span> ${esc(c.context.label)} <button class="pinbtn" id="clearCtx">retirer</button>` : `<span class="eyebrow">Contexte</span> tout le comparateur`;
   const cc = $("#clearCtx"); if (cc) cc.onclick = () => { c.context = null; renderChat(); };
   const box = $("#msgs");
-  box.innerHTML = c.messages.length ? "" : `<div class="emptystate">Pose une question sur les programmes : différences entre candidats, conséquences d'une mesure, coût annoncé… Les réponses s'appuient sur les propositions relevées et restent neutres. Chaque échange est enregistré dans l'onglet Historique.</div>`;
+  box.innerHTML = c.messages.length ? "" : S.justReady ? `<div class="ready-cta"><b>Ton IA est prête !</b><span>Pose ta première question ci-dessous, ou touche une suggestion. Elle répond à partir des propositions relevées, de façon neutre, et tout reste sur ton ordinateur.</span></div>` : `<div class="emptystate">Pose une question sur les programmes : différences entre candidats, conséquences d'une mesure, coût annoncé… Les réponses s'appuient sur les propositions relevées et restent neutres. Chaque échange est enregistré dans l'onglet Historique.</div>`;
   c.messages.forEach((m, i) => box.appendChild(msgEl(m, i)));
   box.scrollTop = box.scrollHeight;
   const sug = c.context ? ["Quelles sont les principales différences ?", "Quelles conséquences pour les ménages ?", "Qu'est-ce qui est chiffré, et comment ?"] : ["Qui propose de baisser les impôts, et lesquels ?", "Compare les positions sur les retraites", "Quelles mesures sur le logement ?"];
@@ -1058,7 +1095,7 @@ async function refreshLlmUi() {
   const on = !!(await getSample());
   const b = $("#llmBtn");
   if (window.claude?.use) b.hidden = true;
-  b.textContent = on ? "IA prête" : "Activer mon IA";
+  b.textContent = typeof dl === "number" ? `IA… ${dl} %` : on ? "IA prête" : "Activer mon IA";
   b.classList.toggle("on", on);
   $("#sendChat").textContent = on ? "Envoyer" : "Copier pour mon IA";
   $("#chatNote").textContent = on ? "Réponses de l'IA de ton ordinateur, à partir des propositions relevées." : "Aucune IA activée : ta question et les propositions sont copiées, à coller dans ton IA. Ou « Activer mon IA ».";
@@ -1070,30 +1107,48 @@ async function refreshStored() {
   $("#webStored").textContent = n ? `L'IA occupe ${fmtGo(n)} sur ton ordinateur${p.last ? `, dernier usage le ${new Date(p.last).toLocaleDateString("fr-FR")}` : ""}.` : "Aucune IA enregistrée sur ton ordinateur.";
   $("#webDel").disabled = !n && !webEngine;
 }
-$("#llmBtn").onclick = () => {
+// Fenêtre « Activer mon IA » : 3 états (proposer, téléchargement en cours, prête)
+let dl = null; // pourcentage pendant le téléchargement
+function iaDlgState() {
+  const ready = !!webEngine, busy = dl !== null;
+  $("#iaTitle").textContent = ready ? "Ton IA est prête" : busy ? "Installation en cours…" : "Une IA rien que pour toi";
+  $("#iaSub").textContent = ready ? "Pose-lui tes questions sur les programmes, elle répond depuis ton ordinateur." : busy ? "La première fois, ça prend quelques minutes. Les fois suivantes, quelques secondes." : "Elle s'installe dans ton navigateur et répond à tes questions sur les programmes.";
+  $("#iaPts").hidden = ready || busy;
+  $("#iaDl").hidden = !busy;
+  $("#iaNote").hidden = ready;
   const go = $("#webGo");
-  go.textContent = webEngine ? "IA prête" : "Télécharger et lancer l'IA";
-  go.disabled = !!webEngine;
+  go.hidden = busy;
+  go.textContent = ready ? "Poser une question" : "Télécharger mon IA";
+}
+$("#llmBtn").onclick = () => {
   $("#webKeep").value = String(llmPrefs().keep);
-  $("#webStatus").textContent = "";
-  refreshStored();
+  $("#webErr").hidden = true;
+  iaDlgState(); refreshStored();
   $("#llmDlg").showModal();
 };
+$("#llmX").onclick = () => $("#llmDlg").close();
 $("#webKeep").onchange = (e) => { const p = llmPrefs(); p.keep = Number(e.target.value); saveLlmPrefs(p); };
+function showDl(p, fromCache) {
+  dl = Math.round(p * 100);
+  $("#webBar").style.width = dl + "%";
+  $("#webStatus").textContent = fromCache ? `Chargement depuis ton ordinateur… ${dl} %` : `Téléchargement… ${dl} %`;
+  $("#llmBtn").textContent = `IA… ${dl} %`;
+}
 $("#webGo").onclick = async () => {
-  const go = $("#webGo"), prog = $("#webProg"), st = $("#webStatus");
-  go.disabled = true; prog.hidden = false; prog.value = 0; st.textContent = "Préparation…";
+  if (webEngine) { $("#llmDlg").close(); openChat(); return; }
+  $("#webErr").hidden = true; dl = 0; showDl(0); iaDlgState();
   try {
-    await startWebLLM((p, t) => { prog.value = p; st.textContent = /cache/i.test(t) ? `Chargement depuis ton ordinateur… ${Math.round(p * 100)} %` : `Téléchargement… ${Math.round(p * 100)} % (une seule fois)`; });
-    prog.hidden = true; st.textContent = "";
-    $("#llmDlg").close(); await setLlm({ kind: "web" }); toast("IA prête, sur ton ordinateur.");
-  } catch (e) { prog.hidden = true; go.disabled = false; st.textContent = aiErr(e); }
+    await startWebLLM((p, t) => showDl(p, /cache/i.test(t)));
+    dl = null;
+    if ($("#llmDlg").open) $("#llmDlg").close();
+    await setLlm({ kind: "web" });
+    S.justReady = true; openChat();
+  } catch (e) { dl = null; iaDlgState(); refreshLlmUi(); $("#webErr").textContent = aiErr(e); $("#webErr").hidden = false; if (!$("#llmDlg").open) $("#llmDlg").showModal(); }
 };
 $("#webDel").onclick = async () => {
   await deleteWebModel().catch(() => {});
   $("#llmDlg").close(); await setLlm(null); toast("IA supprimée de ton ordinateur.");
 };
-$("#llmCancel").onclick = () => $("#llmDlg").close();
 // « tout de suite en fermant la page » : on efface en partant (et à la visite suivante si ça n'a pas eu le temps).
 addEventListener("pagehide", () => { if (llmPrefs().keep === 0 && llmPrefs().last) { if ("caches" in window) caches.keys().then((ks) => ks.filter((k) => WEB_CACHES.test(k)).forEach((k) => caches.delete(k))); } });
 
