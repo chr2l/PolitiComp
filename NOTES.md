@@ -6,10 +6,7 @@ Contexte à relire en début de session. À tenir à jour.
 Comparateur politique : site statique (site/), données JSON (data/), scripts.
 
 ## Ouverture aux IA (PR claude/public-llm-access)
-- Le site n'appelle aucune IA : chaque visiteur branche la sienne. Bouton « Connecter mon IA » : gratuit, sans clé ni compte (demande de l'utilisateur : pas d'API payante). Par défaut l'IA tourne dans le navigateur (WebLLM 0.2.84 depuis jsdelivr, modèle Qwen2.5-3B ~2 Go, WebGPU requis : Chrome/Edge récent). Option avancée : Ollama / LM Studio (localhost). Sans IA : « Copier pour mon IA ».
-- Ollama doit autoriser le site : OLLAMA_ORIGINS=<adresse du site>. LM Studio : « Enable CORS ».
-- Connecteur MCP : `scripts/mcp.js`, branché sur /mcp dans serve.js (sans dépendance, sans état, sans journal). Le vrai serveur doit faire tourner ce code Node pour que /mcp marche.
-- Version Claude : https://claude.ai/artifact/QSVU2Q25hGSzaSjKdcw3p3 (artifact avec sample/db/user : chaque visiteur utilise son propre Claude). Ses données sont une copie : à republier après chaque mise à jour IFRAP (même URL). Doit être partagée en lien public par l'utilisateur.
+- Le site n'appelle aucune IA : bouton « Activer mon IA » = WebLLM 0.2.84 (jsdelivr) + Qwen2.5-3B (~2 Go, WebGPU, Chrome/Edge). Effacement auto du modèle (caches webllm/*) si pas utilisé depuis 7 j / 30 j / à la fermeture (choix du visiteur, vérifié à la visite suivante) + bouton « Supprimer ». Sans IA : « Copier pour mon IA ». Plus de connexion Claude, connecteur MCP ni Ollama (retirés le 2026-11-06 à la demande).
 - Futur domaine public : Élie.place (pas encore en place).
 - `site/llms.txt` = README pour les IA (neutralité, sources). Aussi servi en /README.md.
 - `site/llms-full.txt` = toutes les propositions en texte, régénéré par `node scripts/build-llms.js` (lancé aussi par fetch-ifrap.js).
@@ -37,3 +34,4 @@ Rien de sensible repéré.
 - 2026-11-04 : mentions légales (Charlélie Buchholz • chr2l, contact@elie.place, auto-hébergé). PR #5 fusionnée.
 - 2026-11-04 : face-à-face : en-tête des candidats plus fin et collé sous la vraie barre du haut ; cases vides réduites.
 - 2026-11-04 : version du comparateur publiée dans Claude + bouton « Ouvrir dans Claude ».
+- 2026-11-06 : retrait de Claude (bouton, connecteur /mcp) et d'Ollama ; seule l'IA téléchargée reste, avec effacement automatique.
