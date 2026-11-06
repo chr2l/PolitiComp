@@ -38,3 +38,4 @@ Rien de sensible repéré.
 - 2026-11-06 : vue « Par thème » refaite (maquette A) : thèmes en haut, panneau des candidats avec interrupteurs (Tous, Aucun, Avec propositions, blocs, « seul »), recherche dans toutes les propositions, raccourcis clavier (touche ?), sélection gardée dans le navigateur et lien partageable (#s=…&c=…).
 - 2026-11-06 : barres de défilement cachées sur tout le site (le défilement marche toujours).
 - 2026-11-06 : ligne des sources déplacée de la barre du haut vers le bas de la page.
+- 2026-11-06 : fenêtre « Activer mon IA » plus simple et accueillante ; le téléchargement continue si on la ferme (progression affichée sur le bouton) ; la discussion s'ouvre toute seule avec un message « Ton IA est prête ! ».
