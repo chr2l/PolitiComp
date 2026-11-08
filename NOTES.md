@@ -52,3 +52,4 @@ Rien de sensible repéré.
 - 2026-11-07 : fenêtre de discussion flottante : ombre en couches, surface et barre de titre plus claires en mode sombre, ombre plus forte pendant le déplacement (repères « au premier plan »).
 - 2026-11-08 : page d'infos (conditions.html) refaite : sommaire collant à gauche qui suit la lecture (barre repliable sur téléphone), couleurs du comparateur.
 - 2026-11-08 : passage sur Cloudflare Pages (projet `politicomp`, build `node scripts/build-pages.js` → `dist/`, adresses partagées avec serve.js dans `scripts/pages.js`), mentions légales : hébergeur Cloudflare. L'icône est gérée à part (projet elie.place).
+- 2026-11-08 : icône [P] jaune remise dans les pages (site/favicon.svg) : le site est sur Cloudflare Pages, le portail elie.place ne peut plus la poser. À garder.
