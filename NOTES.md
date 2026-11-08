@@ -7,22 +7,21 @@ Comparateur politique : site statique (site/), données JSON (data/), scripts.
 
 ## Ouverture aux IA (PR claude/public-llm-access)
 - Le site n'appelle aucune IA : bouton « Activer mon IA » = WebLLM 0.2.84 (jsdelivr) + Qwen2.5-3B (~2 Go, WebGPU, Chrome/Edge). Effacement auto du modèle (caches webllm/*) si pas utilisé depuis 7 j / 30 j / à la fermeture (choix du visiteur, vérifié à la visite suivante) + bouton « Supprimer ». Sans IA : « Copier pour mon IA ». Plus de connexion Claude, connecteur MCP ni Ollama (retirés le 2026-11-06 à la demande).
-- Futur domaine public : Élie.place (pas encore en place).
 - `site/llms.txt` = README pour les IA (neutralité, sources). Aussi servi en /README.md.
 - `site/llms-full.txt` = toutes les propositions en texte, régénéré par `node scripts/build-llms.js` (lancé aussi par fetch-ifrap.js).
 - `site/conditions.html` : aucune collecte. Le site ne charge plus rien d'externe (Google Fonts retiré).
-- En ligne : https://politicomp.elie.place (app publique du portail elie.place, Cloudflare devant). Le conteneur `politicomp` (dépôt chr2l/serveur) fait tourner `node --watch scripts/serve.js` (plus nginx), sans journal d'accès.
+- En ligne : https://politicomp.elie.place (Cloudflare devant). Le serveur fait tourner `node scripts/serve.js`, sans journal d'accès.
 
 ## Déploiement
-Auto sur le serveur (dépôt chr2l/serveur) : chaque commit sur `main` est déployé en moins de 5 min.
-Adresse : http://[adresse interne retirée] — tuile « * PolitiComp ».
+Automatique : chaque commit sur `main` est mis en ligne en moins de 5 min.
+Les détails du serveur de l'éditeur ne sont pas dans ce dépôt (dépôt public).
 
 ## Branches
 - `main` : version stable / déployée.
 - `dev` : travail en cours. Merge `dev` → `main` quand c'est testé.
 
-## Ne jamais commiter
-Rien de sensible repéré.
+## Ne jamais commiter (dépôt public)
+Adresses IP, chemins locaux, détails du serveur maison, e-mails perso, clés ou mots de passe. Seules infos perso autorisées : celles des mentions légales (nom de l'éditeur, contact@elie.place).
 
 ## Journal
 - 2026-10-08 : passage sur Git (dépôt privé chr2l/PolitiComp), audit sécurité OK, .gitignore.
@@ -50,3 +49,4 @@ Rien de sensible repéré.
 - 2026-11-06 : blocs du panneau : une seule barre de 5 carrés cliquables (G … D), carré plein = bloc affiché, à moitié = en partie.
 - 2026-11-06 : fenêtre de discussion flottante sur ordinateur : déplaçable par sa barre de titre, redimensionnable par le coin, position gardée (double-clic sur la barre = position d'origine). Plein écran sur téléphone.
 - 2026-11-07 : fenêtre de discussion flottante : ombre en couches, surface et barre de titre plus claires en mode sombre, ombre plus forte pendant le déplacement (repères « au premier plan »).
+- 2026-11-08 : dépôt préparé pour le public : README, CONTRIBUTING, modèle de PR, captures retirées, IP et détails du serveur retirés des notes.

@@ -1,5 +1,5 @@
 // Serveur du site (aperçu local : node scripts/serve.js puis http://localhost:5177 ;
-// en ligne : conteneur politicomp du dépôt chr2l/serveur, port 8082).
+// en ligne : même script, port choisi avec la variable PORT).
 // Ne journalise rien et ne dépose aucun cookie (voir site/conditions.html).
 const http = require("http"), fs = require("fs"), path = require("path");
 const root = path.join(__dirname, "..");

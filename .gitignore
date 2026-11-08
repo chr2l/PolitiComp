@@ -72,3 +72,6 @@ id_ed25519*
 *.bak
 # Journaux
 *.log
+
+# Captures d’écran de travail (ne pas commiter à la racine)
+/*.png

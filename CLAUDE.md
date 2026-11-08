@@ -4,7 +4,7 @@
 - Site statique sans build : `site/index.html`. Données : `data/partis.json`, `data/officiel.json`, `data/ifrap.json`.
 - Mettre à jour les données IFRAP : `node scripts/fetch-ifrap.js`. Serveur local : `node scripts/serve.js`.
 - Comparateur politique : rester neutre et équilibré entre les partis, sourcer chaque donnée, ne rien inventer.
-- Servi depuis le dépôt sur le port 8082. Branches `claude/*` : PR fusionnée automatiquement dans `main`, en ligne en moins de 5 min.
+- Dépôt PUBLIC : ne jamais commiter d'IP, chemin local, détail du serveur ou e-mail perso. Branches `claude/*` : PR fusionnée automatiquement dans `main`, en ligne en moins de 5 min.
 - Les JSON peuvent être gros : chercher la clé avec Grep plutôt que tout lire.
 
 - rtk actif (hook) : sortie Bash compressée auto. Sortie brute : `rtk bypass <cmd>`. Read/Grep/Glob non concernés.
