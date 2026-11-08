@@ -55,6 +55,12 @@ node scripts/fetch-ifrap.js  # mettre à jour les données IFRAP (et llms-full.t
 
 Les relectures, signalements d'erreur et pull requests sont les bienvenus : voir [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Licence
+
+Le code est sous licence **GNU AGPL v3** (voir [LICENSE](LICENSE)) : vous pouvez le réutiliser et le modifier, mais toute version modifiée, y compris un site en ligne, doit publier son code sous la même licence.
+
+Les données de `data/ifrap.json` appartiennent à la Fondation IFRAP, et les programmes à leurs candidats : elles ne sont pas couvertes par cette licence. Voir leurs sources.
+
 ## Contact
 
 Éditeur : Charlélie Buchholz • chr2l — <contact@elie.place> (voir les [mentions légales](https://politicomp.elie.place/conditions.html)).
