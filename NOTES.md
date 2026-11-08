@@ -48,4 +48,6 @@ Rien de sensible repéré.
 - 2026-11-06 : boutons de blocs du panneau remplacés par la petite barre de position (G à gauche, D à droite, bulle au survol).
 - 2026-11-06 : barre du haut collée en haut, pleine largeur (plus de marge) ; onglets de page en style « enfoncé », distinct des pastilles de thèmes ; barre compacte sur téléphone.
 - 2026-11-06 : blocs du panneau : une seule barre de 5 carrés cliquables (G … D), carré plein = bloc affiché, à moitié = en partie.
-- 2026-11-06 : icône [P] jaune dans l'onglet (même dessin que les apps d'elie.place). Passage sur Cloudflare Pages (projet `politicomp`, build `node scripts/build-pages.js` → `dist/`, adresses partagées avec serve.js dans `scripts/pages.js`), mentions légales : hébergeur Cloudflare.
+- 2026-11-06 : fenêtre de discussion flottante sur ordinateur : déplaçable par sa barre de titre, redimensionnable par le coin, position gardée (double-clic sur la barre = position d'origine). Plein écran sur téléphone.
+- 2026-11-07 : fenêtre de discussion flottante : ombre en couches, surface et barre de titre plus claires en mode sombre, ombre plus forte pendant le déplacement (repères « au premier plan »).
+- 2026-11-08 : passage sur Cloudflare Pages (projet `politicomp`, build `node scripts/build-pages.js` → `dist/`, adresses partagées avec serve.js dans `scripts/pages.js`), mentions légales : hébergeur Cloudflare. L'icône est gérée à part (projet elie.place).

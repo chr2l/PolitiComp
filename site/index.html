@@ -3,7 +3,7 @@
 /* Layout : barre d'onglets en haut ; vue Thème = index des thèmes à gauche + fiches candidats ; tiroir de discussion à droite. */
 :root {
   --paper: #F6F5F1; --surface: #FFFFFF; --sunk: #EFEDE7; --ink: #1F2430; --muted: #5F6470; --line: #E3E0D8;
-  --accent: #3346C4; --accent-ink: #FFFFFF; --accent-soft: #EBEDFB; --pressed: #E9E6DE;
+  --accent: #3346C4; --accent-ink: #FFFFFF; --accent-soft: #EBEDFB; --pressed: #E9E6DE; --float: #FFFFFF; --float-head: #EFEDE7; --float-shadow: 0 0 0 1px rgba(30, 24, 10, .06), 0 2px 4px rgba(30, 24, 10, .06), 0 12px 24px rgba(30, 24, 10, .12), 0 28px 56px rgba(30, 24, 10, .16);
   --shadow: 0 1px 2px rgba(40, 32, 16, .05), 0 6px 18px rgba(40, 32, 16, .06);
   --s1: #0E7471; --s2: #A65B17; --s3: #6347AD; --s4: #AC3556;
   --ok: #2F7A3E; --warn: #9A6A00; --bad: #A33A2B;
@@ -14,7 +14,7 @@
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --paper: #15161B; --surface: #1D1F26; --sunk: #25272F; --ink: #ECEBE7; --muted: #A5A5AB; --line: #30323B;
-  --accent: #9DAAF5; --accent-ink: #12142A; --accent-soft: #262B47; --pressed: #121318; --shadow: none;
+  --accent: #9DAAF5; --accent-ink: #12142A; --accent-soft: #262B47; --pressed: #121318; --shadow: none; --float: #262830; --float-head: #30323C; --float-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 0 0 1px rgba(0, 0, 0, .5), 0 4px 8px rgba(0, 0, 0, .35), 0 16px 32px rgba(0, 0, 0, .45), 0 32px 64px rgba(0, 0, 0, .4); --float: #262830; --float-head: #30323C; --float-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 0 0 1px rgba(0, 0, 0, .5), 0 4px 8px rgba(0, 0, 0, .35), 0 16px 32px rgba(0, 0, 0, .45), 0 32px 64px rgba(0, 0, 0, .4);
   --s1: #4FC1BC; --s2: #E4A260; --s3: #A994EC; --s4: #EC8AA6;
   --ok: #6CC27D; --warn: #E2B44C; --bad: #EE8A7B; color-scheme: dark } }
 :root[data-theme="dark"] {
@@ -259,6 +259,21 @@ table.pos tr:last-child td { border-bottom: 0 }
 .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100%); background: var(--surface); border-left: 1px solid var(--line); z-index: 40; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .22s ease; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-shadow: -12px 0 30px rgba(10, 20, 40, .12) }
 .drawer.open { transform: none }
 @media (prefers-reduced-motion: reduce) { .drawer { transition: none } }
+/* Sur ordinateur : fenêtre flottante, déplaçable par sa barre de titre et redimensionnable par le coin */
+@media (min-width: 901px) {
+  .drawer { top: auto; left: auto; right: 24px; bottom: 24px; width: 420px; height: min(620px, calc(100vh - 48px)); min-width: 320px; min-height: 320px; max-width: calc(100vw - 16px); max-height: calc(100vh - 16px);
+    background: var(--float); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; resize: both; padding: 0; box-shadow: var(--float-shadow);
+    transform: translateY(12px) scale(.98); opacity: 0; visibility: hidden; transition: opacity .16s, transform .16s, visibility 0s .16s }
+  .drawer.open { transform: none; opacity: 1; visibility: visible; transition: opacity .16s, transform .16s }
+  /* Repères « au premier plan » : barre de titre teintée (comme une fenêtre), ombre en couches, surface plus claire en sombre */
+  .drawer .d-head { cursor: grab; user-select: none; touch-action: none; background: var(--float-head) }
+  .drawer .d-ctx { background: var(--float) }
+  .drawer .msg.assistant { background: var(--surface) }
+  .drawer.dragging { box-shadow: var(--float-shadow), 0 40px 80px rgba(0, 0, 0, .18) }
+  .drawer.dragging { transition: none } .drawer.dragging .d-head { cursor: grabbing }
+  .d-grip { color: var(--muted); display: inline-flex }
+}
+@media (max-width: 900px) { .d-grip { display: none } }
 .d-head { padding: 12px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; align-items: center }
 .d-head h3 { font-size: 17px; margin-right: auto }
 .d-ctx { padding: 8px 14px; font-size: 12.5px; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--paper); display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
@@ -271,6 +286,7 @@ table.pos tr:last-child td { border-bottom: 0 }
 .composer { border-top: 1px solid var(--line); padding: 10px; display: grid; gap: 8px }
 .composer textarea { width: 100%; resize: none; min-height: 64px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--paper) }
 .composer .row { display: flex; gap: 8px; justify-content: space-between; align-items: center }
+.composer .row > span:last-child { flex: none; white-space: nowrap }
 .sugg { display: flex; gap: 6px; flex-wrap: wrap }
 .sugg button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; font-size: 12.5px; padding: 3px 9px; cursor: pointer }
 .toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 8px; font-size: 14px; z-index: 60 }
@@ -320,7 +336,8 @@ table.pos tr:last-child td { border-bottom: 0 }
 
 <aside class="drawer" id="drawer" aria-label="Discussion">
   <div class="d-head">
-    <h3>Discussion</h3>
+    <span class="d-grip" aria-hidden="true" title="Glisser pour déplacer"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><circle cx="4" cy="3" r="1.3"/><circle cx="10" cy="3" r="1.3"/><circle cx="4" cy="7" r="1.3"/><circle cx="10" cy="7" r="1.3"/><circle cx="4" cy="11" r="1.3"/><circle cx="10" cy="11" r="1.3"/></svg></span>
+    <h3 title="Glisser la barre pour déplacer la fenêtre">Discussion</h3>
     <button class="btn sm" id="newConv">Nouvelle</button>
     <button class="btn sm" id="closeChat" aria-label="Fermer">Fermer</button>
   </div>
@@ -1216,6 +1233,26 @@ addEventListener("pagehide", () => { if (llmPrefs().keep === 0 && llmPrefs().las
 document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setView(b.dataset.view)));
 $("#openChat").onclick = () => openChat();
 $("#closeChat").onclick = () => $("#drawer").classList.remove("open");
+// Fenêtre de discussion flottante (ordinateur) : on la déplace par sa barre de titre, position gardée sur cet appareil
+{
+  const dr = $("#drawer"), head = dr.querySelector(".d-head"), wide = matchMedia("(min-width: 901px)");
+  const clamp = () => { if (!wide.matches || !dr.style.left) return; const x = parseFloat(dr.style.left), y = parseFloat(dr.style.top);
+    dr.style.left = Math.max(8, Math.min(x, innerWidth - dr.offsetWidth - 8)) + "px"; dr.style.top = Math.max(8, Math.min(y, innerHeight - dr.offsetHeight - 8)) + "px"; };
+  const place = (x, y) => { dr.style.left = x + "px"; dr.style.top = y + "px"; dr.style.right = dr.style.bottom = "auto"; };
+  try { const p = JSON.parse(localStorage.getItem("pc27-chatpos") || "null"); if (p && wide.matches) { place(p.x, p.y); requestAnimationFrame(clamp); } } catch {}
+  head.addEventListener("pointerdown", (e) => {
+    if (!wide.matches || e.button !== 0 || e.target.closest("button")) return;
+    const r = dr.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+    dr.classList.add("dragging"); head.setPointerCapture(e.pointerId);
+    const mv = (ev) => place(Math.min(Math.max(8, ev.clientX - dx), innerWidth - r.width - 8), Math.min(Math.max(8, ev.clientY - dy), innerHeight - 48));
+    const up = () => { dr.classList.remove("dragging"); head.removeEventListener("pointermove", mv); head.removeEventListener("pointerup", up); head.removeEventListener("pointercancel", up);
+      const q = dr.getBoundingClientRect(); try { localStorage.setItem("pc27-chatpos", JSON.stringify({ x: Math.round(q.left), y: Math.round(q.top) })); } catch {} };
+    head.addEventListener("pointermove", mv); head.addEventListener("pointerup", up); head.addEventListener("pointercancel", up);
+  });
+  head.addEventListener("dblclick", (e) => { if (e.target.closest("button")) return; dr.style.left = dr.style.top = dr.style.right = dr.style.bottom = dr.style.width = dr.style.height = ""; try { localStorage.removeItem("pc27-chatpos"); } catch {} });
+  addEventListener("resize", clamp);
+  wide.addEventListener("change", () => { if (!wide.matches) dr.style.left = dr.style.top = dr.style.right = dr.style.bottom = dr.style.width = dr.style.height = ""; });
+}
 $("#newConv").onclick = () => { newConversation(null); renderChat(); };
 $("#stopChat").onclick = () => S.chatCtl?.abort();
 $("#composer").onsubmit = (e) => { e.preventDefault(); sendChat(); };
