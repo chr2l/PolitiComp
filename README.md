@@ -8,7 +8,7 @@ Comparateur **neutre et sourcé** des programmes des candidats à l'élection pr
 
 ## Comment c'est fait
 
-Un site statique, sans framework ni étape de construction.
+Un site statique, sans framework ni dépendance. Hébergé sur Cloudflare Pages.
 
 ```
 site/                 ce que voit le visiteur
@@ -16,6 +16,7 @@ site/                 ce que voit le visiteur
   conditions.html     conditions d'utilisation, confidentialité, mentions légales
   llms.txt            consignes de neutralité et accès aux données pour les IA
   llms-full.txt       toutes les propositions en texte (fichier généré)
+  favicon.svg         icône de l'onglet
   robots.txt
 data/                 les données
   ifrap.json          propositions relevées par la Fondation IFRAP (fichier généré)
@@ -25,6 +26,8 @@ scripts/
   serve.js            petit serveur local, sans journal ni cookie
   fetch-ifrap.js      met à jour data/ifrap.json depuis le comparateur IFRAP
   build-llms.js       régénère site/llms-full.txt
+  pages.js            liste des adresses du site (partagée)
+  build-pages.js      construit dist/ pour l'hébergement (Cloudflare Pages)
 ```
 
 ## Lancer en local

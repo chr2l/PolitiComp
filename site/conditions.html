@@ -3,78 +3,211 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Conditions et confidentialité</title>
+<title>Infos et mentions légales · PolitiComp</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="description" content="PolitiComp : conditions d'utilisation, confidentialité (aucune collecte), IA dans le navigateur, sources, mentions légales et réutilisation des données.">
 <style>
-:root { --paper: #F3F4F6; --surface: #FFFFFF; --ink: #172030; --muted: #5A6476; --line: #D9DDE5; --accent: #2647A8; --ok: #2F7A3E; }
-@media (prefers-color-scheme: dark) { :root { --paper: #10141B; --surface: #171C26; --ink: #E5E8EE; --muted: #9AA3B3; --line: #2A3242; --accent: #8FA9F3; --ok: #6CC27D; color-scheme: dark } }
+/* Page d'infos : barre du haut comme le comparateur ; sommaire collant à gauche (comme Google Docs) qui suit la lecture. */
+:root {
+  --paper: #F6F5F1; --surface: #FFFFFF; --sunk: #EFEDE7; --ink: #1F2430; --muted: #5F6470; --line: #E3E0D8;
+  --accent: #3346C4; --accent-soft: #EBEDFB; --ok: #2F7A3E;
+  --shadow: 0 1px 2px rgba(40, 32, 16, .05), 0 6px 18px rgba(40, 32, 16, .06);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 14px; --hdr: 64px;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --paper: #15161B; --surface: #1D1F26; --sunk: #25272F; --ink: #ECEBE7; --muted: #A5A5AB; --line: #30323B;
+  --accent: #9DAAF5; --accent-soft: #262B47; --ok: #6CC27D; --shadow: none; color-scheme: dark } }
+
 * { box-sizing: border-box }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif }
-main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px }
-h1 { font-size: 28px; margin: 0 0 4px }
-h2 { font-size: 19px; margin: 32px 0 8px }
+html, * { scrollbar-width: none; -ms-overflow-style: none }
+*::-webkit-scrollbar { display: none; width: 0; height: 0 }
+html { scroll-padding-top: calc(var(--hdr) + 16px) }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth } }
+html, body { background: var(--paper); color: var(--ink) }
+body { font: 15.5px/1.65 var(--f-body); margin: 0 }
+h1, h2 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.2 }
 a { color: var(--accent) }
-.muted { color: var(--muted); font-size: 14px }
-.box { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--ok); border-radius: 10px; padding: 14px 18px; margin: 20px 0 }
-.box p { margin: 0 }
-ul { padding-left: 22px }
-li { margin: 4px 0 }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 16px }
+
+/* Barre du haut : collée en haut, pleine largeur */
+header.top { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20 }
+.top-in { display: flex; align-items: center; gap: 16px; min-height: var(--hdr) }
+.brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto; color: inherit; text-decoration: none; min-width: 0 }
+.brand b { font: 700 22px/1.2 var(--f-display); letter-spacing: -0.01em }
+.brand span { font-family: var(--f-mono); font-size: 12px; color: var(--muted); white-space: nowrap }
+.back { border: 1px solid var(--accent); color: var(--accent); padding: 7px 14px; border-radius: 999px; font-weight: 600; text-decoration: none; white-space: nowrap }
+.back:hover { background: var(--accent-soft) }
+
+/* Mise en page : sommaire + texte */
+.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 28px; align-items: start; padding-block: 24px 64px }
+
+/* Sommaire : liste de liens, l'élément lu est surligné (trait d'accent à gauche) */
+.toc { position: sticky; top: calc(var(--hdr) + 16px); max-height: calc(100vh - var(--hdr) - 32px); overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 14px 10px }
+.toc summary { list-style: none; font: 600 12px var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 0 10px 8px; cursor: default }
+.toc summary::-webkit-details-marker { display: none }
+.toc summary .cur, .toc summary .chev { display: none }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px }
+.toc a { display: flex; gap: 8px; padding: 6px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 14.5px; line-height: 1.35; border-left: 3px solid transparent }
+.toc a .n { font-family: var(--f-mono); font-size: 12px; min-width: 1.4em; padding-top: 2px }
+.toc a:hover { background: var(--sunk); color: var(--ink) }
+.toc a[aria-current="true"] { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600 }
+
+/* Texte */
+main { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 28px 36px 36px; min-width: 0 }
+main > h1 { font-size: 30px; margin-bottom: 6px }
+.muted { color: var(--muted); font-size: 14px; margin: 0 }
+section { padding-top: 8px }
+section + section { border-top: 1px solid var(--line); margin-top: 26px; padding-top: 26px }
+h2 { font-size: 21px; margin-bottom: 10px; display: flex; gap: 10px; align-items: baseline }
+h2 .n { font: 500 14px var(--f-mono); color: var(--muted) }
+p { margin: 0 0 10px } p:last-child { margin-bottom: 0 }
+ul { padding-left: 22px; margin: 0 0 10px } li { margin: 4px 0 }
+.box { background: var(--paper); border-left: 4px solid var(--ok); border-radius: 10px; padding: 14px 18px; margin: 22px 0 0 }
+
+/* Téléphone : le sommaire devient une barre repliable collée sous la barre du haut */
+@media (max-width: 820px) {
+  :root { --hdr: 56px }
+  .brand span { display: none }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 12px; padding-top: 12px }
+  .toc { top: var(--hdr); z-index: 10; max-height: calc(100vh - var(--hdr) - 16px); padding: 0; border-radius: 0 0 var(--r) var(--r); margin-inline: -16px; border-inline: 0; border-top: 0 }
+  .toc summary { display: flex; align-items: center; gap: 8px; padding: 12px 16px; cursor: pointer; text-transform: none; letter-spacing: 0; font: 500 14px var(--f-body) }
+  .toc summary .lbl { font: 600 12px var(--f-mono); text-transform: uppercase; letter-spacing: .06em }
+  .toc summary .cur { display: block; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 }
+  .toc summary .chev { display: block; transition: transform .15s }
+  .toc[open] summary .chev { transform: rotate(180deg) }
+  .toc ol { padding: 0 8px 10px }
+  main { padding: 20px 18px 28px }
+  main > h1 { font-size: 25px }
+  html { scroll-padding-top: calc(var(--hdr) + 60px) }
+}
+@media (prefers-reduced-motion: reduce) { .toc summary .chev { transition: none } }
 </style>
 </head>
 <body>
-<main>
-  <p class="muted"><a href="./">← Retour au comparateur</a></p>
-  <h1>Conditions d'utilisation et confidentialité</h1>
-  <p class="muted">PolitiComp · comparateur des programmes de la présidentielle 2027 · mise à jour le 4 novembre 2026</p>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="./"><b>PolitiComp</b><span>présidentielle 2027 · infos</span></a>
+    <a class="back" href="./">← Comparateur</a>
+  </div>
+</header>
 
-  <div class="box"><p><strong>En bref : nous ne récupérons rien. Aucune donnée, aucune question, aucune conversation.</strong> Pas de compte, pas de cookie, pas de mesure d'audience, pas de publicité, pas de traceur.</p></div>
+<div class="wrap layout">
+  <details class="toc" id="toc" open>
+    <summary><span class="lbl">Sommaire</span><span class="cur" id="tocCur"></span><span class="chev" aria-hidden="true">▾</span></summary>
+    <nav aria-label="Sommaire">
+      <ol>
+        <li><a href="#site"><span class="n">1</span>Ce que fait ce site</a></li>
+        <li><a href="#donnees"><span class="n">2</span>Données personnelles</a></li>
+        <li><a href="#navigateur"><span class="n">3</span>Ce qui reste chez vous</a></li>
+        <li><a href="#ia"><span class="n">4</span>Votre IA, vos règles</a></li>
+        <li><a href="#neutralite"><span class="n">5</span>Neutralité et sources</a></li>
+        <li><a href="#limites"><span class="n">6</span>Limites</a></li>
+        <li><a href="#mentions"><span class="n">7</span>Mentions légales</a></li>
+        <li><a href="#reutilisation"><span class="n">8</span>Réutiliser les données</a></li>
+      </ol>
+    </nav>
+  </details>
 
-  <h2>1. Ce que fait ce site</h2>
-  <p>PolitiComp met à disposition, gratuitement, les propositions publiées par les candidats à l'élection présidentielle de 2027, classées par thème, avec leurs sources. Il héberge seulement ce comparateur et ces données.</p>
-  <p>Le site n'appelle aucune intelligence artificielle sur son serveur. Pour poser des questions à une IA :</p>
-  <ul>
-    <li>le bouton <strong>« Activer mon IA »</strong> télécharge une IA gratuite dans votre navigateur. Elle tourne sur votre ordinateur, sans compte ni clé ;</li>
-    <li>ou le bouton <strong>« Copier pour mon IA »</strong> : vous collez le texte dans l'IA de votre choix, ou vous lui donnez l'adresse <a href="llms.txt">/llms.txt</a>.</li>
-  </ul>
+  <main>
+    <h1>Infos, confidentialité et mentions légales</h1>
+    <p class="muted">PolitiComp · comparateur des programmes de la présidentielle 2027 · mise à jour le 8 novembre 2026</p>
 
-  <h2>2. Données personnelles : rien n'est collecté</h2>
-  <ul>
-    <li>Pas de formulaire, pas d'inscription, pas de compte.</li>
-    <li>Pas de cookie, pas de mesure d'audience (aucun Google Analytics ou équivalent), pas de publicité, pas de pixel ni de traceur.</li>
-    <li>Aucune ressource n'est chargée depuis un autre site (pas de polices, scripts ou images externes) : votre navigateur ne contacte que ce site. Seule exception, si vous la demandez : le téléchargement de l'IA (voir point 4).</li>
-    <li>Vos questions, vos sélections et vos discussions ne sont jamais envoyées à notre serveur.</li>
-    <li>Comme pour toute page web, votre navigateur doit envoyer son adresse IP au serveur pour recevoir la page. Nous ne l'enregistrons pas et nous ne gardons aucun journal de visites.</li>
-    <li>Le site passe par Cloudflare, qui fournit le HTTPS et protège le serveur. Comme tout intermédiaire de ce type, Cloudflare voit passer les connexions, selon <a href="https://www.cloudflare.com/fr-fr/privacypolicy/" rel="noopener">sa propre politique de confidentialité</a>.</li>
-  </ul>
+    <div class="box"><p><strong>En bref : nous ne récupérons rien. Aucune donnée, aucune question, aucune conversation.</strong> Pas de compte, pas de cookie, pas de mesure d'audience, pas de publicité, pas de traceur.</p></div>
 
-  <h2>3. Ce qui reste dans votre navigateur</h2>
-  <p>L'historique, le récapitulatif et votre sélection de candidats et la position de la fenêtre de discussion sont enregistrés <strong>uniquement dans votre navigateur</strong> (stockage local), sur votre appareil. Ils ne quittent jamais votre appareil et nous n'y avons pas accès. Vous pouvez les effacer à tout moment depuis le comparateur ou en vidant les données du site dans votre navigateur.</p>
-  <p>Si vous activez l'IA, le modèle (environ 2 Go) est gardé par votre navigateur pour les prochaines fois. Il est effacé tout seul si vous ne vous en servez pas pendant 7 jours (ou 30 jours, ou dès la fermeture de la page : vous choisissez). L'effacement a lieu à votre visite suivante, car un site fermé ne peut rien faire. Le bouton « Supprimer l'IA maintenant » l'efface tout de suite, et vider les données du site aussi.</p>
+    <section id="site">
+      <h2><span class="n">1</span>Ce que fait ce site</h2>
+      <p>PolitiComp met à disposition, gratuitement, les propositions publiées par les candidats à l'élection présidentielle de 2027, classées par thème, avec leurs sources. Il héberge seulement ce comparateur et ces données.</p>
+      <p>Le site n'appelle aucune intelligence artificielle sur son serveur. Pour poser des questions à une IA :</p>
+      <ul>
+        <li>le bouton <strong>« Activer mon IA »</strong> télécharge une IA gratuite dans votre navigateur. Elle tourne sur votre ordinateur, sans compte ni clé ;</li>
+        <li>ou le bouton <strong>« Copier pour mon IA »</strong> : vous collez le texte dans l'IA de votre choix, ou vous lui donnez l'adresse <a href="llms.txt">/llms.txt</a>.</li>
+      </ul>
+    </section>
 
-  <h2>4. Votre IA, vos règles</h2>
-  <p>Avec « Activer mon IA », l'IA tourne sur votre ordinateur : vos questions et ses réponses ne quittent pas votre machine et ne passent pas par notre serveur. C'est gratuit, sans compte et sans clé.</p>
-  <p>Le seul échange avec l'extérieur a lieu quand vous cliquez sur « Télécharger et lancer l'IA » : votre navigateur télécharge le programme d'IA (WebLLM, depuis cdn.jsdelivr.net) et le modèle Qwen (depuis huggingface.co et raw.githubusercontent.com). Ces sites voient alors votre adresse IP, comme pour tout téléchargement, mais ne reçoivent aucune question. Sans ce clic, rien n'est téléchargé.</p>
-  <p>Si vous collez le texte copié dans une IA en ligne (ChatGPT, Claude, Mistral…), ce sont les conditions de ce service qui s'appliquent. Nous ne recevons et ne stockons aucun identifiant, aucune clé et aucun mot de passe.</p>
+    <section id="donnees">
+      <h2><span class="n">2</span>Données personnelles : rien n'est collecté</h2>
+      <ul>
+        <li>Pas de formulaire, pas d'inscription, pas de compte.</li>
+        <li>Pas de cookie, pas de mesure d'audience (aucun Google Analytics ou équivalent), pas de publicité, pas de pixel ni de traceur.</li>
+        <li>Aucune ressource n'est chargée depuis un autre site (pas de polices, scripts ou images externes) : votre navigateur ne contacte que ce site. Seule exception, si vous la demandez : le téléchargement de l'IA (voir <a href="#ia">point 4</a>).</li>
+        <li>Vos questions, vos sélections et vos discussions ne sont jamais envoyées à notre serveur.</li>
+        <li>Comme pour toute page web, votre navigateur doit envoyer son adresse IP au serveur pour recevoir la page. Nous ne l'enregistrons pas et nous ne gardons aucun journal de visites.</li>
+        <li>Le site est hébergé par Cloudflare, qui fournit aussi le HTTPS. Comme tout hébergeur, Cloudflare voit passer les connexions, selon <a href="https://www.cloudflare.com/fr-fr/privacypolicy/" rel="noopener">sa propre politique de confidentialité</a>.</li>
+      </ul>
+    </section>
 
-  <h2>5. Neutralité et sources</h2>
-  <ul>
-    <li>Le comparateur ne soutient aucun candidat, parti ou courant, et ne donne aucune consigne de vote.</li>
-    <li>La source principale est le <a href="https://www.ifrap.org/comparateurs/presidentielles-2027" rel="noopener">comparateur de la Fondation IFRAP</a> (think tank d'orientation libérale). Des propositions issues de sources officielles des candidats peuvent s'y ajouter, chacune avec son lien.</li>
-    <li>La position des partis suit le <a href="https://www.legifrance.gouv.fr/circulaire/id/45645" rel="noopener">classement officiel du ministère de l'Intérieur (2026)</a>, que certains partis contestent ; c'est indiqué quand c'est le cas.</li>
-    <li>Les IA qui lisent ce site reçoivent des <a href="llms.txt">consignes</a> : rester impartiales, s'appuyer sur les propositions publiées, citer leurs sources et dire quand une information manque.</li>
-  </ul>
+    <section id="navigateur">
+      <h2><span class="n">3</span>Ce qui reste dans votre navigateur</h2>
+      <p>L'historique, le récapitulatif, votre sélection de candidats et la position de la fenêtre de discussion sont enregistrés <strong>uniquement dans votre navigateur</strong> (stockage local), sur votre appareil. Ils ne quittent jamais votre appareil et nous n'y avons pas accès. Vous pouvez les effacer à tout moment depuis le comparateur ou en vidant les données du site dans votre navigateur.</p>
+      <p>Si vous activez l'IA, le modèle (environ 2 Go) est gardé par votre navigateur pour les prochaines fois. Il est effacé tout seul si vous ne vous en servez pas pendant 7 jours (ou 30 jours, ou dès la fermeture de la page : vous choisissez). L'effacement a lieu à votre visite suivante, car un site fermé ne peut rien faire. Le bouton « Supprimer l'IA maintenant » l'efface tout de suite, et vider les données du site aussi.</p>
+    </section>
 
-  <h2>6. Limites</h2>
-  <p>Les relevés peuvent être incomplets ou dater ; la date de chaque relevé est affichée. Les réponses d'une IA peuvent contenir des erreurs : vérifiez toujours dans le programme officiel du candidat. Le site est fourni tel quel, sans garantie. Nous ne sommes pas responsables des réponses produites par l'IA que vous utilisez.</p>
+    <section id="ia">
+      <h2><span class="n">4</span>Votre IA, vos règles</h2>
+      <p>Avec « Activer mon IA », l'IA tourne sur votre ordinateur : vos questions et ses réponses ne quittent pas votre machine et ne passent pas par notre serveur. C'est gratuit, sans compte et sans clé.</p>
+      <p>Le seul échange avec l'extérieur a lieu quand vous cliquez sur « Télécharger et lancer l'IA » : votre navigateur télécharge le programme d'IA (WebLLM, depuis cdn.jsdelivr.net) et le modèle Qwen (depuis huggingface.co et raw.githubusercontent.com). Ces sites voient alors votre adresse IP, comme pour tout téléchargement, mais ne reçoivent aucune question. Sans ce clic, rien n'est téléchargé.</p>
+      <p>Si vous collez le texte copié dans une IA en ligne (ChatGPT, Claude, Mistral…), ce sont les conditions de ce service qui s'appliquent. Nous ne recevons et ne stockons aucun identifiant, aucune clé et aucun mot de passe.</p>
+    </section>
 
-  <h2 id="mentions">7. Mentions légales</h2>
-  <ul>
-    <li><strong>Éditeur et directeur de la publication :</strong> Charlélie Buchholz • chr2l (particulier, site non commercial).</li>
-    <li><strong>Contact :</strong> <a href="mailto:contact@elie.place">contact@elie.place</a>. Si vous écrivez, votre message sert seulement à vous répondre ; il n'est ni réutilisé ni transmis.</li>
-    <li><strong>Hébergement :</strong> auto-hébergé par l'éditeur, sur son propre serveur.</li>
-  </ul>
+    <section id="neutralite">
+      <h2><span class="n">5</span>Neutralité et sources</h2>
+      <ul>
+        <li>Le comparateur ne soutient aucun candidat, parti ou courant, et ne donne aucune consigne de vote.</li>
+        <li>La source principale est le <a href="https://www.ifrap.org/comparateurs/presidentielles-2027" rel="noopener">comparateur de la Fondation IFRAP</a> (think tank d'orientation libérale). Des propositions issues de sources officielles des candidats peuvent s'y ajouter, chacune avec son lien.</li>
+        <li>La position des partis suit le <a href="https://www.legifrance.gouv.fr/circulaire/id/45645" rel="noopener">classement officiel du ministère de l'Intérieur (2026)</a>, que certains partis contestent ; c'est indiqué quand c'est le cas.</li>
+        <li>Les IA qui lisent ce site reçoivent des <a href="llms.txt">consignes</a> : rester impartiales, s'appuyer sur les propositions publiées, citer leurs sources et dire quand une information manque.</li>
+      </ul>
+    </section>
 
-  <h2>8. Réutilisation des données</h2>
-  <p>Les données du comparateur sont en lecture libre, sans clé : <a href="llms-full.txt">texte complet</a>, <a href="data.json">propositions (JSON)</a>, <a href="partis.json">partis (JSON)</a>, <a href="officiel.json">sources officielles (JSON)</a>. Merci de citer les sources d'origine indiquées dans chaque fichier.</p>
-</main>
+    <section id="limites">
+      <h2><span class="n">6</span>Limites</h2>
+      <p>Les relevés peuvent être incomplets ou dater ; la date de chaque relevé est affichée. Les réponses d'une IA peuvent contenir des erreurs : vérifiez toujours dans le programme officiel du candidat. Le site est fourni tel quel, sans garantie. Nous ne sommes pas responsables des réponses produites par l'IA que vous utilisez.</p>
+    </section>
+
+    <section id="mentions">
+      <h2><span class="n">7</span>Mentions légales</h2>
+      <ul>
+        <li><strong>Éditeur et directeur de la publication :</strong> Charlélie Buchholz • chr2l (particulier, site non commercial).</li>
+        <li><strong>Contact :</strong> <a href="mailto:contact@elie.place">contact@elie.place</a>. Si vous écrivez, votre message sert seulement à vous répondre ; il n'est ni réutilisé ni transmis.</li>
+        <li><strong>Hébergement :</strong> Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, États-Unis (<a href="https://www.cloudflare.com/fr-fr/" rel="noopener">cloudflare.com</a>).</li>
+      </ul>
+    </section>
+
+    <section id="reutilisation">
+      <h2><span class="n">8</span>Réutilisation des données</h2>
+      <p>Les données du comparateur sont en lecture libre, sans clé : <a href="llms-full.txt">texte complet</a>, <a href="data.json">propositions (JSON)</a>, <a href="partis.json">partis (JSON)</a>, <a href="officiel.json">sources officielles (JSON)</a>. Merci de citer les sources d'origine indiquées dans chaque fichier.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+// Sommaire : surligne la partie en cours de lecture ; sur téléphone, se replie après un clic.
+(() => {
+  const toc = document.getElementById("toc"), cur = document.getElementById("tocCur");
+  const links = [...toc.querySelectorAll("a")];
+  const secs = links.map((a) => document.querySelector(a.hash));
+  const phone = matchMedia("(max-width: 820px)");
+  const fit = () => { toc.open = !phone.matches; };
+  fit(); phone.addEventListener("change", fit);
+  toc.querySelector("summary").addEventListener("click", (e) => { if (!phone.matches) e.preventDefault(); });
+  let forced = -1; // partie cliquée : reste surlignée jusqu'au prochain défilement à la main
+  links.forEach((a, k) => a.addEventListener("click", () => { forced = k; if (phone.matches) toc.open = false; setTimeout(mark, 0); }));
+  ["wheel", "touchstart", "keydown"].forEach((t) => addEventListener(t, () => { forced = -1; }, { passive: true }));
+  const mark = () => {
+    const top = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 80;
+    let i = 0;
+    secs.forEach((s, k) => { if (s.getBoundingClientRect().top - top <= 24) i = k; });
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) i = secs.length - 1;
+    if (forced >= 0) i = forced;
+    links.forEach((a, k) => a.setAttribute("aria-current", k === i ? "true" : "false"));
+    cur.textContent = links[i].lastChild.textContent;
+  };
+  addEventListener("scroll", mark, { passive: true }); addEventListener("resize", mark); mark();
+})();
+</script>
 </body>
 </html>

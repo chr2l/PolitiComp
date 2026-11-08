@@ -1,9 +1,9 @@
 name: Auto-merge Claude PRs
-# Fusionne automatiquement les PR ouvertes depuis une branche claude/*,
-# (pas les brouillons : fusion quand la PR passe « prête »)
-# UNIQUEMENT si le dépôt est privé et si la PR vient de ce même dépôt (pas d'un fork).
-# Si le dépôt devient public, plus rien n'est fusionné et le job "warn-public"
-# échoue volontairement pour te prévenir (notification GitHub d'échec de workflow).
+# Fusionne automatiquement les PR des branches claude/* poussées DANS CE DÉPÔT
+# (seules les personnes ayant le droit d'écrire ici peuvent créer ces branches).
+# Les PR venant d'un fork (contributions extérieures) ne sont JAMAIS fusionnées
+# automatiquement : l'éditeur les relit et les fusionne à la main.
+# Les brouillons attendent d'être marqués « prêts ».
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -17,7 +17,6 @@ jobs:
     if: >-
       startsWith(github.head_ref, 'claude/') &&
       github.event.pull_request.draft == false &&
-      github.event.repository.private == true &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
@@ -25,13 +24,3 @@ jobs:
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  warn-public:
-    if: >-
-      startsWith(github.head_ref, 'claude/') &&
-      github.event.repository.private == false
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo "::error::ATTENTION : ce dépôt est PUBLIC. L'auto-merge des PR claude/* est désactivé par sécurité. Repasse le dépôt en privé ou supprime .github/workflows/automerge.yml."
-          exit 1

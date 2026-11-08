@@ -13,7 +13,7 @@ Comparateur politique : site statique (site/), données JSON (data/), scripts.
 - En ligne : https://politicomp.elie.place (Cloudflare devant). Le serveur fait tourner `node scripts/serve.js`, sans journal d'accès.
 
 ## Déploiement
-Automatique : chaque commit sur `main` est mis en ligne en moins de 5 min.
+Automatique via Cloudflare Pages (`node scripts/build-pages.js` → `dist/`) : chaque commit sur `main` est mis en ligne en quelques minutes.
 Les détails du serveur de l'éditeur ne sont pas dans ce dépôt (dépôt public).
 
 ## Branches
@@ -49,4 +49,7 @@ Adresses IP, chemins locaux, détails du serveur maison, e-mails perso, clés ou
 - 2026-11-06 : blocs du panneau : une seule barre de 5 carrés cliquables (G … D), carré plein = bloc affiché, à moitié = en partie.
 - 2026-11-06 : fenêtre de discussion flottante sur ordinateur : déplaçable par sa barre de titre, redimensionnable par le coin, position gardée (double-clic sur la barre = position d'origine). Plein écran sur téléphone.
 - 2026-11-07 : fenêtre de discussion flottante : ombre en couches, surface et barre de titre plus claires en mode sombre, ombre plus forte pendant le déplacement (repères « au premier plan »).
+- 2026-11-08 : page d'infos (conditions.html) refaite : sommaire collant à gauche qui suit la lecture (barre repliable sur téléphone), couleurs du comparateur.
+- 2026-11-08 : passage sur Cloudflare Pages (projet `politicomp`, build `node scripts/build-pages.js` → `dist/`, adresses partagées avec serve.js dans `scripts/pages.js`), mentions légales : hébergeur Cloudflare. L'icône est gérée à part (projet elie.place).
+- 2026-11-08 : icône [P] jaune remise dans les pages (site/favicon.svg) : le site est sur Cloudflare Pages, le portail elie.place ne peut plus la poser. À garder.
 - 2026-11-08 : dépôt préparé pour le public : README, CONTRIBUTING, modèle de PR, captures retirées, IP et détails du serveur retirés des notes.
