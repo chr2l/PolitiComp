@@ -37,12 +37,12 @@ h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; l
 header.top { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20 }
 .top-in { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; min-height: 64px }
 .brand { display: flex; align-items: center; gap: 10px; margin-right: auto }
-/* Icône [P] du site (dessin d'elie.place : crochets blancs, P jaune) : seulement affichée ici, pas modifiée */
-.brand .mark { flex: none; width: 36px; height: 36px; display: block }
+/* Icône du site : la balance en caractères (dessin de Maitre), jaune sur fond sombre */
+.brand .mark { flex: none; width: 46px; height: 46px; display: block }
 .brand { min-width: 0; flex: 0 1 auto }
-.brand .bt { display: grid; min-width: 0; max-width: 300px }
-.brand h1 { font-size: 22px; letter-spacing: -0.01em; line-height: 1.1 }
-.brand .yr { font-size: 12px; line-height: 1.25; color: var(--muted); text-wrap: balance }
+.brand .bt { display: grid; gap: 2px; min-width: 0; max-width: 270px }
+.brand h1 { font-size: 21px; letter-spacing: -0.01em; line-height: 1.1 }
+.brand .yr { font-size: 11px; line-height: 1.35; color: var(--muted); text-wrap: balance }
 /* Onglets de page : style « enfoncé » sur toute la hauteur de la barre (différent des pastilles de thèmes) */
 nav.tabs { display: flex; align-self: stretch }
 nav.tabs button { border: 0; background: none; padding: 0 16px; cursor: pointer; color: var(--muted); font-weight: 500; position: relative }
@@ -331,7 +331,7 @@ table.pos tr:last-child td { border-bottom: 0 }
 
 <header class="top">
   <div class="wrap top-in">
-    <div class="brand"><svg class="mark" viewBox="0 0 1000 1000" aria-hidden="true"><rect width="1000" height="1000" rx="220" fill="#0b0b0c"/><path fill="#ffffff" transform="translate(1.4 708.7) scale(0.5797 -0.5797)" d="M170 -110V830H475V690H320V30H475V-110Z"/><path fill="#ffc21a" transform="translate(326.1 708.7) scale(0.5797 -0.5797)" d="M66 0V730H315Q392 730 449.5 701Q507 672 538.5 620Q570 568 570 498Q570 429 538 376.5Q506 324 449 295Q392 266 315 266H216V0ZM216 396H315Q363 396 391.5 425Q420 454 420 498Q420 542 391.5 571Q363 600 315 600H216Z"/><path fill="#ffffff" transform="translate(650.7 708.7) scale(0.5797 -0.5797)" d="M125 -110V30H280V690H125V830H430V-110Z"/></svg><div class="bt"><h1>PolitiComp</h1><span class="yr">comparateur de programmes politiques pour les élections françaises 2027</span></div></div>
+    <div class="brand"><svg class="mark" viewBox="0 0 100 100" role="img" aria-label="Balance"><rect width="100" height="100" rx="22" fill="#0b0b0c"/><text text-anchor="middle" fill="#ffc21a" font-family="ui-monospace, Consolas, Menlo, monospace" font-size="18" font-weight="700" style="white-space:pre"><tspan x="50" y="21.0">    |    </tspan><tspan x="50" y="38.5"> ---+--- </tspan><tspan x="50" y="56.0"> |     | </tspan><tspan x="50" y="73.5">/_\   /_\</tspan><tspan x="50" y="91.0">  __|__  </tspan></text></svg><div class="bt"><h1>PolitiComp</h1><span class="yr">comparateur de programmes politiques pour les élections françaises 2027</span></div></div>
     <nav class="tabs" role="tablist" id="tabs">
       <button role="tab" data-view="theme" aria-selected="true">Par thème</button>
       <button role="tab" data-view="vs" aria-selected="false">Face-à-face</button>
