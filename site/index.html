@@ -36,9 +36,13 @@ h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; l
 
 header.top { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20 }
 .top-in { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; min-height: 64px }
-.brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto }
-.brand h1 { font-size: 22px; letter-spacing: -0.01em }
-.brand .yr { font-family: var(--f-mono); font-size: 12px; color: var(--muted) }
+.brand { display: flex; align-items: center; gap: 10px; margin-right: auto }
+/* Icône [P] du site (dessin d'elie.place : crochets blancs, P jaune) : seulement affichée ici, pas modifiée */
+.brand .mark { flex: none; width: 36px; height: 36px; display: block }
+.brand { min-width: 0; flex: 0 1 auto }
+.brand .bt { display: grid; min-width: 0; max-width: 300px }
+.brand h1 { font-size: 22px; letter-spacing: -0.01em; line-height: 1.1 }
+.brand .yr { font-size: 12px; line-height: 1.25; color: var(--muted); text-wrap: balance }
 /* Onglets de page : style « enfoncé » sur toute la hauteur de la barre (différent des pastilles de thèmes) */
 nav.tabs { display: flex; align-self: stretch }
 nav.tabs button { border: 0; background: none; padding: 0 16px; cursor: pointer; color: var(--muted); font-weight: 500; position: relative }
@@ -163,7 +167,14 @@ a.btn.primary { color: var(--accent-ink) }
 .hit mark { background: var(--accent-soft); color: inherit; border-radius: 3px; padding: 0 1px }
 kbd { font: 11px var(--f-mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--paper) }
 dialog.keys table { border-collapse: collapse; font-size: 14px; width: 100% } dialog.keys td { padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top } dialog.keys td:first-child { white-space: nowrap }
-.keybtn { border: 1px solid var(--line); background: transparent; color: var(--muted); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: 700 }
+.keybtn { border: 1px solid var(--line); background: transparent; color: var(--muted); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: 700; position: relative; padding: 0 }
+.keybtn:hover { border-color: var(--accent); color: var(--accent) }
+/* Langue : même famille que « ? » (petit bouton discret de la barre), en pilule pour tenir FR·EN */
+.keybtn.lang { width: auto; border-radius: 999px; padding: 0 10px; font: 600 12px var(--f-mono); letter-spacing: .02em }
+.keybtn.lang b { color: var(--ink) } .keybtn.lang i { font-style: normal; opacity: .55 }
+.keybtn[data-tip]::after { content: attr(data-tip); position: absolute; top: calc(100% + 8px); right: 0; z-index: 30; width: max-content; max-width: 240px; background: var(--ink); color: var(--paper); font: 500 12.5px/1.35 var(--f-body); padding: 6px 10px; border-radius: 8px; pointer-events: none; opacity: 0; transform: translateY(-3px); transition: opacity .12s, transform .12s; text-align: left; letter-spacing: 0 }
+.keybtn[data-tip]:hover::after, .keybtn[data-tip]:focus-visible::after { opacity: 1; transform: none }
+@media (prefers-reduced-motion: reduce) { .keybtn[data-tip]::after { transition: none } }
 
 .sec-head { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; justify-content: space-between; margin-bottom: 14px }
 .sec-head h2 { font-size: 28px; letter-spacing: -0.015em }
@@ -299,9 +310,15 @@ table.pos tr:last-child td { border-bottom: 0 }
   /* Barre du haut compacte sur téléphone : marque + 2 boutons, puis les onglets sur toute la largeur */
   .top-in { gap: 8px; min-height: 0; padding-top: 8px }
   .brand { flex: 1 1 0; min-width: 0 }
-  .brand h1 { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis } .brand .yr, #keysBtn, .m-hide { display: none }
+  .brand { gap: 6px } .brand .mark { width: 28px; height: 28px }
+  .brand h1 { font-size: 16.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis } #keysBtn, .m-hide { display: none }
+  @media (max-width: 370px) { .brand h1 { display: none } } /* très petit écran : l'icône suffit */
+  /* Téléphone : le sous-titre ne tient pas, on garde le nom ; FR/EN devient un rond qui montre l'autre langue */
+  .brand .yr { display: none }
+  .keybtn.lang { width: 30px; height: 30px; padding: 0; border-radius: 50% } .keybtn.lang .cur { display: none } .keybtn.lang i { opacity: 1 }
   .m-cap { text-transform: capitalize }
-  .llm-btn, .chat-btn { font-size: 12.5px; padding: 6px 10px; white-space: nowrap }
+  .llm-btn, .chat-btn { font-size: 12.5px; padding: 6px 9px; white-space: nowrap }
+  .top-in { column-gap: 6px }
   nav.tabs { order: 9; flex-basis: calc(100% + 32px); margin-inline: -16px; height: 42px }
   nav.tabs button { flex: 1 1 auto; padding: 0 6px; font-size: 14px; white-space: nowrap }
   nav.tabs button[aria-selected="true"]::after { left: 8px; right: 8px }
@@ -314,14 +331,15 @@ table.pos tr:last-child td { border-bottom: 0 }
 
 <header class="top">
   <div class="wrap top-in">
-    <div class="brand"><h1>Programmes 2027</h1><span class="yr">présidentielle · comparateur</span></div>
+    <div class="brand"><svg class="mark" viewBox="0 0 1000 1000" aria-hidden="true"><rect width="1000" height="1000" rx="220" fill="#0b0b0c"/><path fill="#ffffff" transform="translate(1.4 708.7) scale(0.5797 -0.5797)" d="M170 -110V830H475V690H320V30H475V-110Z"/><path fill="#ffc21a" transform="translate(326.1 708.7) scale(0.5797 -0.5797)" d="M66 0V730H315Q392 730 449.5 701Q507 672 538.5 620Q570 568 570 498Q570 429 538 376.5Q506 324 449 295Q392 266 315 266H216V0ZM216 396H315Q363 396 391.5 425Q420 454 420 498Q420 542 391.5 571Q363 600 315 600H216Z"/><path fill="#ffffff" transform="translate(650.7 708.7) scale(0.5797 -0.5797)" d="M125 -110V30H280V690H125V830H430V-110Z"/></svg><div class="bt"><h1>PolitiComp</h1><span class="yr">comparateur de programmes politiques pour les élections françaises 2027</span></div></div>
     <nav class="tabs" role="tablist" id="tabs">
       <button role="tab" data-view="theme" aria-selected="true">Par thème</button>
       <button role="tab" data-view="vs" aria-selected="false">Face-à-face</button>
       <button role="tab" data-view="history" aria-selected="false">Historique</button>
       <button role="tab" data-view="recap" aria-selected="false">Récap</button>
     </nav>
-    <button class="keybtn" id="keysBtn" title="Raccourcis clavier (touche ?)" aria-label="Raccourcis clavier">?</button>
+    <button class="keybtn lang" id="langBtn"><b class="cur">FR</b> <i>EN</i></button>
+    <button class="keybtn" id="keysBtn" data-tip="Raccourcis clavier (touche ?)" aria-label="Raccourcis clavier">?</button>
     <button class="llm-btn" id="llmBtn">Activer mon IA</button>
     <button class="chat-btn" id="openChat"><span class="m-hide">Poser une </span><span class="m-cap">question</span></button>
   </div>
@@ -350,7 +368,7 @@ table.pos tr:last-child td { border-bottom: 0 }
       <span><button type="button" class="btn sm" id="stopChat" hidden>Arrêter</button> <button class="btn primary sm" id="sendChat">Envoyer</button></span></div>
   </form>
 </aside>
-<footer class="wrap foot"><div class="srcline" id="srcline">Chargement des données…</div>Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne. · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
+<footer class="wrap foot"><div class="srcline" id="srcline">Chargement des données…</div><span>Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne.</span> · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
 <dialog class="llm ia" id="llmDlg">
   <form method="dialog" id="llmForm">
     <button type="button" class="ia-x" id="llmX" aria-label="Fermer">×</button>
@@ -405,9 +423,81 @@ const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 const hash = (s) => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
-const fmtDate = (t) => new Date(t).toLocaleString("fr-FR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const fmtDate = (t) => new Date(t).toLocaleString(LOC(), { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 const SLOT = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)"];
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2600); }
+// ---------- langue : français / anglais ----------
+// L'interface est traduite ; les propositions des programmes restent en français (texte d'origine, non traduit).
+// Choix gardé dans ce navigateur ; sinon, langue du navigateur (français par défaut). Lien direct possible : ?lang=en
+const LANG_KEY = "pc27-lang";
+let LANG = (() => {
+  try { const q = new URLSearchParams(location.search).get("lang"); if (q === "fr" || q === "en") return q; const v = localStorage.getItem(LANG_KEY); if (v === "fr" || v === "en") return v; } catch {}
+  const l = navigator.languages?.length ? navigator.languages : [navigator.language || "fr"];
+  return l.some((x) => /^fr\b/i.test(x)) || !l[0] ? "fr" : "en";
+})();
+const tr = (fr, en) => (LANG === "en" ? en : fr);
+const LOC = () => (LANG === "en" ? "en-GB" : "fr-FR");
+const fmtDay = (t) => new Date(t).toLocaleDateString(LOC());
+const plural = (n, one, many) => n + " " + (n > 1 ? many : one);
+// Noms des thèmes et des blocs (les données sont en français)
+const EN_NAMES = {
+  "Finances publiques": "Public finances", "Economies & hausses de dépenses": "Savings & spending increases", "Dette & déficit": "Debt & deficit", "Fiscalité": "Taxation", "Secteur bancaire & finance": "Banking & finance",
+  "Intérieur & Justice": "Home affairs & justice", "Immigration": "Immigration", "Justice & pénitentiaire": "Justice & prisons", "Lutte contre le narcotrafic": "Fighting drug trafficking", "Sécurité intérieure": "Domestic security", "Outre-mer": "Overseas territories",
+  "Social & Solidarité": "Social affairs & solidarity", "Allocations & prestations sociales": "Social benefits", "Santé": "Health", "Culture": "Culture", "Logement": "Housing", "Transports": "Transport",
+  "Retraites & Travail": "Pensions & work", "Emploi & travail": "Employment & work", "Système de retraite": "Pension system", "Industrie & relocalisation": "Industry & reshoring",
+  "Environnement": "Environment", "Energie": "Energy", "Ecologie": "Ecology", "Agriculture": "Agriculture",
+  "Europe & international": "Europe & international", "Affaires étrangères & diplomatie": "Foreign affairs & diplomacy", "Union Européenne": "European Union",
+  "Gouvernance & République": "Governance & the Republic", "Démocratie, élections et pouvoir législatif": "Democracy, elections & legislature", "Egalité, laïcité & droits individuels": "Equality, secularism & individual rights", "Numérique et IA": "Digital & AI",
+  "Réformes de l'Etat": "State reform", "Administrations et opérateurs": "Administrations & public agencies", "Fonction publique": "Civil service",
+  "Education & Jeunesse": "Education & youth", "Services de la petite enfance": "Early childhood services", "Périscolaire": "After-school activities", "Education nationale": "Schools (national education)", "Enseignement supérieur": "Higher education",
+  "Défense": "Defence", "Défense & armées": "Defence & armed forces",
+  "Extrême gauche": "Far left", "Gauche": "Left", "Centre": "Centre", "Droite": "Right", "Extrême droite": "Far right",
+};
+const nm = (s) => (LANG === "en" && EN_NAMES[s]) || s;
+// Textes fixes de la page (barre du haut, discussion, pied de page, fenêtres) : français → anglais
+const EN_STATIC = {
+  "comparateur de programmes politiques pour les élections françaises 2027": "a comparison of political manifestos for the 2027 French elections",
+  "Par thème": "By topic", "Face-à-face": "Head-to-head", "Historique": "History", "Récap": "Summary",
+  "Raccourcis clavier (touche ?)": "Keyboard shortcuts (? key)", "Raccourcis clavier": "Keyboard shortcuts",
+  "Poser une": "Ask a", "question": "question",
+  "Discussion": "Chat", "Glisser pour déplacer": "Drag to move", "Glisser la barre pour déplacer la fenêtre": "Drag the bar to move the window",
+  "Nouvelle": "New", "Fermer": "Close", "Arrêter": "Stop", "Envoyer": "Send",
+  "Ex. : Quelles différences entre ces candidats sur la dette ?": "E.g. How do these candidates differ on public debt?",
+  "Réponses factuelles, sources : propositions relevées.": "Factual answers, based on the recorded proposals.",
+  "Chargement des données…": "Loading data…",
+  "Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne.": "This site collects no data and calls no AI: bring your own.",
+  "Pour les IA (llms.txt)": "For AIs (llms.txt)", "Toutes les propositions en texte": "All proposals as text (French)",
+  "Conditions et confidentialité": "Terms & privacy (French)", "Mentions légales": "Legal notice (French)",
+  "Une IA rien que pour toi": "An AI just for you", "Elle s'installe dans ton navigateur et répond à tes questions sur les programmes.": "It installs in your browser and answers your questions about the manifestos.",
+  "Gratuite": "Free", "sans compte ni clé": "no account, no key", "Privée": "Private", "tout reste sur ton ordi": "everything stays on your computer", "2 Go": "2 GB", "téléchargés une fois": "downloaded once",
+  "Tu peux fermer cette fenêtre et continuer à lire : le téléchargement continue. On t'ouvre la discussion dès que c'est prêt.": "You can close this window and keep reading: the download carries on. The chat opens as soon as it's ready.",
+  "Télécharger mon IA": "Download my AI", "Marche avec Chrome ou Edge à jour, sur un ordinateur assez récent.": "Works with an up-to-date Chrome or Edge, on a fairly recent computer.",
+  "Réglages et suppression": "Settings and removal", "Effacer l'IA si je ne m'en sers pas pendant": "Delete the AI if I don't use it for",
+  "7 jours": "7 days", "30 jours": "30 days", "tout de suite en fermant la page": "right away when I close the page", "Supprimer l'IA maintenant": "Delete the AI now",
+  "Activer mon IA": "Turn on my AI", "Copier pour mon IA": "Copy for my AI",
+  "Raccourcis": "Shortcuts", "Sous-thème précédent / suivant": "Previous / next sub-topic", "Maj": "Shift", "Thème précédent / suivant": "Previous / next topic",
+  "Chercher dans toutes les propositions": "Search all proposals", "Chercher un candidat (ouvre le panneau sur téléphone)": "Find a candidate (opens the panel on phones)",
+  "Tous les candidats / aucun": "All candidates / none", "Seulement ceux qui ont des propositions ici": "Only those with proposals here", "Copier le lien de cette vue": "Copy the link to this view",
+  "Poser une question": "Ask a question", "Afficher cette aide": "Show this help", "Échap": "Esc",
+  "Sur un candidat : « seul » n'affiche que lui. La croix sur une fiche le cache. Ta sélection est gardée dans ce navigateur pour la prochaine visite.": "On a candidate: “only” shows just them. The cross on a card hides it. Your selection is kept in this browser for your next visit.",
+};
+const FR_STATIC = Object.fromEntries(Object.entries(EN_STATIC).map(([f, e]) => [e, f]));
+function applyStatic() {
+  const dict = LANG === "en" ? EN_STATIC : FR_STATIC;
+  const swap = (v) => { const k = v.trim(); return dict[k] !== undefined ? v.replace(k, dict[k]) : v; };
+  for (const root of document.querySelectorAll("header.top, #drawer, footer.foot, #llmDlg, #keysDlg")) {
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement?.closest("#msgs, #dctx, #sugg") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    for (let n; (n = w.nextNode());) if (n.nodeValue.trim()) n.nodeValue = swap(n.nodeValue);
+    for (const el of root.querySelectorAll("[title], [aria-label], [placeholder], [data-tip]"))
+      for (const a of ["title", "aria-label", "placeholder", "data-tip"]) if (el.hasAttribute(a)) el.setAttribute(a, swap(el.getAttribute(a)));
+  }
+  document.documentElement.lang = LANG;
+  const b = $("#langBtn");
+  b.innerHTML = LANG === "en" ? `<i lang="fr">FR</i> <b class="cur">EN</b>` : `<b class="cur">FR</b> <i lang="en">EN</i>`;
+  b.dataset.tip = LANG === "en" ? "Lire le site en français" : "Read this site in English";
+  b.setAttribute("aria-label", b.dataset.tip);
+  b.lang = LANG === "en" ? "fr" : "en";
+}
 function initials(name) { return name.split(/[\s-]+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase(); }
 
 // Mini rendu Markdown (titres, listes, gras, italique, code)
@@ -461,11 +551,16 @@ async function loadData() {
     if (!D.props.has(k)) D.props.set(k, []);
     D.props.get(k).push({ text: it.text, src: it.source, url: it.url, date: it.date });
   }
-  const extraN = (extra.items || []).length;
-  $("#srcline").innerHTML = `Source principale : <a href="${esc(D.sourceUrl)}" target="_blank" rel="noopener">comparateur de la Fondation IFRAP</a> (think tank d'orientation libérale), relevé du <span class="mono">${esc(new Date(D.fetchedAt).toLocaleDateString("fr-FR"))}</span>`
-    + (extraN ? ` · ${extraN} proposition(s) issues de sources officielles des candidats (màj ${esc(new Date(extra.updatedAt).toLocaleDateString("fr-FR"))})` : "")
-    + ` · Positions des partis : <a href="${esc(D.partisUrl || "#")}" target="_blank" rel="noopener" title="${esc(D.partisMethode || "")}">blocs du ministère de l'Intérieur (2026)</a>`
-    + ` · mise à jour hebdomadaire.`;
+  D.extraN = (extra.items || []).length;
+  renderSrcline();
+}
+function renderSrcline() {
+  if (!D.fetchedAt) return;
+  $("#srcline").innerHTML = tr("Source principale : ", "Main source: ") + `<a href="${esc(D.sourceUrl)}" target="_blank" rel="noopener">${tr("comparateur de la Fondation IFRAP", "Fondation IFRAP comparison")}</a> ${tr("(think tank d'orientation libérale), relevé du", "(a free-market think tank), collected on")} <span class="mono">${esc(fmtDay(D.fetchedAt))}</span>`
+    + (D.extraN ? ` · ${tr(`${D.extraN} proposition(s) issues de sources officielles des candidats (màj ${esc(fmtDay(D.extraUpdated))})`, `${D.extraN} proposal(s) from the candidates' official sources (updated ${esc(fmtDay(D.extraUpdated))})`)}` : "")
+    + ` · ${tr("Positions des partis : ", "Party positions: ")}<a href="${esc(D.partisUrl || "#")}" target="_blank" rel="noopener" title="${esc(D.partisMethode || "")}">${tr("blocs du ministère de l'Intérieur (2026)", "blocs set by the French Ministry of the Interior (2026)")}</a>`
+    + ` · ${tr("mise à jour hebdomadaire.", "updated weekly.")}`
+    + (LANG === "en" ? ` · <b>The proposals are shown in their original French.</b>` : "");
 }
 
 // Parti + position (bloc officiel) sur un axe neutre à 5 crans
@@ -479,13 +574,13 @@ function posScale(bloc) {
 function pinfoNote(c) {
   const p = c.pinfo; if (!p) return "";
   const t = [p.base.startsWith("par analogie") ? "Classement " + p.base + "." : "", p.note || ""].filter(Boolean).join(" ");
-  return t ? `<details class="pnote"><summary title="Précision sur ce classement">i</summary><div>${esc(t)}</div></details>` : "";
+  return t ? `<details class="pnote"><summary title="${tr("Précision sur ce classement", "About this classification (French)")}">i</summary><div>${esc(t)}</div></details>` : "";
 }
-const blocShort = (b) => String(b || "").replace(/^Extrême /, "ext. ").toLowerCase();
+const blocShort = (b) => (LANG === "en" ? nm(b) : String(b || "").replace(/^Extrême /, "ext. ")).toLowerCase();
 function partyLine(c, short) {
   const p = c.pinfo;
-  if (!p) return esc(c.party || "Parti non renseigné");
-  const tip = [p.parti, "Position : " + p.bloc + " (bloc du ministère de l'Intérieur)", "Base : " + p.base, p.note || ""].filter(Boolean).join("\n");
+  if (!p) return esc(c.party || tr("Parti non renseigné", "Party not given"));
+  const tip = [p.parti, tr("Position : " + p.bloc + " (bloc du ministère de l'Intérieur)", "Position: " + nm(p.bloc) + " (Ministry of the Interior bloc)"), tr("Base : ", "Basis (French): ") + p.base, p.note || ""].filter(Boolean).join("\n");
   return `<span class="ptag" title="${esc(tip)}">${esc(short ? p.sigle : p.parti)} ${posScale(p.bloc)}${short === "tiny" ? "" : ` <span class="bl">${esc(blocShort(p.bloc))}</span>`}</span>`;
 }
 const byLast = (a, b) => a.name.split(" ").slice(1).join(" ").localeCompare(b.name.split(" ").slice(1).join(" "), "fr");
@@ -513,7 +608,7 @@ const Store = {
     try {
       if (this.db) { const { id, ...body } = obj; await this.db.collection("data/users/" + this.uid).doc(id).set(body); }
       else localStorage.setItem("pc27-items", JSON.stringify([...this.items.values()]));
-    } catch (e) { if (e?.code === "quota_exceeded") toast("Espace de stockage plein : supprime d'anciennes conversations."); }
+    } catch (e) { if (e?.code === "quota_exceeded") toast(tr("Espace de stockage plein : supprime d'anciennes conversations.", "Storage is full: delete some old chats.")); }
   },
   async del(id) {
     this.items.delete(id);
@@ -542,8 +637,8 @@ let LLM = null;   // { kind: "web" } quand l'IA est chargée
 let webEngine = null;
 const llmPrefs = () => { try { return { keep: 7, ...JSON.parse(localStorage.getItem(LLM_KEY) || "{}") }; } catch { return { keep: 7 }; } };
 const saveLlmPrefs = (p) => { try { localStorage.setItem(LLM_KEY, JSON.stringify(p)); } catch {} };
-const llmName = () => (window.claude?.use ? "Claude" : LLM ? "IA de ton ordinateur" : "");
-const aiShort = () => (window.claude?.use ? "Claude" : "L'IA de ton ordinateur");
+const llmName = () => (window.claude?.use ? "Claude" : LLM ? tr("IA de ton ordinateur", "your computer's AI") : "");
+const aiShort = () => (window.claude?.use ? "Claude" : tr("L'IA de ton ordinateur", "Your computer's AI"));
 
 // Taille du modèle gardé par le navigateur (0 si rien)
 async function webStoredBytes() {
@@ -636,14 +731,19 @@ async function startWebLLM(onProgress) {
 
 let samplePromise = null;
 const getSample = () => (samplePromise ||= (window.claude?.use ? claude.use("sample").catch(() => null) : Promise.resolve(LLM ? makeSample() : null)));
-const AI_ERR = { not_granted: "L'accès à Claude n'a pas été autorisé pour cette page.", sampling_disabled: "Claude n'est pas disponible pour ce compte.", rate_limited: "Trop de demandes pour le moment, réessaie dans quelques minutes.", session_expired: "Session expirée : reconnecte-toi.", prompt_too_large: "Trop de données à analyser d'un coup : réduis le nombre de candidats ou choisis un thème.", invalid_json: "La réponse n'a pas pu être lue. Réessaie.", refused: "Claude n'a pas pu répondre à cette demande.", empty_completion: "Réponse vide. Réessaie." };
-Object.assign(AI_ERR, {
+const AI_ERR_FR = { not_granted: "L'accès à Claude n'a pas été autorisé pour cette page.", sampling_disabled: "Claude n'est pas disponible pour ce compte.", rate_limited: "Trop de demandes pour le moment, réessaie dans quelques minutes.", session_expired: "Session expirée : reconnecte-toi.", prompt_too_large: "Trop de données à analyser d'un coup : réduis le nombre de candidats ou choisis un thème.", invalid_json: "La réponse n'a pas pu être lue. Réessaie.", refused: "Claude n'a pas pu répondre à cette demande.", empty_completion: "Réponse vide. Réessaie." };
+Object.assign(AI_ERR_FR, {
   no_webgpu: "Ton navigateur ne peut pas faire tourner l'IA (WebGPU absent). Essaie Chrome ou Edge à jour sur ordinateur, ou utilise « Copier pour mon IA ».",
   unreachable_web: "Téléchargement impossible. Vérifie ta connexion et réessaie.",
   web_failed: "L'IA n'a pas pu démarrer (mémoire graphique insuffisante ?). Ferme d'autres onglets et réessaie, ou utilise « Copier pour mon IA ».",
   http: "Ton IA a renvoyé une erreur. Réessaie ou change de modèle.",
 });
-const aiErr = (e) => (AI_ERR[e?.code] || "Erreur passagère. Réessaie.") + (e?.detail ? ` (${e.detail.slice(0, 160)})` : "");
+const AI_ERR_EN = { not_granted: "Access to Claude was not allowed for this page.", sampling_disabled: "Claude isn't available for this account.", rate_limited: "Too many requests right now, try again in a few minutes.", session_expired: "Session expired: sign in again.", prompt_too_large: "Too much to analyse at once: pick fewer candidates or a single topic.", invalid_json: "The answer couldn't be read. Try again.", refused: "Claude couldn't answer this request.", empty_completion: "Empty answer. Try again.",
+  no_webgpu: "Your browser can't run the AI (no WebGPU). Try an up-to-date Chrome or Edge on a computer, or use “Copy for my AI”.",
+  unreachable_web: "Download failed. Check your connection and try again.",
+  web_failed: "The AI couldn't start (not enough graphics memory?). Close other tabs and try again, or use “Copy for my AI”.",
+  http: "Your AI returned an error. Try again or change model." };
+const aiErr = (e) => ((LANG === "en" ? AI_ERR_EN : AI_ERR_FR)[e?.code] || tr("Erreur passagère. Réessaie.", "Temporary error. Try again.")) + (e?.detail ? ` (${e.detail.slice(0, 160)})` : "");
 
 const RULES = `Tu es l'assistant d'un comparateur des programmes de l'élection présidentielle française de 2027. Réponds en français.
 RÈGLES DE NEUTRALITÉ (obligatoires) :
@@ -653,6 +753,8 @@ RÈGLES DE NEUTRALITÉ (obligatoires) :
 - Pour les conséquences, explique les mécanismes : qui paie, qui en bénéficie, ordres de grandeur connus, délais, contraintes juridiques (Constitution, droit européen, traités). Indique le degré d'incertitude.
 - N'attribue jamais à un candidat une mesure absente des données fournies. Si une information manque, écris « non précisé dans les propositions relevées ». Si tu utilises une connaissance générale (contexte, chiffres publics), signale-le.
 - Les propositions proviennent principalement du comparateur de la Fondation IFRAP (think tank d'orientation libérale) et éventuellement de sources officielles des candidats ; ce sont des relevés possiblement incomplets, susceptibles d'évoluer.`;
+// Consignes envoyées à l'IA : toujours les mêmes règles ; seule la langue de la réponse change.
+const rules = () => (LANG === "en" ? RULES.replace("Réponds en français.", "Answer in English: the user reads English (the proposals below are quoted in French; translate them faithfully when you cite them).") : RULES);
 
 function propsBlock(cids, sids) {
   const lines = [];
@@ -676,12 +778,12 @@ function propsBlock(cids, sids) {
 function llmText(spec, task) {
   const cids = spec.cids?.length ? spec.cids : D.cands.map((c) => c.id);
   const block = spec.block ?? propsBlock(cids, spec.sids || []);
-  return `${RULES}\n\nConsignes complètes : ${location.origin}/llms.txt · toutes les propositions : ${location.origin}/llms-full.txt\n\n${task}\n\nPÉRIMÈTRE : ${spec.label || "toutes les propositions"}\nPROPOSITIONS RELEVÉES (source : PolitiComp) :${block.slice(0, 80000)}\n\nRAPPEL — ${task}`;
+  return `${rules()}\n\nConsignes complètes : ${location.origin}/llms.txt · toutes les propositions : ${location.origin}/llms-full.txt\n\n${task}\n\nPÉRIMÈTRE : ${spec.label || "toutes les propositions"}\nPROPOSITIONS RELEVÉES (source : PolitiComp) :${block.slice(0, 80000)}\n\nRAPPEL — ${task}`;
 }
 async function copyForLLM(text) {
   try { await navigator.clipboard.writeText(text); }
   catch { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); } catch {} t.remove(); }
-  toast("Copié : colle-le dans l'IA de ton choix.");
+  toast(tr("Copié : colle-le dans l'IA de ton choix.", "Copied: paste it into the AI of your choice."));
 }
 
 // ---------- état ----------
@@ -739,45 +841,47 @@ function renderTheme() {
   const cq = norm(S.cq);
   const list = D.cands.filter((c) => !cq || norm(c.name + " " + (c.pinfo?.sigle || "") + " " + (c.party || "")).includes(cq));
   const blocBtns = (D.blocs || []).map((b) => { const ids = D.cands.filter((c) => c.pinfo?.bloc === b).map((c) => c.id);
-    if (!ids.length) return `<button disabled data-tip="${esc(b)} · aucun candidat." aria-label="${esc(b)} : aucun candidat"></button>`;
+    const bn = esc(nm(b));
+    if (!ids.length) return `<button disabled data-tip="${bn} · ${tr("aucun candidat.", "no candidates.")}" aria-label="${bn} : ${tr("aucun candidat", "no candidates")}"></button>`;
     const n = ids.filter((id) => S.on.has(id)).length, full = n === ids.length;
-    return `<button data-bloc="${esc(b)}" class="${full ? "full" : n ? "part" : ""}" data-tip="${esc(b)} · ${n}/${ids.length} affiché${n > 1 ? "s" : ""}. Clic pour ${full ? "les cacher" : "les afficher"}." aria-label="${full ? "Cacher" : "Afficher"} : ${esc(b)}" aria-pressed="${full}"></button>`; }).join("");
+    const tip = tr(`${n}/${ids.length} affiché${n > 1 ? "s" : ""}. Clic pour ${full ? "les cacher" : "les afficher"}.`, `${n}/${ids.length} shown. Click to ${full ? "hide" : "show"} them.`);
+    return `<button data-bloc="${esc(b)}" class="${full ? "full" : n ? "part" : ""}" data-tip="${bn} · ${tip}" aria-label="${full ? tr("Cacher", "Hide") : tr("Afficher", "Show")} : ${bn}" aria-pressed="${full}"></button>`; }).join("");
   const { words, hits } = findProps(S.q);
-  const hitsHtml = S.q.trim() ? `<div class="hits">${hits.length ? `<div class="note">${hits.length} proposition${hits.length > 1 ? "s" : ""} trouvée${hits.length > 1 ? "s" : ""}${hits.length > 40 ? " (40 premières affichées)" : ""}. Clique pour ouvrir le sous-thème.</div>` + hits.slice(0, 40).map((h) => `<button class="hit" data-go="${h.sb.id}" data-cid="${h.c.id}"><span class="where">${esc(h.c.name)} · ${esc(h.t.name)} › ${esc(h.sb.name)}</span><span>${hl(h.text, words)}</span></button>`).join("") : `<div class="note">Aucune proposition ne contient « ${esc(S.q)} ».</div>`}</div>` : "";
+  const hitsHtml = S.q.trim() ? `<div class="hits">${hits.length ? `<div class="note">${tr(`${hits.length} proposition${hits.length > 1 ? "s" : ""} trouvée${hits.length > 1 ? "s" : ""}${hits.length > 40 ? " (40 premières affichées)" : ""}. Clique pour ouvrir le sous-thème.`, `${plural(hits.length, "proposal", "proposals")} found${hits.length > 40 ? " (first 40 shown)" : ""}. Click to open the sub-topic. Search works on the French text.`)}</div>` + hits.slice(0, 40).map((h) => `<button class="hit" data-go="${h.sb.id}" data-cid="${h.c.id}"><span class="where">${esc(h.c.name)} · ${esc(nm(h.t.name))} › ${esc(nm(h.sb.name))}</span><span>${hl(h.text, words)}</span></button>`).join("") : `<div class="note">${tr(`Aucune proposition ne contient « ${esc(S.q)} ».`, `No proposal contains “${esc(S.q)}”. Tip: proposals are in French, search with French words.`)}</div>`}</div>` : "";
 
   let seen = false; try { seen = localStorage.getItem("pc27-hello") === "1"; } catch {}
-  const hello = seen ? "" : `<div class="hello"><div><h2>Bienvenue !</h2><p>Choisis un thème en haut, garde à gauche les candidats qui t'intéressent, et compare leurs propositions côte à côte. Une question ? Une IA gratuite peut t'aider, directement sur ton ordinateur.</p></div>
-    <div class="acts"><button class="btn primary" id="helloIa">Activer mon IA</button><button class="btn" id="helloOk">C'est compris</button></div></div>`;
-  el.innerHTML = hello + `<nav class="tbar" aria-label="Thèmes">${D.themes.map((t) => `<button data-theme="${t.id}" aria-current="${t === theme}" title="${nThem(t)} candidats avec propositions">${esc(t.name)}</button>`).join("")}</nav>
+  const hello = seen ? "" : `<div class="hello"><div><h2>${tr("Bienvenue !", "Welcome!")}</h2><p>${tr("Choisis un thème en haut, garde à gauche les candidats qui t'intéressent, et compare leurs propositions côte à côte. Une question ? Une IA gratuite peut t'aider, directement sur ton ordinateur.", "Pick a topic at the top, keep the candidates you care about on the left, and compare their proposals side by side (proposals are in their original French). A question? A free AI can help, right on your computer.")}</p></div>
+    <div class="acts"><button class="btn primary" id="helloIa">${tr("Activer mon IA", "Turn on my AI")}</button><button class="btn" id="helloOk">${tr("C'est compris", "Got it")}</button></div></div>`;
+  el.innerHTML = hello + `<nav class="tbar" aria-label="${tr("Thèmes", "Topics")}">${D.themes.map((t) => `<button data-theme="${t.id}" aria-current="${t === theme}" title="${tr(`${nThem(t)} candidats avec propositions`, `${nThem(t)} candidates with proposals`)}">${esc(nm(t.name))}</button>`).join("")}</nav>
   <div class="theme-layout${S.panel ? " open" : ""}">
-    <aside class="cside" aria-label="Candidats">
-      <div class="cside-h"><div class="eyebrow">Candidats affichés</div><span class="mono note">${S.on.size}/${D.cands.length}</span></div>
-      <div class="row2"><button class="btn sm" data-all="all" title="Touche T">Tous</button><button class="btn sm" data-all="none" title="Touche A">Aucun</button><button class="btn sm" data-all="here" title="Touche P">Avec propositions ici</button></div>
-      <div class="blocs" role="group" aria-label="Blocs politiques, de gauche à droite (classement du ministère de l'Intérieur)"><span class="gd" title="Gauche" aria-hidden="true">G</span><span class="bbar">${blocBtns}</span><span class="gd" title="Droite" aria-hidden="true">D</span></div>
-      <input type="search" id="cq" placeholder="Chercher un candidat (C)" value="${esc(S.cq)}" aria-label="Chercher un candidat">
-      <div>${list.map((c) => { const n = propsOf(c.id, S.sub).length; return `<label class="tog${n ? "" : " zero"}"><input type="checkbox" class="sw" data-cid="${c.id}" ${S.on.has(c.id) ? "checked" : ""}><span class="nm"><span>${esc(c.name)}</span>${partyLine(c, "tiny")}</span><button type="button" class="solo" data-solo="${c.id}" title="N'afficher que ce candidat">seul</button><span class="n0" title="Propositions sur ce sous-thème">${n}</span></label>`; }).join("") || `<p class="note">Aucun candidat ne correspond.</p>`}</div>
-      <p class="note">Ordre alphabétique. Le chiffre : propositions sur le sous-thème affiché. Touche <kbd>?</kbd> : raccourcis.</p>
+    <aside class="cside" aria-label="${tr("Candidats", "Candidates")}">
+      <div class="cside-h"><div class="eyebrow">${tr("Candidats affichés", "Candidates shown")}</div><span class="mono note">${S.on.size}/${D.cands.length}</span></div>
+      <div class="row2"><button class="btn sm" data-all="all" title="${tr("Touche T", "T key")}">${tr("Tous", "All")}</button><button class="btn sm" data-all="none" title="${tr("Touche A", "A key")}">${tr("Aucun", "None")}</button><button class="btn sm" data-all="here" title="${tr("Touche P", "P key")}">${tr("Avec propositions ici", "With proposals here")}</button></div>
+      <div class="blocs" role="group" aria-label="${tr("Blocs politiques, de gauche à droite (classement du ministère de l'Intérieur)", "Political blocs, from left to right (French Ministry of the Interior classification)")}"><span class="gd" title="${tr("Gauche", "Left")}" aria-hidden="true">${tr("G", "L")}</span><span class="bbar">${blocBtns}</span><span class="gd" title="${tr("Droite", "Right")}" aria-hidden="true">${tr("D", "R")}</span></div>
+      <input type="search" id="cq" placeholder="${tr("Chercher un candidat (C)", "Find a candidate (C)")}" value="${esc(S.cq)}" aria-label="${tr("Chercher un candidat", "Find a candidate")}">
+      <div>${list.map((c) => { const n = propsOf(c.id, S.sub).length; return `<label class="tog${n ? "" : " zero"}"><input type="checkbox" class="sw" data-cid="${c.id}" ${S.on.has(c.id) ? "checked" : ""}><span class="nm"><span>${esc(c.name)}</span>${partyLine(c, "tiny")}</span><button type="button" class="solo" data-solo="${c.id}" title="${tr("N'afficher que ce candidat", "Show only this candidate")}">${tr("seul", "only")}</button><span class="n0" title="${tr("Propositions sur ce sous-thème", "Proposals on this sub-topic")}">${n}</span></label>`; }).join("") || `<p class="note">${tr("Aucun candidat ne correspond.", "No matching candidate.")}</p>`}</div>
+      <p class="note">${tr("Ordre alphabétique. Le chiffre : propositions sur le sous-thème affiché. Touche <kbd>?</kbd> : raccourcis.", "Alphabetical order. The number: proposals on the sub-topic shown. <kbd>?</kbd> key: shortcuts.")}</p>
     </aside>
     <div style="min-width:0">
-      <div class="search"><input type="search" id="pq" placeholder="Chercher dans toutes les propositions, ex. : retraite 62 ans  (touche /)" value="${esc(S.q)}" aria-label="Chercher dans les propositions"></div>
+      <div class="search"><input type="search" id="pq" placeholder="${tr("Chercher dans toutes les propositions, ex. : retraite 62 ans  (touche /)", "Search all proposals (in French), e.g. retraite 62 ans  (/ key)")}" value="${esc(S.q)}" aria-label="${tr("Chercher dans les propositions", "Search the proposals")}"></div>
       ${hitsHtml}
-      <div class="sec-head"><div><div class="eyebrow">${esc(theme.name)}</div><h2>${esc(sub.name)}</h2></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn candBtn" id="candBtn">Candidats (${S.on.size})</button><button class="ibtn" id="copyLink" data-tip="Copier le lien de cette page, avec ces candidats" aria-label="Copier le lien"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button><button class="ibtn" id="askTheme" data-tip="Poser une question à ton IA sur ce thème" aria-label="Poser une question sur ce thème"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9.8 9.5a2.3 2.3 0 0 1 4.4.8c0 1.5-2.2 2-2.2 3.2"/><path d="M12 16.5h.01"/></svg></button></div></div>
-      <div class="subs">${theme.subs.map((s) => `<button data-sub="${s.id}" aria-current="${s.id === S.sub}">${esc(s.name)}<span class="n">${candsWith(s.id).filter((c) => S.on.has(c.id)).length}</span></button>`).join("")}</div>
+      <div class="sec-head"><div><div class="eyebrow">${esc(nm(theme.name))}</div><h2>${esc(nm(sub.name))}</h2></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn candBtn" id="candBtn">${tr("Candidats", "Candidates")} (${S.on.size})</button><button class="ibtn" id="copyLink" data-tip="${tr("Copier le lien de cette page, avec ces candidats", "Copy the link to this page, with these candidates")}" aria-label="${tr("Copier le lien", "Copy link")}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button><button class="ibtn" id="askTheme" data-tip="${tr("Poser une question à ton IA sur ce thème", "Ask your AI a question about this topic")}" aria-label="${tr("Poser une question sur ce thème", "Ask a question about this topic")}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9.8 9.5a2.3 2.3 0 0 1 4.4.8c0 1.5-2.2 2-2.2 3.2"/><path d="M12 16.5h.01"/></svg></button></div></div>
+      <div class="subs">${theme.subs.map((s) => `<button data-sub="${s.id}" aria-current="${s.id === S.sub}">${esc(nm(s.name))}<span class="n">${candsWith(s.id).filter((c) => S.on.has(c.id)).length}</span></button>`).join("")}</div>
       <div class="ai" id="aiBox"></div>
-      <div class="cards">${shown.map((c) => `<article class="card"><h3><span class="ini">${initials(c.name)}</span>${esc(c.name)}<button class="hide" data-hide="${c.id}" title="Cacher ce candidat" aria-label="Cacher ${esc(c.name)}">×</button></h3><div class="party">${partyLine(c, true)}${pinfoNote(c)}</div>
-        <ol class="props">${propsOf(c.id, S.sub).map((p) => `<li>${esc(p.text)}${p.src !== "IFRAP" ? `<a class="srcbadge" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.src)}</a>` : ""}</li>`).join("")}</ol></article>`).join("")}</div>
-      ${!withP.length ? `<div class="emptystate">Aucune proposition relevée sur ce sous-thème pour l'instant.</div>` : !shown.length ? `<div class="emptystate">Aucun des candidats affichés n'a de proposition relevée ici. <button class="btn sm" data-all="here">Afficher ceux qui en ont (${withP.length})</button></div>` : ""}
-      ${hiddenP.length && shown.length ? `<p class="empty-cands">Cachés, avec des propositions ici : ${hiddenP.map((c) => `<button class="pinbtn" data-show="${c.id}">${esc(c.name)}</button>`).join(", ")}.</p>` : ""}
-      ${without.length ? `<p class="empty-cands">Aucune proposition relevée pour : ${without.map((c) => esc(c.name)).join(", ")}.</p>` : ""}
-      <div class="pager"><button class="ibtn" id="prevSub" data-tip="Aller au sous-thème précédent" aria-label="Sous-thème précédent"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button class="ibtn" id="nextSub" data-tip="Aller au sous-thème suivant" aria-label="Sous-thème suivant"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
+      <div class="cards">${shown.map((c) => `<article class="card"><h3><span class="ini">${initials(c.name)}</span>${esc(c.name)}<button class="hide" data-hide="${c.id}" title="${tr("Cacher ce candidat", "Hide this candidate")}" aria-label="${tr("Cacher", "Hide")} ${esc(c.name)}">×</button></h3><div class="party">${partyLine(c, true)}${pinfoNote(c)}</div>
+        <ol class="props" lang="fr">${propsOf(c.id, S.sub).map((p) => `<li>${esc(p.text)}${p.src !== "IFRAP" ? `<a class="srcbadge" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.src)}</a>` : ""}</li>`).join("")}</ol></article>`).join("")}</div>
+      ${!withP.length ? `<div class="emptystate">${tr("Aucune proposition relevée sur ce sous-thème pour l'instant.", "No proposals recorded on this sub-topic yet.")}</div>` : !shown.length ? `<div class="emptystate">${tr("Aucun des candidats affichés n'a de proposition relevée ici.", "None of the candidates shown has a recorded proposal here.")} <button class="btn sm" data-all="here">${tr("Afficher ceux qui en ont", "Show those who do")} (${withP.length})</button></div>` : ""}
+      ${hiddenP.length && shown.length ? `<p class="empty-cands">${tr("Cachés, avec des propositions ici : ", "Hidden, with proposals here: ")}${hiddenP.map((c) => `<button class="pinbtn" data-show="${c.id}">${esc(c.name)}</button>`).join(", ")}.</p>` : ""}
+      ${without.length ? `<p class="empty-cands">${tr("Aucune proposition relevée pour : ", "No proposals recorded for: ")}${without.map((c) => esc(c.name)).join(", ")}.</p>` : ""}
+      <div class="pager"><button class="ibtn" id="prevSub" data-tip="${tr("Aller au sous-thème précédent", "Go to the previous sub-topic")}" aria-label="${tr("Sous-thème précédent", "Previous sub-topic")}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button class="ibtn" id="nextSub" data-tip="${tr("Aller au sous-thème suivant", "Go to the next sub-topic")}" aria-label="${tr("Sous-thème suivant", "Next sub-topic")}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
     </div></div>`;
 
   el.querySelectorAll("[data-theme]").forEach((b) => (b.onclick = () => { S.sub = D.themes.find((t) => t.id === b.dataset.theme).subs[0].id; renderTheme(); }));
   el.querySelectorAll("[data-sub]").forEach((b) => (b.onclick = () => { S.sub = b.dataset.sub; renderTheme(); }));
   el.querySelectorAll(".sw").forEach((i) => (i.onchange = () => { i.checked ? S.on.add(i.dataset.cid) : S.on.delete(i.dataset.cid); renderTheme(); }));
-  el.querySelectorAll("[data-solo]").forEach((b) => (b.onclick = (e) => { e.preventDefault(); setOn([b.dataset.solo], "Seulement " + D.candById.get(b.dataset.solo).name); }));
-  el.querySelectorAll("[data-hide]").forEach((b) => (b.onclick = () => { S.on.delete(b.dataset.hide); renderTheme(); toast(D.candById.get(b.dataset.hide).name + " caché"); }));
+  el.querySelectorAll("[data-solo]").forEach((b) => (b.onclick = (e) => { e.preventDefault(); setOn([b.dataset.solo], tr("Seulement ", "Only ") + D.candById.get(b.dataset.solo).name); }));
+  el.querySelectorAll("[data-hide]").forEach((b) => (b.onclick = () => { S.on.delete(b.dataset.hide); renderTheme(); toast(D.candById.get(b.dataset.hide).name + tr(" caché", " hidden")); }));
   el.querySelectorAll("[data-show]").forEach((b) => (b.onclick = () => { S.on.add(b.dataset.show); renderTheme(); }));
   el.querySelectorAll("[data-all]").forEach((b) => (b.onclick = () => selectAll(b.dataset.all)));
   el.querySelectorAll("[data-bloc]").forEach((b) => (b.onclick = () => { const ids = D.cands.filter((c) => c.pinfo?.bloc === b.dataset.bloc).map((c) => c.id); const full = ids.every((id) => S.on.has(id)); ids.forEach((id) => (full ? S.on.delete(id) : S.on.add(id))); renderTheme(); }));
@@ -792,42 +896,42 @@ function renderTheme() {
   $("#prevSub").onclick = () => { stepSub(-1); window.scrollTo({ top: 0 }); };
   $("#nextSub").onclick = () => { stepSub(1); window.scrollTo({ top: 0 }); };
   $("#copyLink").onclick = copyLink;
-  $("#askTheme").onclick = () => openChat({ label: `${sub.name} · ${shown.length} candidat(s)`, cids: shown.map((c) => c.id), sids: [S.sub] });
+  $("#askTheme").onclick = () => openChat({ label: `${nm(sub.name)} · ${shown.length} ${tr("candidat(s)", "candidate(s)")}`, cids: shown.map((c) => c.id), sids: [S.sub] });
   saveSel();
-  setupAnalysis($("#aiBox"), { kind: "theme", cids: shown.map((c) => c.id), sids: [S.sub], label: `${sub.name} — ${shown.map((c) => c.name).join(", ")}` });
+  setupAnalysis($("#aiBox"), { kind: "theme", cids: shown.map((c) => c.id), sids: [S.sub], label: `${nm(sub.name)} — ${shown.map((c) => c.name).join(", ")}` });
 }
 function selectAll(k) {
-  if (k === "all") setOn(D.cands.map((c) => c.id), "Tous les candidats");
-  else if (k === "none") setOn([], "Aucun candidat");
-  else setOn(candsWith(S.sub).map((c) => c.id), "Candidats avec propositions ici");
+  if (k === "all") setOn(D.cands.map((c) => c.id), tr("Tous les candidats", "All candidates"));
+  else if (k === "none") setOn([], tr("Aucun candidat", "No candidates"));
+  else setOn(candsWith(S.sub).map((c) => c.id), tr("Candidats avec propositions ici", "Candidates with proposals here"));
 }
 async function copyLink() {
   saveSel();
-  const url = location.origin + location.pathname + "#s=" + S.sub + (S.on.size === D.cands.length ? "" : "&c=" + [...S.on].join("."));
-  try { await navigator.clipboard.writeText(url); toast("Lien copié : il ouvre ce thème avec ces candidats."); } catch { prompt("Copie ce lien :", url); }
+  const url = location.origin + location.pathname + (LANG === "en" ? "?lang=en" : "") + "#s=" + S.sub + (S.on.size === D.cands.length ? "" : "&c=" + [...S.on].join("."));
+  try { await navigator.clipboard.writeText(url); toast(tr("Lien copié : il ouvre ce thème avec ces candidats.", "Link copied: it opens this topic with these candidates.")); } catch { prompt(tr("Copie ce lien :", "Copy this link:"), url); }
 }
 
 // ---------- analyses ----------
 function analysisKey(spec) {
   const body = spec.kind + "|" + spec.sids.join(",") + "|" + spec.cids.join(",") + "|" + propsBlock(spec.cids, spec.sids);
-  return spec.kind + "-" + hash(body);
+  return spec.kind + "-" + (LANG === "en" ? "en-" : "") + hash(body); // une analyse par langue
 }
 
 async function setupAnalysis(box, spec) {
-  const title = spec.kind === "full" ? "Analyse comparative du programme complet" : "Analyse comparative";
+  const title = spec.kind === "full" ? tr("Analyse comparative du programme complet", "Comparative analysis of the full manifesto") : tr("Analyse comparative", "Comparative analysis");
   if (spec.cids.length < (spec.kind === "theme" ? 1 : 2)) {
-    box.innerHTML = `<div class="ai-head"><h3>${title}</h3></div><p class="note">Sélectionne au moins ${spec.kind === "theme" ? "un candidat" : "deux candidats"} pour lancer l'analyse.</p>`; return;
+    box.innerHTML = `<div class="ai-head"><h3>${title}</h3></div><p class="note">${spec.kind === "theme" ? tr("Sélectionne au moins un candidat pour lancer l'analyse.", "Select at least one candidate to run the analysis.") : tr("Sélectionne au moins deux candidats pour lancer l'analyse.", "Select at least two candidates to run the analysis.")}</p>`; return;
   }
   const key = analysisKey(spec);
-  box.innerHTML = `<div class="ai-head"><div><h3>${title}</h3><div class="note">Résumé, points communs, clivages et conséquences possibles, rédigés par ton IA à partir des propositions affichées ci-dessous.</div></div>
-    <span><button class="btn primary" data-act="run">Générer l'analyse</button></span></div><div class="ai-body" data-out></div>`;
+  box.innerHTML = `<div class="ai-head"><div><h3>${title}</h3><div class="note">${tr("Résumé, points communs, clivages et conséquences possibles, rédigés par ton IA à partir des propositions affichées ci-dessous.", "Summary, common ground, dividing lines and possible consequences, written by your AI from the proposals shown below.")}</div></div>
+    <span><button class="btn primary" data-act="run">${tr("Générer l'analyse", "Generate the analysis")}</button></span></div><div class="ai-body" data-out></div>`;
   const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
   const cached = await Store.getAnalysis(key);
   if (box.isConnected && cached?.result) { showAnalysis(box, spec, cached); }
   const sample = await getSample();
   if (!sample) {
-    btn.textContent = "Copier pour mon IA"; btn.title = "Copie les consignes de neutralité et les propositions affichées";
-    if (!cached) out.innerHTML = `<p class="note">Active l'IA gratuite de ton ordinateur (« Activer mon IA », en haut) pour générer l'analyse ici. Ou copie les consignes de neutralité et les propositions affichées, et colle-les dans l'IA de ton choix. Rien n'est envoyé à ce site.</p>`;
+    btn.textContent = tr("Copier pour mon IA", "Copy for my AI"); btn.title = tr("Copie les consignes de neutralité et les propositions affichées", "Copies the neutrality rules and the proposals shown");
+    if (!cached) out.innerHTML = `<p class="note">${tr("Active l'IA gratuite de ton ordinateur (« Activer mon IA », en haut) pour générer l'analyse ici. Ou copie les consignes de neutralité et les propositions affichées, et colle-les dans l'IA de ton choix. Rien n'est envoyé à ce site.", "Turn on the free AI on your computer (“Turn on my AI”, at the top) to generate the analysis here. Or copy the neutrality rules and the proposals shown, and paste them into the AI of your choice. Nothing is sent to this site.")}</p>`;
     const sids = spec.sids?.length ? spec.sids : D.themes.flatMap((t) => t.subs.map((s) => s.id));
     btn.onclick = () => copyForLLM(llmText({ ...spec, sids }, `TÂCHE : analyse comparative neutre de ces propositions : synthèse factuelle, points communs, clivages, puis pour chaque candidat les conséquences possibles (mécanismes, qui paie, qui bénéficie) et les points débattus, toujours attribués.`));
     return;
@@ -837,9 +941,9 @@ async function setupAnalysis(box, spec) {
 
 function showAnalysis(box, spec, rec) {
   const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
-  btn.textContent = "Régénérer"; btn.classList.remove("primary");
+  btn.textContent = tr("Régénérer", "Regenerate"); btn.classList.remove("primary");
   out.innerHTML = (spec.kind === "theme" ? renderThemeAnalysis(rec.result) : renderVsAnalysis(rec.result, spec))
-    + `<div class="note">Généré le ${fmtDate(rec.createdAt)} · données du ${esc(new Date(rec.dataDate).toLocaleDateString("fr-FR"))} · <button class="pinbtn" data-act="pin">Ajouter la synthèse au récap</button> · <button class="pinbtn" data-act="ask">Approfondir dans la discussion</button></div>`;
+    + `<div class="note">${tr("Généré le", "Generated on")} ${fmtDate(rec.createdAt)} · ${tr("données du", "data from")} ${esc(fmtDay(rec.dataDate))} · <button class="pinbtn" data-act="pin">${tr("Ajouter la synthèse au récap", "Add the summary to my notes")}</button> · <button class="pinbtn" data-act="ask">${tr("Approfondir dans la discussion", "Dig deeper in the chat")}</button></div>`;
   out.querySelector("[data-act=pin]").onclick = () => addPin(rec.result.synthese || "", spec.label);
   out.querySelector("[data-act=ask]").onclick = () => openChat({ label: spec.label, cids: spec.cids, sids: spec.sids, analysis: rec.result });
 }
@@ -848,7 +952,7 @@ async function runAnalysis(box, spec, key) {
   const sample = await getSample();
   const out = box.querySelector("[data-out]"), btn = box.querySelector("[data-act=run]");
   btn.disabled = true;
-  out.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} lit ${spec.cids.length} programme(s) et rédige l'analyse… (30 s à 2 min)</div>`;
+  out.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} ${tr(`lit ${spec.cids.length} programme(s) et rédige l'analyse… (30 s à 2 min)`, `is reading ${spec.cids.length} manifesto(s) and writing the analysis… (30 s to 2 min)`)}</div>`;
   const names = spec.cids.map((id) => D.candById.get(id).name);
   const scope = spec.sids.length === 1 ? D.subById.get(spec.sids[0]).name : spec.kind === "full" ? "l'ensemble du programme" : D.themeOfSub.get(spec.sids[0]).name;
   let fmt;
@@ -871,7 +975,7 @@ Candidats, dans cet ordre : ${names.join(", ")}. 4 à 8 sujets dans par_sujet.`;
  "candidats":[{"nom":"<Nom exact>","philosophie":"logique d'ensemble en une phrase","consequences_possibles":["conséquence macro : finances publiques, pouvoir d'achat, emploi, institutions… avec mécanisme"],"points_debattus":["objection attribuée"],"chiffrage":"chiffres clés présents dans les propositions","incertitude":"faible|moyenne|élevée","incertitude_raison":"…"}],
  "a_savoir":["…"]}
 Candidats, dans cet ordre : ${names.join(", ")}. Un élément par_sujet pour chacun des grands thèmes où au moins un des deux a des propositions (10 au maximum).`;
-  const prompt = `${RULES}\n\nTÂCHE : analyse comparative neutre des propositions de ${names.join(", ")} sur : ${scope}.\n\nPROPOSITIONS RELEVÉES :${propsBlock(spec.cids, spec.sids)}\n\n${fmt}`;
+  const prompt = `${rules()}\n\nTÂCHE : analyse comparative neutre des propositions de ${names.join(", ")} sur : ${scope}.\n\nPROPOSITIONS RELEVÉES :${propsBlock(spec.cids, spec.sids)}\n\n${fmt}`;
   try {
     const result = await sample.json(prompt, { modelTier: spec.kind === "full" ? "complex" : "default" });
     if (!result || typeof result !== "object") throw { code: "invalid_json" };
@@ -885,39 +989,39 @@ Candidats, dans cet ordre : ${names.join(", ")}. Un élément par_sujet pour cha
 }
 
 const li = (arr) => (Array.isArray(arr) && arr.length ? `<ul>${arr.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="note">—</p>`);
-const uncCls = (u) => norm(u).includes("elev") ? "elevee" : norm(u).includes("faib") ? "faible" : "moyenne";
+const uncCls = (u) => /elev|high/.test(norm(u)) ? "elevee" : /faib|low/.test(norm(u)) ? "faible" : "moyenne";
 function candCards(list, names) {
   return `<div class="cmp-grid">${(list || []).map((c, i) => `<div class="cmp" style="border-top:3px solid ${SLOT[names.indexOf(c.nom)] || "var(--line)"}">
     <h5><span class="ini">${initials(c.nom || "?")}</span>${esc(c.nom)} ${(() => { const k = D.cands.find((x) => x.name === c.nom); return k ? partyLine(k, true) : ""; })()}</h5>
     <div>${esc(c.approche || c.philosophie || "")}</div>
-    ${c.mesures_cles ? `<span class="lbl">Mesures clés</span>${li(c.mesures_cles)}` : ""}
-    ${c.effets_vises ? `<span class="lbl">Effets visés (selon le candidat)</span>${li(c.effets_vises)}` : ""}
-    <span class="lbl">Conséquences possibles</span>${li(c.consequences_possibles)}
-    <span class="lbl">Points débattus</span>${li(c.points_debattus)}
-    <span class="lbl">Chiffrage</span><div style="font-size:14px">${esc(c.chiffrage || "—")}</div>
-    <span class="lbl">Incertitude</span><div style="font-size:14px"><span class="unc ${uncCls(c.incertitude)}">${esc(c.incertitude || "?")}</span> ${esc(c.incertitude_raison || "")}</div>
+    ${c.mesures_cles ? `<span class="lbl">${tr("Mesures clés", "Key measures")}</span>${li(c.mesures_cles)}` : ""}
+    ${c.effets_vises ? `<span class="lbl">${tr("Effets visés (selon le candidat)", "Intended effects (according to the candidate)")}</span>${li(c.effets_vises)}` : ""}
+    <span class="lbl">${tr("Conséquences possibles", "Possible consequences")}</span>${li(c.consequences_possibles)}
+    <span class="lbl">${tr("Points débattus", "Debated points")}</span>${li(c.points_debattus)}
+    <span class="lbl">${tr("Chiffrage", "Costing")}</span><div style="font-size:14px">${esc(c.chiffrage || "—")}</div>
+    <span class="lbl">${tr("Incertitude", "Uncertainty")}</span><div style="font-size:14px"><span class="unc ${uncCls(c.incertitude)}">${esc(c.incertitude || "?")}</span> ${esc(c.incertitude_raison || "")}</div>
   </div>`).join("")}</div>`;
 }
 function posTable(rows, names, key) {
   if (!Array.isArray(rows) || !rows.length) return "";
-  return `<div class="tablewrap"><table class="pos"><thead><tr><th>${key === "sujet" ? "Sujet" : "Clivage"}</th>${names.map((n) => `<th>${esc(n)}</th>`).join("")}${rows[0].difference_cle !== undefined ? "<th>Différence clé</th>" : ""}</tr></thead><tbody>
+  return `<div class="tablewrap"><table class="pos"><thead><tr><th>${key === "sujet" ? tr("Sujet", "Topic") : tr("Clivage", "Dividing line")}</th>${names.map((n) => `<th>${esc(n)}</th>`).join("")}${rows[0].difference_cle !== undefined ? `<th>${tr("Différence clé", "Key difference")}</th>` : ""}</tr></thead><tbody>
     ${rows.map((r) => `<tr><td><strong>${esc(r.sujet)}</strong></td>${names.map((n) => `<td>${esc((r.positions || {})[n] || "—")}</td>`).join("")}${r.difference_cle !== undefined ? `<td>${esc(r.difference_cle)}</td>` : ""}</tr>`).join("")}
   </tbody></table></div>`;
 }
 function renderThemeAnalysis(r) {
   const names = (r.candidats || []).map((c) => c.nom);
-  return `<div><h4>Synthèse</h4><p>${esc(r.synthese)}</p></div>
-    <div><h4>Convergences</h4>${li(r.convergences)}</div>
-    ${r.clivages?.length ? `<div><h4>Lignes de clivage</h4>${posTable(r.clivages, names, "clivage")}</div>` : ""}
-    <div><h4>Par candidat : mesures et conséquences</h4>${candCards(r.candidats, names)}</div>
-    <div><h4>À savoir</h4>${li(r.a_savoir)}</div>`;
+  return `<div><h4>${tr("Synthèse", "Summary")}</h4><p>${esc(r.synthese)}</p></div>
+    <div><h4>${tr("Convergences", "Common ground")}</h4>${li(r.convergences)}</div>
+    ${r.clivages?.length ? `<div><h4>${tr("Lignes de clivage", "Dividing lines")}</h4>${posTable(r.clivages, names, "clivage")}</div>` : ""}
+    <div><h4>${tr("Par candidat : mesures et conséquences", "By candidate: measures and consequences")}</h4>${candCards(r.candidats, names)}</div>
+    <div><h4>${tr("À savoir", "Good to know")}</h4>${li(r.a_savoir)}</div>`;
 }
 function renderVsAnalysis(r, spec) {
   const names = spec.cids.map((id) => D.candById.get(id).name);
-  return `<div><h4>Synthèse</h4><p>${esc(r.synthese)}</p></div>
-    <div><h4>Positions sujet par sujet</h4>${posTable(r.par_sujet, names, "sujet")}</div>
-    <div><h4>Conséquences possibles</h4>${candCards(r.candidats, names)}</div>
-    <div><h4>À savoir</h4>${li(r.a_savoir)}</div>`;
+  return `<div><h4>${tr("Synthèse", "Summary")}</h4><p>${esc(r.synthese)}</p></div>
+    <div><h4>${tr("Positions sujet par sujet", "Positions topic by topic")}</h4>${posTable(r.par_sujet, names, "sujet")}</div>
+    <div><h4>${tr("Conséquences possibles", "Possible consequences")}</h4>${candCards(r.candidats, names)}</div>
+    <div><h4>${tr("À savoir", "Good to know")}</h4>${li(r.a_savoir)}</div>`;
 }
 
 // ---------- vue Face-à-face ----------
@@ -932,19 +1036,19 @@ function vsSids() {
 function renderVs() {
   const el = $("#view-vs");
   const ranked = [...D.cands].sort(byLast);
-  const opt = (sel) => `<option value="">—</option>` + ranked.map((c) => `<option value="${c.id}" ${c.id === sel ? "selected" : ""}>${esc(c.name)} — ${esc(c.pinfo ? c.pinfo.sigle + ", " + c.pinfo.bloc : c.party)} (${countCand(c.id)})</option>`).join("");
-  const scopeOpts = `<option value="all" ${S.vsScope === "all" ? "selected" : ""}>Programme complet (2 candidats max.)</option>` + D.themes.map((t) => `<optgroup label="${esc(t.name)}"><option value="t:${t.id}" ${S.vsScope === "t:" + t.id ? "selected" : ""}>${esc(t.name)} — tout le thème</option>${t.subs.map((s) => `<option value="s:${s.id}" ${S.vsScope === "s:" + s.id ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</optgroup>`).join("");
+  const opt = (sel) => `<option value="">—</option>` + ranked.map((c) => `<option value="${c.id}" ${c.id === sel ? "selected" : ""}>${esc(c.name)} — ${esc(c.pinfo ? c.pinfo.sigle + ", " + nm(c.pinfo.bloc) : c.party)} (${countCand(c.id)})</option>`).join("");
+  const scopeOpts = `<option value="all" ${S.vsScope === "all" ? "selected" : ""}>${tr("Programme complet (2 candidats max.)", "Full manifesto (2 candidates max.)")}</option>` + D.themes.map((t) => `<optgroup label="${esc(nm(t.name))}"><option value="t:${t.id}" ${S.vsScope === "t:" + t.id ? "selected" : ""}>${esc(nm(t.name))} — ${tr("tout le thème", "whole topic")}</option>${t.subs.map((s) => `<option value="s:${s.id}" ${S.vsScope === "s:" + s.id ? "selected" : ""}>${esc(nm(s.name))}</option>`).join("")}</optgroup>`).join("");
   const cids = S.vs.filter(Boolean);
   const tooMany = S.vsScope === "all" && cids.length > 2;
   const sids = vsSids();
-  const scopeName = S.vsScope === "all" ? "Programme complet" : S.vsScope.startsWith("t:") ? D.themes.find((t) => t.id === S.vsScope.slice(2)).name : D.subById.get(S.vsScope.slice(2)).name;
+  const scopeName = nm(S.vsScope === "all" ? tr("Programme complet", "Full manifesto") : S.vsScope.startsWith("t:") ? D.themes.find((t) => t.id === S.vsScope.slice(2)).name : D.subById.get(S.vsScope.slice(2)).name);
 
-  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">Face-à-face</div><h2>${esc(scopeName)}</h2></div><button class="btn" id="askVs" ${cids.length ? "" : "disabled"}>Poser une question sur ce face-à-face</button></div>
+  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">${tr("Face-à-face", "Head-to-head")}</div><h2>${esc(scopeName)}</h2></div><button class="btn" id="askVs" ${cids.length ? "" : "disabled"}>${tr("Poser une question sur ce face-à-face", "Ask a question about this head-to-head")}</button></div>
     <div class="vs-controls">
-      ${[0, 1, 2, 3].map((i) => `<div class="field slot" style="--c:${SLOT[i]}"><label for="vs${i}">Candidat ${String.fromCharCode(65 + i)}${i > 1 ? " (facultatif)" : ""}</label><select id="vs${i}" data-i="${i}">${opt(S.vs[i])}</select></div>`).join("")}
-      <div class="field" style="flex:1 1 240px"><label for="vsScope">Périmètre</label><select id="vsScope">${scopeOpts}</select></div>
+      ${[0, 1, 2, 3].map((i) => `<div class="field slot" style="--c:${SLOT[i]}"><label for="vs${i}">${tr("Candidat", "Candidate")} ${String.fromCharCode(65 + i)}${i > 1 ? tr(" (facultatif)", " (optional)") : ""}</label><select id="vs${i}" data-i="${i}">${opt(S.vs[i])}</select></div>`).join("")}
+      <div class="field" style="flex:1 1 240px"><label for="vsScope">${tr("Périmètre", "Scope")}</label><select id="vsScope">${scopeOpts}</select></div>
     </div>
-    ${tooMany ? `<div class="emptystate" style="margin-bottom:16px">Le programme complet se compare à 2 candidats au maximum, pour que l'analyse reste lisible. Retire un candidat ou choisis un thème.</div>` : ""}
+    ${tooMany ? `<div class="emptystate" style="margin-bottom:16px">${tr("Le programme complet se compare à 2 candidats au maximum, pour que l'analyse reste lisible. Retire un candidat ou choisis un thème.", "The full manifesto can be compared for 2 candidates at most, to keep the analysis readable. Remove a candidate or pick a topic.")}</div>` : ""}
     <div class="ai" id="aiVs"></div>
     <div id="vsGrid"></div>`;
 
@@ -956,7 +1060,7 @@ function renderVs() {
   $("#askVs").onclick = () => openChat({ label: `${cids.map((id) => D.candById.get(id).name).join(" vs ")} · ${scopeName}`, cids, sids });
 
   if (tooMany || cids.length < 2) {
-    $("#aiVs").innerHTML = `<div class="ai-head"><h3>Analyse comparative</h3></div><p class="note">${tooMany ? "Analyse indisponible au-delà de 2 candidats sur le programme complet." : "Choisis au moins deux candidats."}</p>`;
+    $("#aiVs").innerHTML = `<div class="ai-head"><h3>${tr("Analyse comparative", "Comparative analysis")}</h3></div><p class="note">${tooMany ? tr("Analyse indisponible au-delà de 2 candidats sur le programme complet.", "No analysis beyond 2 candidates on the full manifesto.") : tr("Choisis au moins deux candidats.", "Pick at least two candidates.")}</p>`;
   } else {
     setupAnalysis($("#aiVs"), { kind: S.vsScope === "all" ? "full" : "vs", cids, sids, label: `${cids.map((id) => D.candById.get(id).name).join(" vs ")} — ${scopeName}` });
   }
@@ -966,9 +1070,9 @@ function renderVs() {
   const cols = shown.length;
   const rows = sids.filter((sid) => shown.some((cid) => propsOf(cid, sid).length));
   $("#vsGrid").innerHTML = `<div class="vs-table"><div class="vs-heads"><div class="vs-row" style="--cols:${cols};margin:0">${shown.map((cid) => { const c = D.candById.get(cid); return `<div class="vs-cell" style="--c:${SLOT[S.vs.indexOf(cid)]}"><span class="ini">${initials(c.name)}</span>${esc(c.name)} ${partyLine(c, true)}</div>`; }).join("")}</div></div>
-    ${rows.map((sid) => `<div class="vs-sub">${esc(D.subById.get(sid).name)}${sids.length > 1 && S.vsScope === "all" ? `<span class="eyebrow">${esc(D.themeOfSub.get(sid).name)}</span>` : ""}</div>
-      <div class="vs-row" style="--cols:${cols}">${shown.map((cid) => { const ps = propsOf(cid, sid); return `<div class="vs-cell${ps.length ? "" : " vs-empty"}" style="--c:${SLOT[S.vs.indexOf(cid)]}"><div class="vs-who">${esc(D.candById.get(cid).name)}</div>${ps.length ? `<ol>${ps.map((p) => `<li>${esc(p.text)}</li>`).join("")}</ol>` : `<span class="muted">Aucune proposition relevée.</span>`}</div>`; }).join("")}</div>`).join("")}
-    ${rows.length ? "" : `<div class="emptystate">Aucune proposition relevée pour ces candidats sur ce périmètre.</div>`}</div>`;
+    ${rows.map((sid) => `<div class="vs-sub">${esc(nm(D.subById.get(sid).name))}${sids.length > 1 && S.vsScope === "all" ? `<span class="eyebrow">${esc(nm(D.themeOfSub.get(sid).name))}</span>` : ""}</div>
+      <div class="vs-row" style="--cols:${cols}">${shown.map((cid) => { const ps = propsOf(cid, sid); return `<div class="vs-cell${ps.length ? "" : " vs-empty"}" style="--c:${SLOT[S.vs.indexOf(cid)]}"><div class="vs-who">${esc(D.candById.get(cid).name)}</div>${ps.length ? `<ol lang="fr">${ps.map((p) => `<li>${esc(p.text)}</li>`).join("")}</ol>` : `<span class="muted">${tr("Aucune proposition relevée.", "No proposals recorded.")}</span>`}</div>`; }).join("")}</div>`).join("")}
+    ${rows.length ? "" : `<div class="emptystate">${tr("Aucune proposition relevée pour ces candidats sur ce périmètre.", "No proposals recorded for these candidates in this scope.")}</div>`}</div>`;
 }
 
 // ---------- discussion ----------
@@ -1023,13 +1127,15 @@ function newConversation(ctx) {
 function renderChat() {
   const c = S.conv;
   if (c.messages.length) S.justReady = false;
-  $("#dctx").innerHTML = c.context ? `<span class="eyebrow">Contexte</span> ${esc(c.context.label)} <button class="pinbtn" id="clearCtx">retirer</button>` : `<span class="eyebrow">Contexte</span> tout le comparateur`;
+  $("#dctx").innerHTML = `<span class="eyebrow">${tr("Contexte", "Context")}</span> ` + (c.context ? `${esc(c.context.label)} <button class="pinbtn" id="clearCtx">${tr("retirer", "remove")}</button>` : tr("tout le comparateur", "the whole comparison"));
   const cc = $("#clearCtx"); if (cc) cc.onclick = () => { c.context = null; renderChat(); };
   const box = $("#msgs");
-  box.innerHTML = c.messages.length ? "" : S.justReady ? `<div class="ready-cta"><b>Ton IA est prête !</b><span>Pose ta première question ci-dessous, ou touche une suggestion. Elle répond à partir des propositions relevées, de façon neutre, et tout reste sur ton ordinateur.</span></div>` : `<div class="emptystate">Pose une question sur les programmes : différences entre candidats, conséquences d'une mesure, coût annoncé… Les réponses s'appuient sur les propositions relevées et restent neutres. Chaque échange est enregistré dans l'onglet Historique.</div>`;
+  box.innerHTML = c.messages.length ? "" : S.justReady ? `<div class="ready-cta"><b>${tr("Ton IA est prête !", "Your AI is ready!")}</b><span>${tr("Pose ta première question ci-dessous, ou touche une suggestion. Elle répond à partir des propositions relevées, de façon neutre, et tout reste sur ton ordinateur.", "Ask your first question below, or tap a suggestion. It answers from the recorded proposals, neutrally, and everything stays on your computer.")}</span></div>` : `<div class="emptystate">${tr("Pose une question sur les programmes : différences entre candidats, conséquences d'une mesure, coût annoncé… Les réponses s'appuient sur les propositions relevées et restent neutres. Chaque échange est enregistré dans l'onglet Historique.", "Ask a question about the manifestos: differences between candidates, the consequences of a measure, stated costs… Answers are based on the recorded proposals and stay neutral. Each exchange is saved in the History tab.")}</div>`;
   c.messages.forEach((m, i) => box.appendChild(msgEl(m, i)));
   box.scrollTop = box.scrollHeight;
-  const sug = c.context ? ["Quelles sont les principales différences ?", "Quelles conséquences pour les ménages ?", "Qu'est-ce qui est chiffré, et comment ?"] : ["Qui propose de baisser les impôts, et lesquels ?", "Compare les positions sur les retraites", "Quelles mesures sur le logement ?"];
+  const sug = LANG === "en"
+    ? (c.context ? ["What are the main differences?", "What consequences for households?", "What is costed, and how?"] : ["Who proposes tax cuts, and which taxes?", "Compare the positions on pensions", "What measures on housing?"])
+    : (c.context ? ["Quelles sont les principales différences ?", "Quelles conséquences pour les ménages ?", "Qu'est-ce qui est chiffré, et comment ?"] : ["Qui propose de baisser les impôts, et lesquels ?", "Compare les positions sur les retraites", "Quelles mesures sur le logement ?"]);
   $("#sugg").innerHTML = c.messages.length ? "" : sug.map((s) => `<button type="button">${esc(s)}</button>`).join("");
   $("#sugg").querySelectorAll("button").forEach((b) => (b.onclick = () => { $("#chatInput").value = b.textContent; sendChat(); }));
 }
@@ -1038,8 +1144,8 @@ function msgEl(m) {
   d.className = "msg " + m.role;
   if (m.role === "user") d.textContent = m.content;
   else {
-    d.innerHTML = `<div class="prose">${md(m.content)}</div>${m.error ? `<div class="err">${esc(m.error)}</div>` : ""}<div class="acts"><button class="pinbtn">Ajouter au récap</button></div>`;
-    d.querySelector(".pinbtn").onclick = () => addPin(m.content, S.conv.title || "Discussion");
+    d.innerHTML = `<div class="prose">${md(m.content)}</div>${m.error ? `<div class="err">${esc(m.error)}</div>` : ""}<div class="acts"><button class="pinbtn">${tr("Ajouter au récap", "Add to my notes")}</button></div>`;
+    d.querySelector(".pinbtn").onclick = () => addPin(m.content, S.conv.title || tr("Discussion", "Chat"));
   }
   return d;
 }
@@ -1050,9 +1156,9 @@ async function sendChat() {
   const sample = await getSample();
   if (!sample) {
     const hits = searchProps(q, 40);
-    const ctx = S.conv?.context || { label: "propositions qui contiennent les mots de la question (le reste est dans llms-full.txt)",
+    const ctx = S.conv?.context || { label: tr("propositions qui contiennent les mots de la question (le reste est dans llms-full.txt)", "proposals containing the words of the question (the rest is in llms-full.txt)"),
       block: hits.length ? "\n" + hits.map((h) => `- ${D.candById.get(h.cid).name} [${D.subById.get(h.sid).name}] : ${h.text}`).join("\n") : "\n(aucune proposition ne contient ces mots : consulte llms-full.txt)" };
-    return copyForLLM(llmText(ctx, `QUESTION : ${q}`));
+    return copyForLLM(llmText(ctx, `QUESTION : ${q}` + (LANG === "en" ? "\n(Answer in English.)" : "")));
   }
   const c = S.conv;
   input.value = "";
@@ -1060,7 +1166,7 @@ async function sendChat() {
   if (!c.title) c.title = q.slice(0, 90);
   renderChat();
   const bubble = document.createElement("div"); bubble.className = "msg assistant";
-  bubble.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} cherche dans les programmes…</div>`;
+  bubble.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} ${tr("cherche dans les programmes…", "is searching the manifestos…")}</div>`;
   $("#msgs").appendChild(bubble); $("#msgs").scrollTop = 1e9;
 
   let ctxText = "";
@@ -1072,7 +1178,7 @@ async function sendChat() {
 
   const limits = await sample.limits().catch(() => null);
   const useTools = !!limits?.tools;
-  const rules = `${RULES}\n- Réponds de façon claire et structurée (titres courts, listes), sans tableaux. Cite les candidats nommément. Termine si utile par ce qui reste incertain ou non précisé.\n${useTools ? "- Utilise les outils propositions_candidat et rechercher_propositions pour vérifier ce que disent les programmes avant d'affirmer quoi que ce soit sur un candidat." : ""}\n\n${catalog()}\n${ctxText}`;
+  const rules = `${rules()}\n- Réponds de façon claire et structurée (titres courts, listes), sans tableaux. Cite les candidats nommément. Termine si utile par ce qui reste incertain ou non précisé.\n${useTools ? "- Utilise les outils propositions_candidat et rechercher_propositions pour vérifier ce que disent les programmes avant d'affirmer quoi que ce soit sur un candidat." : ""}\n\n${catalog()}\n${ctxText}`;
   const turns = [{ role: "user", content: rules }, ...c.messages.slice(-16).map((m) => ({ role: m.role, content: m.content }))];
 
   S.chatCtl = new AbortController();
@@ -1080,14 +1186,14 @@ async function sendChat() {
   const reply = { role: "assistant", content: "", t: Date.now() };
   try {
     const opts = { signal: S.chatCtl.signal, onText: ({ text }) => { bubble.innerHTML = `<div class="prose">${md(text)}</div>`; $("#msgs").scrollTop = 1e9; } };
-    if (useTools) opts.tools = TOOLS.map((t) => ({ ...t, execute: (i) => { bubble.querySelector(".thinking") && (bubble.querySelector(".thinking").lastChild.textContent = "Claude consulte les propositions…"); return t.execute(i); } }));
+    if (useTools) opts.tools = TOOLS.map((t) => ({ ...t, execute: (i) => { bubble.querySelector(".thinking") && (bubble.querySelector(".thinking").lastChild.textContent = tr("Claude consulte les propositions…", "Claude is checking the proposals…")); return t.execute(i); } }));
     else opts.cache = false;
     const { text, truncated } = await sample(turns, opts);
-    reply.content = text + (truncated ? "\n\n*(réponse interrompue : pose une question plus ciblée)*" : "");
+    reply.content = text + (truncated ? tr("\n\n*(réponse interrompue : pose une question plus ciblée)*", "\n\n*(answer cut off: ask a more focused question)*") : "");
   } catch (e) {
     reply.content = e?.text || "";
     if (e?.code !== "cancelled") reply.error = aiErr(e);
-    if (!reply.content && e?.code === "cancelled") reply.content = "*(réponse arrêtée)*";
+    if (!reply.content && e?.code === "cancelled") reply.content = tr("*(réponse arrêtée)*", "*(answer stopped)*");
     if (!reply.content) reply.content = "—";
   } finally {
     S.chatCtl = null; $("#stopChat").hidden = true; $("#sendChat").disabled = false;
@@ -1103,28 +1209,28 @@ async function sendChat() {
 async function addPin(text, source) {
   if (!text) return;
   await Store.put({ id: newId("pin"), type: "pin", text, source, createdAt: Date.now() });
-  toast("Ajouté au récap");
+  toast(tr("Ajouté au récap", "Added to my notes"));
   if (S.view === "recap") renderRecap();
 }
 
 function renderHistory() {
   const el = $("#view-history");
   const convs = Store.list("conv"), ans = Store.list("analysis");
-  const store = Store.db ? "Enregistré dans ton espace privé de cette page." : "Enregistré dans ce navigateur uniquement.";
-  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">Suivi</div><h2>Historique de nos échanges</h2></div><span class="note">${store}</span></div>
-    <div class="two"><div><h3 style="font-size:18px;margin-bottom:10px">Discussions (${convs.length})</h3>
-      <div class="list">${convs.length ? convs.map((c) => `<div class="item"><div style="min-width:0"><div class="meta">${fmtDate(c.updatedAt)} · ${c.messages.length} messages${c.context ? " · " + esc(c.context.label) : ""}</div><h4>${esc(c.title || "Sans titre")}</h4>
+  const store = Store.db ? tr("Enregistré dans ton espace privé de cette page.", "Saved in your private space for this page.") : tr("Enregistré dans ce navigateur uniquement.", "Saved in this browser only.");
+  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">${tr("Suivi", "Follow-up")}</div><h2>${tr("Historique de nos échanges", "History of our exchanges")}</h2></div><span class="note">${store}</span></div>
+    <div class="two"><div><h3 style="font-size:18px;margin-bottom:10px">${tr("Discussions", "Chats")} (${convs.length})</h3>
+      <div class="list">${convs.length ? convs.map((c) => `<div class="item"><div style="min-width:0"><div class="meta">${fmtDate(c.updatedAt)} · ${c.messages.length} messages${c.context ? " · " + esc(c.context.label) : ""}</div><h4>${esc(c.title || tr("Sans titre", "Untitled"))}</h4>
         <div class="note">${esc((c.messages.find((m) => m.role === "assistant")?.content || "").replace(/[#*`]/g, "").slice(0, 160))}…</div></div>
-        <div style="display:flex;gap:6px;flex:none"><button class="btn sm" data-open="${c.id}">Reprendre</button><button class="btn sm" data-del="${c.id}" aria-label="Supprimer">Suppr.</button></div></div>`).join("")
-      : `<div class="emptystate">Aucune discussion pour l'instant. Clique sur « Poser une question » pour commencer ; chaque conversation apparaîtra ici.</div>`}</div></div>
-    <div><h3 style="font-size:18px;margin-bottom:10px">Analyses générées (${ans.length})</h3>
-      <div class="list">${ans.length ? ans.map((a) => `<div class="item"><div style="min-width:0"><div class="meta">${fmtDate(a.createdAt)} · <span class="kind">${a.kind === "theme" ? "thème" : a.kind === "full" ? "programme complet" : "face-à-face"}</span></div><h4>${esc(a.label)}</h4></div>
-        <button class="btn sm" data-goto="${a.id}" style="flex:none">Voir</button></div>`).join("") : `<div class="emptystate">Les analyses comparatives que tu lances apparaîtront ici.</div>`}</div></div></div>`;
+        <div style="display:flex;gap:6px;flex:none"><button class="btn sm" data-open="${c.id}">${tr("Reprendre", "Resume")}</button><button class="btn sm" data-del="${c.id}" aria-label="${tr("Supprimer", "Delete")}">${tr("Suppr.", "Delete")}</button></div></div>`).join("")
+      : `<div class="emptystate">${tr("Aucune discussion pour l'instant. Clique sur « Poser une question » pour commencer ; chaque conversation apparaîtra ici.", "No chats yet. Click “Ask a question” to start; each conversation will show up here.")}</div>`}</div></div>
+    <div><h3 style="font-size:18px;margin-bottom:10px">${tr("Analyses générées", "Generated analyses")} (${ans.length})</h3>
+      <div class="list">${ans.length ? ans.map((a) => `<div class="item"><div style="min-width:0"><div class="meta">${fmtDate(a.createdAt)} · <span class="kind">${a.kind === "theme" ? tr("thème", "topic") : a.kind === "full" ? tr("programme complet", "full manifesto") : tr("face-à-face", "head-to-head")}</span></div><h4>${esc(a.label)}</h4></div>
+        <button class="btn sm" data-goto="${a.id}" style="flex:none">${tr("Voir", "View")}</button></div>`).join("") : `<div class="emptystate">${tr("Les analyses comparatives que tu lances apparaîtront ici.", "The comparative analyses you run will show up here.")}</div>`}</div></div></div>`;
   el.querySelectorAll("[data-open]").forEach((b) => (b.onclick = () => { S.conv = JSON.parse(JSON.stringify(Store.items.get(b.dataset.open))); openChat(); }));
   el.querySelectorAll("[data-del]").forEach((b) => {
     b.onclick = async () => {
       if (b.dataset.confirm) { await Store.del(b.dataset.del); if (S.conv?.id === b.dataset.del) S.conv = null; renderHistory(); }
-      else { b.dataset.confirm = "1"; b.textContent = "Confirmer"; }
+      else { b.dataset.confirm = "1"; b.textContent = tr("Confirmer", "Confirm"); }
     };
   });
   el.querySelectorAll("[data-goto]").forEach((b) => (b.onclick = () => {
@@ -1138,31 +1244,31 @@ function renderRecap() {
   const el = $("#view-recap");
   const pins = Store.list("pin"), recap = Store.items.get("recap");
   const convs = Store.list("conv");
-  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">Ce que nous avons établi</div><h2>Récapitulatif</h2></div>
-    <button class="btn primary" id="genRecap" ${convs.length || pins.length ? "" : "disabled"}>${recap ? "Mettre à jour la synthèse" : "Générer la synthèse"}</button></div>
-    <div class="two"><div class="ai" style="margin:0"><div class="ai-head"><h3>Synthèse de nos échanges</h3>${recap ? `<span class="note">màj ${fmtDate(recap.updatedAt)} · ${recap.basis}</span>` : ""}</div>
-      <div class="prose" id="recapOut" style="margin-top:8px">${recap ? md(recap.text) : `<div class="emptystate">La synthèse regroupe, thème par thème, ce qui est ressorti de tes discussions et des éléments épinglés. Elle se génère à partir de l'historique (${convs.length} discussion(s), ${pins.length} élément(s) épinglé(s)).</div>`}</div></div>
-    <div><h3 style="font-size:18px;margin-bottom:10px">Éléments épinglés (${pins.length})</h3>
-      <div class="list">${pins.length ? pins.map((p) => `<div class="item" style="display:block"><div class="meta">${fmtDate(p.createdAt)} · ${esc(p.source)}</div><div class="prose" style="font-size:14px">${md(p.text.length > 700 ? p.text.slice(0, 700) + "…" : p.text)}</div><button class="pinbtn" data-unpin="${p.id}">Retirer</button></div>`).join("")
-        : `<div class="emptystate">Utilise « Ajouter au récap » sous une réponse de la discussion ou sous une analyse pour garder un point ici.</div>`}</div></div></div>`;
+  el.innerHTML = `<div class="sec-head"><div><div class="eyebrow">${tr("Ce que nous avons établi", "What we have established")}</div><h2>${tr("Récapitulatif", "Summary")}</h2></div>
+    <button class="btn primary" id="genRecap" ${convs.length || pins.length ? "" : "disabled"}>${recap ? tr("Mettre à jour la synthèse", "Update the summary") : tr("Générer la synthèse", "Generate the summary")}</button></div>
+    <div class="two"><div class="ai" style="margin:0"><div class="ai-head"><h3>${tr("Synthèse de nos échanges", "Summary of our exchanges")}</h3>${recap ? `<span class="note">${tr("màj", "updated")} ${fmtDate(recap.updatedAt)} · ${recap.basis}</span>` : ""}</div>
+      <div class="prose" id="recapOut" style="margin-top:8px">${recap ? md(recap.text) : `<div class="emptystate">${tr(`La synthèse regroupe, thème par thème, ce qui est ressorti de tes discussions et des éléments épinglés. Elle se génère à partir de l'historique (${convs.length} discussion(s), ${pins.length} élément(s) épinglé(s)).`, `The summary gathers, topic by topic, what came out of your chats and pinned items. It is generated from your history (${convs.length} chat(s), ${pins.length} pinned item(s)).`)}</div>`}</div></div>
+    <div><h3 style="font-size:18px;margin-bottom:10px">${tr("Éléments épinglés", "Pinned items")} (${pins.length})</h3>
+      <div class="list">${pins.length ? pins.map((p) => `<div class="item" style="display:block"><div class="meta">${fmtDate(p.createdAt)} · ${esc(p.source)}</div><div class="prose" style="font-size:14px">${md(p.text.length > 700 ? p.text.slice(0, 700) + "…" : p.text)}</div><button class="pinbtn" data-unpin="${p.id}">${tr("Retirer", "Remove")}</button></div>`).join("")
+        : `<div class="emptystate">${tr("Utilise « Ajouter au récap » sous une réponse de la discussion ou sous une analyse pour garder un point ici.", "Use “Add to my notes” under a chat answer or an analysis to keep a point here.")}</div>`}</div></div></div>`;
   el.querySelectorAll("[data-unpin]").forEach((b) => (b.onclick = async () => { await Store.del(b.dataset.unpin); renderRecap(); }));
   $("#genRecap").onclick = generateRecap;
 }
 
 async function generateRecap() {
   const sample = await getSample();
-  if (!sample) { toast("Active d'abord ton IA (bouton « Activer mon IA » en haut)."); return; }
+  if (!sample) { toast(tr("Active d'abord ton IA (bouton « Activer mon IA » en haut).", "Turn on your AI first (“Turn on my AI” button at the top).")); return; }
   const btn = $("#genRecap"), out = $("#recapOut");
   const pins = Store.list("pin"), convs = Store.list("conv").slice(0, 40);
   btn.disabled = true;
-  out.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} relit ${convs.length} discussion(s) et ${pins.length} élément(s) épinglé(s)…</div>`;
+  out.innerHTML = `<div class="thinking"><span class="dot"></span>${esc(aiShort())} ${tr(`relit ${convs.length} discussion(s) et ${pins.length} élément(s) épinglé(s)…`, `is re-reading ${convs.length} chat(s) and ${pins.length} pinned item(s)…`)}</div>`;
   let material = "ÉLÉMENTS ÉPINGLÉS :\n" + (pins.map((p) => `• [${p.source}] ${p.text}`).join("\n") || "aucun");
   material += "\n\nDISCUSSIONS :\n" + convs.map((c) => `## ${c.title} (${new Date(c.updatedAt).toLocaleDateString("fr-FR")})\n` + c.messages.map((m) => `${m.role === "user" ? "Question" : "Réponse"} : ${m.content}`).join("\n")).join("\n\n");
   material = material.slice(0, 150000);
-  const prompt = `${RULES}\n\nTÂCHE : rédige le récapitulatif de ce que l'utilisateur et l'assistant ont dégagé ensemble dans leurs échanges sur les programmes 2027. Organise-le en Markdown :\n## Vue d'ensemble (3-4 phrases)\n## Par thème (un ### par thème abordé : constats factuels établis, différences entre candidats, conséquences évoquées)\n## Comparaisons de candidats réalisées\n## Questions restées ouvertes ou informations manquantes\nN'ajoute rien qui ne soit pas dans les échanges. Reste neutre. Pas de tableaux.\n\n${material}`;
+  const prompt = `${rules()}\n\nTÂCHE : rédige le récapitulatif de ce que l'utilisateur et l'assistant ont dégagé ensemble dans leurs échanges sur les programmes 2027. Organise-le en Markdown :\n## Vue d'ensemble (3-4 phrases)\n## Par thème (un ### par thème abordé : constats factuels établis, différences entre candidats, conséquences évoquées)\n## Comparaisons de candidats réalisées\n## Questions restées ouvertes ou informations manquantes\nN'ajoute rien qui ne soit pas dans les échanges. Reste neutre. Pas de tableaux.\n\n${material}`;
   try {
     const { text } = await sample(prompt, { cache: false, onText: ({ text }) => { out.innerHTML = md(text); } });
-    await Store.put({ id: "recap", type: "recap", text, basis: `${convs.length} discussion(s), ${pins.length} épinglé(s)`, updatedAt: Date.now() });
+    await Store.put({ id: "recap", type: "recap", text, basis: tr(`${convs.length} discussion(s), ${pins.length} épinglé(s)`, `${convs.length} chat(s), ${pins.length} pinned`), updatedAt: Date.now() });
     renderRecap();
   } catch (e) { out.innerHTML = `<p class="err">${esc(aiErr(e))}</p>`; btn.disabled = false; }
 }
@@ -1172,30 +1278,30 @@ async function refreshLlmUi() {
   const on = !!(await getSample());
   const b = $("#llmBtn");
   if (window.claude?.use) b.hidden = true;
-  b.textContent = typeof dl === "number" ? `IA… ${dl} %` : on ? "IA prête" : "Activer mon IA";
+  b.textContent = typeof dl === "number" ? tr(`IA… ${dl} %`, `AI… ${dl}%`) : on ? tr("IA prête", "AI ready") : tr("Activer mon IA", "Turn on my AI");
   b.classList.toggle("on", on);
-  $("#sendChat").textContent = on ? "Envoyer" : "Copier pour mon IA";
-  $("#chatNote").textContent = on ? "Réponses de l'IA de ton ordinateur, à partir des propositions relevées." : "Aucune IA activée : ta question et les propositions sont copiées, à coller dans ton IA. Ou « Activer mon IA ».";
+  $("#sendChat").textContent = on ? tr("Envoyer", "Send") : tr("Copier pour mon IA", "Copy for my AI");
+  $("#chatNote").textContent = on ? tr("Réponses de l'IA de ton ordinateur, à partir des propositions relevées.", "Answers from your computer's AI, based on the recorded proposals.") : tr("Aucune IA activée : ta question et les propositions sont copiées, à coller dans ton IA. Ou « Activer mon IA ».", "No AI turned on: your question and the proposals are copied, to paste into your AI. Or “Turn on my AI”.");
 }
 async function setLlm(cfg) { LLM = cfg; samplePromise = null; await refreshLlmUi(); setView(S.view); }
-const fmtGo = (n) => n >= 1e9 ? (n / 1e9).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " Go" : Math.max(1, Math.round(n / 1e6)) + " Mo";
+const fmtGo = (n) => n >= 1e9 ? (n / 1e9).toLocaleString(LOC(), { maximumFractionDigits: 1 }) + tr(" Go", " GB") : Math.max(1, Math.round(n / 1e6)) + tr(" Mo", " MB");
 async function refreshStored() {
   const n = await webStoredBytes().catch(() => 0), p = llmPrefs();
-  $("#webStored").textContent = n ? `L'IA occupe ${fmtGo(n)} sur ton ordinateur${p.last ? `, dernier usage le ${new Date(p.last).toLocaleDateString("fr-FR")}` : ""}.` : "Aucune IA enregistrée sur ton ordinateur.";
+  $("#webStored").textContent = n ? tr(`L'IA occupe ${fmtGo(n)} sur ton ordinateur${p.last ? `, dernier usage le ${fmtDay(p.last)}` : ""}.`, `The AI takes up ${fmtGo(n)} on your computer${p.last ? `, last used on ${fmtDay(p.last)}` : ""}.`) : tr("Aucune IA enregistrée sur ton ordinateur.", "No AI stored on your computer.");
   $("#webDel").disabled = !n && !webEngine;
 }
 // Fenêtre « Activer mon IA » : 3 états (proposer, téléchargement en cours, prête)
 let dl = null; // pourcentage pendant le téléchargement
 function iaDlgState() {
   const ready = !!webEngine, busy = dl !== null;
-  $("#iaTitle").textContent = ready ? "Ton IA est prête" : busy ? "Installation en cours…" : "Une IA rien que pour toi";
-  $("#iaSub").textContent = ready ? "Pose-lui tes questions sur les programmes, elle répond depuis ton ordinateur." : busy ? "La première fois, ça prend quelques minutes. Les fois suivantes, quelques secondes." : "Elle s'installe dans ton navigateur et répond à tes questions sur les programmes.";
+  $("#iaTitle").textContent = ready ? tr("Ton IA est prête", "Your AI is ready") : busy ? tr("Installation en cours…", "Installing…") : tr("Une IA rien que pour toi", "An AI just for you");
+  $("#iaSub").textContent = ready ? tr("Pose-lui tes questions sur les programmes, elle répond depuis ton ordinateur.", "Ask it your questions about the manifestos; it answers from your computer.") : busy ? tr("La première fois, ça prend quelques minutes. Les fois suivantes, quelques secondes.", "The first time takes a few minutes. After that, a few seconds.") : tr("Elle s'installe dans ton navigateur et répond à tes questions sur les programmes.", "It installs in your browser and answers your questions about the manifestos.");
   $("#iaPts").hidden = ready || busy;
   $("#iaDl").hidden = !busy;
   $("#iaNote").hidden = ready;
   const go = $("#webGo");
   go.hidden = busy;
-  go.textContent = ready ? "Poser une question" : "Télécharger mon IA";
+  go.textContent = ready ? tr("Poser une question", "Ask a question") : tr("Télécharger mon IA", "Download my AI");
 }
 $("#llmBtn").onclick = () => {
   $("#webKeep").value = String(llmPrefs().keep);
@@ -1208,8 +1314,8 @@ $("#webKeep").onchange = (e) => { const p = llmPrefs(); p.keep = Number(e.target
 function showDl(p, fromCache) {
   dl = Math.round(p * 100);
   $("#webBar").style.width = dl + "%";
-  $("#webStatus").textContent = fromCache ? `Chargement depuis ton ordinateur… ${dl} %` : `Téléchargement… ${dl} %`;
-  $("#llmBtn").textContent = `IA… ${dl} %`;
+  $("#webStatus").textContent = fromCache ? tr(`Chargement depuis ton ordinateur… ${dl} %`, `Loading from your computer… ${dl}%`) : tr(`Téléchargement… ${dl} %`, `Downloading… ${dl}%`);
+  $("#llmBtn").textContent = tr(`IA… ${dl} %`, `AI… ${dl}%`);
 }
 $("#webGo").onclick = async () => {
   if (webEngine) { $("#llmDlg").close(); openChat(); return; }
@@ -1224,12 +1330,22 @@ $("#webGo").onclick = async () => {
 };
 $("#webDel").onclick = async () => {
   await deleteWebModel().catch(() => {});
-  $("#llmDlg").close(); await setLlm(null); toast("IA supprimée de ton ordinateur.");
+  $("#llmDlg").close(); await setLlm(null); toast(tr("IA supprimée de ton ordinateur.", "AI deleted from your computer."));
 };
 // « tout de suite en fermant la page » : on efface en partant (et à la visite suivante si ça n'a pas eu le temps).
 addEventListener("pagehide", () => { if (llmPrefs().keep === 0 && llmPrefs().last) { if ("caches" in window) caches.keys().then((ks) => ks.filter((k) => WEB_CACHES.test(k)).forEach((k) => caches.delete(k))); } });
 
 // ---------- démarrage ----------
+function setLang(l) {
+  LANG = l; try { localStorage.setItem(LANG_KEY, l); } catch {}
+  if (new URLSearchParams(location.search).has("lang")) history.replaceState(null, "", location.pathname + location.hash);
+  applyStatic(); renderSrcline(); refreshLlmUi();
+  if (D.themes.length) { const y = scrollY; setView(S.view); scrollTo({ top: y }); }
+  if (S.conv) renderChat();
+  if ($("#llmDlg").open) { iaDlgState(); refreshStored(); }
+}
+applyStatic();
+$("#langBtn").onclick = () => setLang(LANG === "en" ? "fr" : "en");
 document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setView(b.dataset.view)));
 $("#openChat").onclick = () => openChat();
 $("#closeChat").onclick = () => $("#drawer").classList.remove("open");
@@ -1283,7 +1399,7 @@ addEventListener("hashchange", () => { if (location.hash.startsWith("#s=")) { lo
 
 (async () => {
   try { await loadData(); }
-  catch { $("#srcline").textContent = $("#view-theme").innerHTML = "Les données n'ont pas pu être chargées. Recharge la page."; return; }
+  catch { $("#srcline").textContent = $("#view-theme").innerHTML = tr("Les données n'ont pas pu être chargées. Recharge la page.", "The data couldn't be loaded. Reload the page."); return; }
   const fisc = D.themes.flatMap((t) => t.subs).find((s) => norm(s.name).includes("fiscalit"));
   S.sub = (fisc || D.themes[0].subs[0]).id;
   const alpha = [...D.cands].filter((c) => countCand(c.id)).sort(byLast);
