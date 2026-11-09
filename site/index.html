@@ -37,8 +37,8 @@ h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; l
 header.top { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20 }
 .top-in { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; min-height: 64px }
 .brand { display: flex; align-items: center; gap: 10px; margin-right: auto }
-/* Icône du site : la balance en caractères (dessin de Maitre), jaune sur fond sombre */
-.brand .mark { flex: none; width: 46px; height: 46px; display: block }
+/* Icône du site : la balance en caractères, reprise telle quelle d'elie.place (styles-apps.js, couleur #ffc21a, gras, interligne 1.05) */
+.brand .mark { flex: none; margin: 0; font: 700 9.5px/1.05 var(--f-mono); color: #ffc21a; white-space: pre }
 .brand { min-width: 0; flex: 0 1 auto }
 .brand .bt { display: grid; gap: 2px; min-width: 0; max-width: 270px }
 .brand h1 { font-size: 21px; letter-spacing: -0.01em; line-height: 1.1 }
@@ -310,7 +310,7 @@ table.pos tr:last-child td { border-bottom: 0 }
   /* Barre du haut compacte sur téléphone : marque + 2 boutons, puis les onglets sur toute la largeur */
   .top-in { gap: 8px; min-height: 0; padding-top: 8px }
   .brand { flex: 1 1 0; min-width: 0 }
-  .brand { gap: 6px } .brand .mark { width: 28px; height: 28px }
+  .brand { gap: 6px } .brand .mark { font-size: 6.5px }
   .brand h1 { font-size: 16.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis } #keysBtn, .m-hide { display: none }
   @media (max-width: 370px) { .brand h1 { display: none } } /* très petit écran : l'icône suffit */
   /* Téléphone : le sous-titre ne tient pas, on garde le nom ; FR/EN devient un rond qui montre l'autre langue */
@@ -331,7 +331,11 @@ table.pos tr:last-child td { border-bottom: 0 }
 
 <header class="top">
   <div class="wrap top-in">
-    <div class="brand"><svg class="mark" viewBox="0 0 100 100" role="img" aria-label="Balance"><rect width="100" height="100" rx="22" fill="#0b0b0c"/><text text-anchor="middle" fill="#ffc21a" font-family="ui-monospace, Consolas, Menlo, monospace" font-size="18" font-weight="700" style="white-space:pre"><tspan x="50" y="21.0">    |    </tspan><tspan x="50" y="38.5"> ---+--- </tspan><tspan x="50" y="56.0"> |     | </tspan><tspan x="50" y="73.5">/_\   /_\</tspan><tspan x="50" y="91.0">  __|__  </tspan></text></svg><div class="bt"><h1>PolitiComp</h1><span class="yr">comparateur de programmes politiques pour les élections françaises 2027</span></div></div>
+    <div class="brand"><pre class="mark" aria-hidden="true">    |
+ ---+---
+ |     |
+/_\   /_\
+  __|__</pre><div class="bt"><h1>PolitiComp</h1><span class="yr">comparateur de programmes politiques pour les élections françaises 2027</span></div></div>
     <nav class="tabs" role="tablist" id="tabs">
       <button role="tab" data-view="theme" aria-selected="true">Par thème</button>
       <button role="tab" data-view="vs" aria-selected="false">Face-à-face</button>

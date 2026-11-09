@@ -54,4 +54,4 @@ Adresses IP, chemins locaux, détails du serveur maison, e-mails perso, clés ou
 - 2026-11-08 : icône [P] jaune remise dans les pages (site/favicon.svg) : le site est sur Cloudflare Pages, le portail elie.place ne peut plus la poser. À garder.
 - 2026-11-08 : dépôt préparé pour le public : README, CONTRIBUTING, modèle de PR, captures retirées, IP et détails du serveur retirés des notes.
 - 2026-11-08 : nouveau dépôt public à l'historique nettoyé (ancien : ARCHIVES-PolitiComp, privé) ; licence AGPL v3 pour le code (données IFRAP exclues).
-- 2026-11-09 : barre du haut : icône balance en caractères (jaune sur fond sombre, dessin de Maitre) + titre « PolitiComp » + sous-titre ; bouton FR·EN (interface traduite, propositions laissées en français ; choix gardé, sinon langue du navigateur ; lien ?lang=en).
+- 2026-11-09 : barre du haut : icône balance en caractères reprise d'elie.place (texte jaune, sans fond) + titre « PolitiComp » + sous-titre ; bouton FR·EN (interface traduite, propositions laissées en français ; choix gardé, sinon langue du navigateur ; lien ?lang=en).
