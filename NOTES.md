@@ -16,6 +16,13 @@ Comparateur politique : site statique (site/), données JSON (data/), scripts.
 Automatique via Cloudflare Pages (`node scripts/build-pages.js` → `dist/`) : chaque commit sur `main` est mis en ligne en quelques minutes.
 Les détails du serveur de l'éditeur ne sont pas dans ce dépôt (dépôt public).
 
+## Mise à jour hebdomadaire (GitHub Action)
+`.github/workflows/maj-hebdo.yml`, chaque lundi 07:00 UTC (ou à la main : Actions > Run workflow).
+1. `scripts/fetch-ifrap.js` (sans IA). Garde-fou : un relevé vide ou en échec ne remplace jamais `data/ifrap.json`. Un relevé « inchangé » n'est pas gardé (pas de PR pour une simple date).
+2. Si le secret `ANTHROPIC_API_KEY` (clé payante) ou `CLAUDE_CODE_OAUTH_TOKEN` (abonnement Claude, `claude setup-token`) existe : Claude suit `.github/maj-hebdo-consignes.md` (propositions officielles, partis, glossaire). Il ne peut modifier que ces fichiers de données.
+3. `scripts/check-data.js` vérifie chaque fichier ; un fichier refusé est remis comme avant.
+4. PR `maj-auto/hebdo` (jamais fusionnée seule : pas une branche `claude/*`). Réglage requis : Settings > Actions > General > « Allow GitHub Actions to create and approve pull requests ».
+
 ## Branches
 - `main` : version stable / déployée.
 - `dev` : travail en cours. Merge `dev` → `main` quand c'est testé.
@@ -55,4 +62,5 @@ Adresses IP, chemins locaux, détails du serveur maison, e-mails perso, clés ou
 - 2026-11-08 : dépôt préparé pour le public : README, CONTRIBUTING, modèle de PR, captures retirées, IP et détails du serveur retirés des notes.
 - 2026-11-08 : nouveau dépôt public à l'historique nettoyé (ancien : ARCHIVES-PolitiComp, privé) ; licence AGPL v3 pour le code (données IFRAP exclues).
 - 2026-11-09 : barre du haut : icône balance en caractères reprise d'elie.place (texte jaune, sans fond) + titre « PolitiComp » + sous-titre ; bouton FR·EN (interface traduite, propositions laissées en français ; choix gardé, sinon langue du navigateur ; lien ?lang=en).
+- 2026-11-11 : mise à jour hebdomadaire automatique (GitHub Action maj-hebdo) qui ouvre une PR à relire ; garde-fou dans fetch-ifrap.js ; scripts/check-data.js.
 - 2026-11-11 : pied de page : ligne « Infos relevées le … · mises à jour chaque semaine » (date du relevé IFRAP, `fetchedAt`), avec petite horloge ; FR et EN.
