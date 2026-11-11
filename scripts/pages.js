@@ -2,7 +2,7 @@
 // et la construction pour Cloudflare Pages (build-pages.js).
 const map = {
   "/": "site/index.html",
-  "/data.json": "data/ifrap.json", "/officiel.json": "data/officiel.json", "/partis.json": "data/partis.json",
+  "/data.json": "data/ifrap.json", "/officiel.json": "data/officiel.json", "/partis.json": "data/partis.json", "/glossaire.json": "data/glossaire.json",
   "/llms.txt": "site/llms.txt", "/README.md": "site/llms.txt", "/llms-full.txt": "site/llms-full.txt",
   "/conditions.html": "site/conditions.html", "/robots.txt": "site/robots.txt", "/favicon.svg": "site/favicon.svg",
 };
