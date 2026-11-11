@@ -74,7 +74,7 @@ if ((!only || only === "glossaire") && fs.existsSync(path.join(dir, "glossaire.j
       if (!Array.isArray(t.motifs) || !t.motifs.length) errors.push(`${at} : motifs doit être une liste non vide`);
       for (const m of t.motifs || []) {
         if (typeof m !== "string" || !m.trim()) { errors.push(`${at} : motif vide`); continue; }
-        const k = /^[A-Z0-9\W]+$/.test(m) ? m : m.toLowerCase();
+        const k = m.toLowerCase();
         if (motifs.has(k)) errors.push(`${at} : motif « ${m} » déjà utilisé`);
         motifs.add(k);
       }
