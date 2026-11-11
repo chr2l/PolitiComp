@@ -25,6 +25,7 @@ data/                 les données
 scripts/
   serve.js            petit serveur local, sans journal ni cookie
   fetch-ifrap.js      met à jour data/ifrap.json depuis le comparateur IFRAP
+  check-data.js       vérifie les fichiers de data/
   build-llms.js       régénère site/llms-full.txt
   pages.js            liste des adresses du site (partagée)
   build-pages.js      construit dist/ pour l'hébergement (Cloudflare Pages)

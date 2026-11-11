@@ -89,6 +89,10 @@ dialog.llm code { font-size: 12px; background: var(--sunk); padding: 1px 4px; bo
 dialog.llm .acts { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 16px }
 .foot { font-size: 12px; color: var(--muted); padding-block: 24px 40px; border-top: 1px solid var(--line); margin-top: 32px }
 .foot a { color: inherit }
+/* Date des infos : discrète, en bas, avec une petite horloge */
+.dateline { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 8px; color: var(--muted) }
+.dateline svg { flex: none; margin-top: 1px; color: var(--accent) }
+.dateline b { color: var(--ink); font-weight: 600 }
 
 main { padding-block: 20px 60px }
 .btn { border: 1px solid var(--line); background: var(--surface); padding: 7px 14px; border-radius: 999px; cursor: pointer; font-weight: 500 }
@@ -383,7 +387,7 @@ table.pos tr:last-child td { border-bottom: 0 }
   </form>
 </aside>
 <div id="gbub" role="tooltip" hidden></div>
-<footer class="wrap foot"><div class="srcline" id="srcline">Chargement des données…</div><span>Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne.</span> · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
+<footer class="wrap foot"><div class="dateline" id="dateline" hidden></div><div class="srcline" id="srcline">Chargement des données…</div><span>Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne.</span> · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
 <dialog class="llm ia" id="llmDlg">
   <form method="dialog" id="llmForm">
     <button type="button" class="ia-x" id="llmX" aria-label="Fermer">×</button>
@@ -636,10 +640,13 @@ async function loadData() {
 }
 function renderSrcline() {
   if (!D.fetchedAt) return;
-  $("#srcline").innerHTML = tr("Source principale : ", "Main source: ") + `<a href="${esc(D.sourceUrl)}" target="_blank" rel="noopener">${tr("comparateur de la Fondation IFRAP", "Fondation IFRAP comparison")}</a> ${tr("(think tank d'orientation libérale), relevé du", "(a free-market think tank), collected on")} <span class="mono">${esc(fmtDay(D.fetchedAt))}</span>`
+  const long = new Date(D.fetchedAt + "T12:00:00").toLocaleDateString(LOC(), { day: "numeric", month: "long", year: "numeric" });
+  const dl = $("#dateline");
+  dl.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${tr("Infos relevées le", "Information collected on")} <b><time datetime="${esc(D.fetchedAt)}">${esc(long)}</time></b> · ${tr("mises à jour chaque semaine", "updated every week")}</span>`;
+  dl.hidden = false;
+  $("#srcline").innerHTML = tr("Source principale : ", "Main source: ") + `<a href="${esc(D.sourceUrl)}" target="_blank" rel="noopener">${tr("comparateur de la Fondation IFRAP", "Fondation IFRAP comparison")}</a> ${tr("(think tank d'orientation libérale)", "(a free-market think tank)")}`
     + (D.extraN ? ` · ${tr(`${D.extraN} proposition(s) issues de sources officielles des candidats (màj ${esc(fmtDay(D.extraUpdated))})`, `${D.extraN} proposal(s) from the candidates' official sources (updated ${esc(fmtDay(D.extraUpdated))})`)}` : "")
     + ` · ${tr("Positions des partis : ", "Party positions: ")}<a href="${esc(D.partisUrl || "#")}" target="_blank" rel="noopener" title="${esc(D.partisMethode || "")}">${tr("blocs du ministère de l'Intérieur (2026)", "blocs set by the French Ministry of the Interior (2026)")}</a>`
-    + ` · ${tr("mise à jour hebdomadaire.", "updated weekly.")}`
     + (LANG === "en" ? ` · <b>The proposals are shown in their original French.</b>` : "");
 }
 

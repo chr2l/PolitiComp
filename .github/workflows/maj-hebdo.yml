@@ -1,0 +1,120 @@
+name: Mise à jour hebdomadaire des données
+# Chaque lundi vers 8 h (heure de Paris) :
+#  1. relève le comparateur IFRAP (scripts/fetch-ifrap.js, sans IA, gratuit) ;
+#  2. si une clé Claude est configurée, cherche les nouvelles propositions officielles,
+#     les changements de parti et les nouveaux termes du glossaire (.github/maj-hebdo-consignes.md) ;
+#  3. vérifie les fichiers (scripts/check-data.js) : un fichier incorrect est remis comme avant ;
+#  4. ouvre (ou met à jour) une pull request « maj-auto/hebdo » à relire. Rien n'est fusionné tout seul.
+# Si rien n'a changé, aucune pull request n'est ouverte.
+# Lancement à la main : onglet Actions > « Mise à jour hebdomadaire des données » > Run workflow.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # lundi 07:00 UTC = 8 h à Paris en hiver, 9 h en été
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: maj-hebdo
+  cancel-in-progress: false
+
+jobs:
+  maj:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HAS_CLAUDE: ${{ secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Relevé IFRAP
+        id: ifrap
+        run: |
+          if node scripts/fetch-ifrap.js > "$RUNNER_TEMP/ifrap.txt" 2>&1; then
+            cat "$RUNNER_TEMP/ifrap.txt"
+            # Rien de neuf : on ne garde pas un simple changement de date.
+            if grep -q "inchangé" "$RUNNER_TEMP/ifrap.txt"; then git checkout -- data/ifrap.json site/llms-full.txt; fi
+          else
+            cat "$RUNNER_TEMP/ifrap.txt"
+            git checkout -- data/ifrap.json site/llms-full.txt
+            echo "::warning::Relevé IFRAP en échec, ancienne version gardée."
+          fi
+          echo "jour=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+          echo "resume=$(tail -n 1 "$RUNNER_TEMP/ifrap.txt" | tr -d '\r')" >> "$GITHUB_OUTPUT"
+
+      - name: Recherche des nouveautés officielles (Claude)
+        if: env.HAS_CLAUDE == 'true'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            Lis le fichier .github/maj-hebdo-consignes.md et applique ses consignes.
+            Date du jour : ${{ steps.ifrap.outputs.jour }}.
+            Résultat du relevé IFRAP de ce matin : ${{ steps.ifrap.outputs.resume }}
+          claude_args: >-
+            --model claude-opus-5-5
+            --max-turns 80
+            --allowedTools "Read,Glob,Grep,WebSearch,WebFetch,Edit(data/officiel.json),Edit(data/partis.json),Edit(data/glossaire.json),Write(compte-rendu.md),Bash(node scripts/check-data.js:*),Bash(node scripts/check-glossaire.js:*)"
+
+      - name: Vérification des fichiers
+        run: |
+          : > "$RUNNER_TEMP/notes.txt"
+          for f in officiel partis glossaire; do
+            [ -f "data/$f.json" ] || continue
+            if ! node scripts/check-data.js "$f" > "$RUNNER_TEMP/check.txt" 2>&1; then
+              cat "$RUNNER_TEMP/check.txt"
+              git checkout -- "data/$f.json" 2>/dev/null || rm -f "data/$f.json"
+              { echo "- data/$f.json refusé par la vérification, ancienne version gardée :"; sed 's/^/  /' "$RUNNER_TEMP/check.txt"; } >> "$RUNNER_TEMP/notes.txt"
+            fi
+          done
+          node scripts/check-data.js
+          # site/llms-full.txt reprend toutes les données : on le régénère seulement si elles ont changé.
+          if ! git diff --quiet -- data; then node scripts/build-llms.js; fi
+
+      - name: Description de la pull request
+        run: |
+          {
+            echo "Mise à jour automatique du $(date -u +%F). À relire avant de fusionner : rien n'est mis en ligne tant que ce n'est pas fusionné."
+            echo
+            echo "## Relevé IFRAP"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/ifrap.txt"
+            echo '```'
+            echo
+            echo "## Compte rendu de Claude"
+            echo
+            if [ -s compte-rendu.md ]; then cat compte-rendu.md
+            elif [ "$HAS_CLAUDE" = "true" ]; then echo "Pas de compte rendu (la recherche a peut-être échoué : voir le journal de l'action)."
+            else echo "Recherche des nouveautés officielles non lancée : aucune clé Claude configurée."
+            fi
+            if [ -s "$RUNNER_TEMP/notes.txt" ]; then echo; echo "## Problèmes"; echo; cat "$RUNNER_TEMP/notes.txt"; fi
+            echo
+            echo "[Journal de l'action](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          } > "$RUNNER_TEMP/pr-body.md"
+          rm -f compte-rendu.md
+
+      - name: Pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: maj-auto/hebdo
+          delete-branch: true
+          add-paths: |
+            data/*.json
+            site/llms-full.txt
+          commit-message: "Mise à jour hebdomadaire des données"
+          title: "Mise à jour hebdomadaire des données"
+          body-path: ${{ runner.temp }}/pr-body.md
+          author: "github-actions[bot] <41898283+github-actions[bot]@users.noreply.github.com>"
+          committer: "github-actions[bot] <41898283+github-actions[bot]@users.noreply.github.com>"
