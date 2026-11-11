@@ -156,6 +156,16 @@ a.btn.primary { color: var(--accent-ink) }
 .pager .ibtn[data-tip]::after { top: auto; bottom: calc(100% + 8px) }
 .ibtn[data-tip]:hover::after, .ibtn[data-tip]:focus-visible::after { opacity: 1; transform: none }
 @media (prefers-reduced-motion: reduce) { .ibtn[data-tip]::after { transition: none } }
+/* Termes compliqués des propositions : mot souligné en pointillé (pas un bouton visible), bulle sombre comme les autres bulles d'aide */
+.term { all: unset; display: inline; cursor: help; border-bottom: 1.5px dotted var(--accent); border-radius: 2px; color: inherit }
+.term:hover, .term[aria-expanded="true"] { background: var(--accent-soft) }
+.term:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
+#gbub { position: fixed; z-index: 60; width: max-content; max-width: min(320px, calc(100vw - 32px)); background: var(--ink); color: var(--paper); border-radius: 10px; padding: 9px 12px 10px; font: 400 13px/1.45 var(--f-body); box-shadow: 0 6px 20px rgba(0,0,0,.22) }
+#gbub .g-h { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin-bottom: 3px }
+#gbub b { font-weight: 600; font-size: 13.5px }
+#gbub p { margin: 0 }
+#gbub .g-w { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); color: var(--ink); text-decoration: none; font: 700 13px/1 Georgia, "Times New Roman", serif }
+#gbub .g-w:hover { background: var(--accent-soft) }
 .pager { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px }
 .candBtn { display: none }
 .search { position: relative; margin-bottom: 12px }
@@ -372,6 +382,7 @@ table.pos tr:last-child td { border-bottom: 0 }
       <span><button type="button" class="btn sm" id="stopChat" hidden>Arrêter</button> <button class="btn primary sm" id="sendChat">Envoyer</button></span></div>
   </form>
 </aside>
+<div id="gbub" role="tooltip" hidden></div>
 <footer class="wrap foot"><div class="srcline" id="srcline">Chargement des données…</div><span>Ce site ne collecte aucune donnée et n'appelle aucune IA : branche la tienne.</span> · <a href="llms.txt">Pour les IA (llms.txt)</a> · <a href="llms-full.txt">Toutes les propositions en texte</a> · <a href="conditions.html">Conditions et confidentialité</a> · <a href="conditions.html#mentions">Mentions légales</a></footer>
 <dialog class="llm ia" id="llmDlg">
   <form method="dialog" id="llmForm">
@@ -527,6 +538,70 @@ function md(src) {
 const D = { cands: [], candById: new Map(), themes: [], subById: new Map(), themeOfSub: new Map(), props: new Map(), fetchedAt: "", sourceUrl: "", extraSources: [] };
 const pkey = (cid, sid) => cid + "|" + sid;
 function propsOf(cid, sid) { return D.props.get(pkey(cid, sid)) || []; }
+// ---------- glossaire : termes compliqués expliqués au survol ou au toucher (data/glossaire.json) ----------
+const G = { list: [], res: [] };
+function setGlossary(g) {
+  G.list = (g && g.termes) || []; G.res = [];
+  const esc_ = (m) => m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/['’]/g, "['’]");
+  const sets = [[], []]; // [respecte la casse (sigles), sans casse]
+  G.list.forEach((t, i) => (t.motifs || []).forEach((m) => sets[m === m.toUpperCase() ? 0 : 1].push([m, i])));
+  sets.forEach((set, k) => {
+    if (!set.length) return;
+    set.sort((a, b) => b[0].length - a[0].length);
+    G.res.push({ re: new RegExp("(?<![\\p{L}\\p{N}])(?:" + set.map(([m]) => esc_(m)).join("|") + ")(?![\\p{L}\\p{N}])", k ? "giu" : "gu"),
+      find: (txt) => set.find(([m]) => k ? new RegExp("^" + esc_(m) + "$", "iu").test(txt) : new RegExp("^" + esc_(m) + "$", "u").test(txt))?.[1] });
+  });
+}
+// Texte d'une proposition, échappé, avec chaque terme du glossaire (1re fois seulement) rendu cliquable.
+function gloss(text) {
+  if (!G.res.length) return esc(text);
+  const hits = [];
+  for (const r of G.res) for (const m of text.matchAll(r.re)) { const i = r.find(m[0]); if (i != null) hits.push({ at: m.index, end: m.index + m[0].length, i }); }
+  hits.sort((a, b) => a.at - b.at || b.end - a.end);
+  let out = "", pos = 0; const seen = new Set();
+  for (const h of hits) {
+    if (h.at < pos || seen.has(h.i)) continue; seen.add(h.i);
+    out += esc(text.slice(pos, h.at)) + `<button type="button" class="term" data-g="${h.i}" aria-expanded="false">${esc(text.slice(h.at, h.end))}</button>`; pos = h.end;
+  }
+  return out + esc(text.slice(pos));
+}
+const GB = { el: null, open: null, timer: 0, pinned: false };
+function gShow(btn, pinned) {
+  const t = G.list[+btn.dataset.g]; if (!t) return;
+  const b = $("#gbub"); clearTimeout(GB.timer);
+  if (GB.open && GB.open !== btn) GB.open.setAttribute("aria-expanded", "false");
+  const w = t.wiki ? `<a class="g-w" href="${esc(t.wiki)}" target="_blank" rel="noopener" aria-label="${tr("Lire l'article Wikipédia", "Read the Wikipedia article (in French)")}" title="${tr("En savoir plus sur Wikipédia", "Learn more on Wikipedia (in French)")}">W</a>` : "";
+  b.innerHTML = `<div class="g-h"><b lang="fr">${esc(t.motifs[0])}</b>${w}</div><p>${esc(LANG === "en" ? t.en || t.fr : t.fr)}</p>`;
+  b.hidden = false; GB.open = btn; GB.pinned = pinned; btn.setAttribute("aria-expanded", "true");
+  const r = btn.getBoundingClientRect(), bw = b.offsetWidth, bh = b.offsetHeight, vw = innerWidth, vh = innerHeight;
+  let x = Math.min(Math.max(16, r.left), vw - bw - 16), y = r.bottom + 8;
+  if (y + bh > vh - 8 && r.top - bh - 8 > 8) y = r.top - bh - 8;
+  b.style.left = x + "px"; b.style.top = y + "px";
+}
+function gHide(now) {
+  clearTimeout(GB.timer);
+  const go = () => { $("#gbub").hidden = true; if (GB.open) GB.open.setAttribute("aria-expanded", "false"); GB.open = null; GB.pinned = false; };
+  now ? go() : (GB.timer = setTimeout(go, 220));
+}
+document.addEventListener("click", (e) => {
+  const t = e.target.closest(".term");
+  if (t) { e.preventDefault(); e.stopPropagation(); (GB.open === t && GB.pinned) ? gHide(true) : gShow(t, true); return; }
+  if (GB.open && !e.target.closest("#gbub")) gHide(true);
+}, true);
+document.addEventListener("pointerover", (e) => {
+  if (e.pointerType !== "mouse") return;
+  const t = e.target.closest(".term");
+  if (t) { clearTimeout(GB.timer); if (GB.open !== t) GB.timer = setTimeout(() => gShow(t, false), 120); }
+  else if (e.target.closest("#gbub")) clearTimeout(GB.timer);
+});
+document.addEventListener("pointerout", (e) => {
+  if (e.pointerType !== "mouse" || GB.pinned) return;
+  if (e.target.closest(".term, #gbub") && !e.relatedTarget?.closest?.(".term, #gbub")) gHide();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && GB.open) { const t = GB.open; gHide(true); t.focus(); } });
+addEventListener("scroll", () => GB.open && gHide(true), { passive: true, capture: true });
+addEventListener("resize", () => GB.open && gHide(true));
+
 function candsWith(sid) { return D.cands.filter((c) => propsOf(c.id, sid).length); }
 function countCand(cid) { let n = 0; for (const t of D.themes) for (const s of t.subs) n += propsOf(cid, s.id).length; return n; }
 
@@ -537,6 +612,7 @@ async function loadData() {
   D.fetchedAt = ifrap.fetchedAt; D.sourceUrl = ifrap.source.url; D.extraUpdated = extra.updatedAt; D.extraSources = extra.sources || [];
   let partis = { candidats: {}, blocs: [] };
   try { partis = await (await fetch("partis.json")).json(); } catch {}
+  try { setGlossary(await (await fetch("glossaire.json")).json()); } catch {}
   D.blocs = partis.blocs || []; D.partisUrl = partis.sourceUrl; D.partisMethode = partis.methode;
   D.cands = ifrap.candidates;
   D.cands.forEach((c) => {
@@ -874,7 +950,7 @@ function renderTheme() {
       <div class="subs">${theme.subs.map((s) => `<button data-sub="${s.id}" aria-current="${s.id === S.sub}">${esc(nm(s.name))}<span class="n">${candsWith(s.id).filter((c) => S.on.has(c.id)).length}</span></button>`).join("")}</div>
       <div class="ai" id="aiBox"></div>
       <div class="cards">${shown.map((c) => `<article class="card"><h3><span class="ini">${initials(c.name)}</span>${esc(c.name)}<button class="hide" data-hide="${c.id}" title="${tr("Cacher ce candidat", "Hide this candidate")}" aria-label="${tr("Cacher", "Hide")} ${esc(c.name)}">×</button></h3><div class="party">${partyLine(c, true)}${pinfoNote(c)}</div>
-        <ol class="props" lang="fr">${propsOf(c.id, S.sub).map((p) => `<li>${esc(p.text)}${p.src !== "IFRAP" ? `<a class="srcbadge" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.src)}</a>` : ""}</li>`).join("")}</ol></article>`).join("")}</div>
+        <ol class="props" lang="fr">${propsOf(c.id, S.sub).map((p) => `<li>${gloss(p.text)}${p.src !== "IFRAP" ? `<a class="srcbadge" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.src)}</a>` : ""}</li>`).join("")}</ol></article>`).join("")}</div>
       ${!withP.length ? `<div class="emptystate">${tr("Aucune proposition relevée sur ce sous-thème pour l'instant.", "No proposals recorded on this sub-topic yet.")}</div>` : !shown.length ? `<div class="emptystate">${tr("Aucun des candidats affichés n'a de proposition relevée ici.", "None of the candidates shown has a recorded proposal here.")} <button class="btn sm" data-all="here">${tr("Afficher ceux qui en ont", "Show those who do")} (${withP.length})</button></div>` : ""}
       ${hiddenP.length && shown.length ? `<p class="empty-cands">${tr("Cachés, avec des propositions ici : ", "Hidden, with proposals here: ")}${hiddenP.map((c) => `<button class="pinbtn" data-show="${c.id}">${esc(c.name)}</button>`).join(", ")}.</p>` : ""}
       ${without.length ? `<p class="empty-cands">${tr("Aucune proposition relevée pour : ", "No proposals recorded for: ")}${without.map((c) => esc(c.name)).join(", ")}.</p>` : ""}
@@ -1075,7 +1151,7 @@ function renderVs() {
   const rows = sids.filter((sid) => shown.some((cid) => propsOf(cid, sid).length));
   $("#vsGrid").innerHTML = `<div class="vs-table"><div class="vs-heads"><div class="vs-row" style="--cols:${cols};margin:0">${shown.map((cid) => { const c = D.candById.get(cid); return `<div class="vs-cell" style="--c:${SLOT[S.vs.indexOf(cid)]}"><span class="ini">${initials(c.name)}</span>${esc(c.name)} ${partyLine(c, true)}</div>`; }).join("")}</div></div>
     ${rows.map((sid) => `<div class="vs-sub">${esc(nm(D.subById.get(sid).name))}${sids.length > 1 && S.vsScope === "all" ? `<span class="eyebrow">${esc(nm(D.themeOfSub.get(sid).name))}</span>` : ""}</div>
-      <div class="vs-row" style="--cols:${cols}">${shown.map((cid) => { const ps = propsOf(cid, sid); return `<div class="vs-cell${ps.length ? "" : " vs-empty"}" style="--c:${SLOT[S.vs.indexOf(cid)]}"><div class="vs-who">${esc(D.candById.get(cid).name)}</div>${ps.length ? `<ol lang="fr">${ps.map((p) => `<li>${esc(p.text)}</li>`).join("")}</ol>` : `<span class="muted">${tr("Aucune proposition relevée.", "No proposals recorded.")}</span>`}</div>`; }).join("")}</div>`).join("")}
+      <div class="vs-row" style="--cols:${cols}">${shown.map((cid) => { const ps = propsOf(cid, sid); return `<div class="vs-cell${ps.length ? "" : " vs-empty"}" style="--c:${SLOT[S.vs.indexOf(cid)]}"><div class="vs-who">${esc(D.candById.get(cid).name)}</div>${ps.length ? `<ol lang="fr">${ps.map((p) => `<li>${gloss(p.text)}</li>`).join("")}</ol>` : `<span class="muted">${tr("Aucune proposition relevée.", "No proposals recorded.")}</span>`}</div>`; }).join("")}</div>`).join("")}
     ${rows.length ? "" : `<div class="emptystate">${tr("Aucune proposition relevée pour ces candidats sur ce périmètre.", "No proposals recorded for these candidates in this scope.")}</div>`}</div>`;
 }
 
