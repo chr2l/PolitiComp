@@ -21,8 +21,11 @@ const strip = (html) =>
     .trim();
 
 (async () => {
-  const html = await (await fetch(URL)).text();
+  const res = await fetch(URL);
+  if (!res.ok) throw new Error(`page IFRAP indisponible (HTTP ${res.status})`);
+  const html = await res.text();
   const start = html.indexOf("window.__NUXT__=");
+  if (start < 0) throw new Error("données window.__NUXT__ introuvables : la structure de la page a changé");
   const end = html.indexOf("</script>", start);
   const sandbox = { window: {} };
   vm.runInNewContext(html.slice(start, end), sandbox);
@@ -50,6 +53,11 @@ const strip = (html) =>
     }),
   }));
 
+  // Garde-fou : ne jamais remplacer data/ifrap.json par un relevé vide ou cassé.
+  if (!candidates.length || !themes.length || !total) {
+    throw new Error(`relevé suspect (${candidates.length} candidats, ${themes.length} thèmes, ${total} propositions) : ancien fichier gardé`);
+  }
+
   let previous = null;
   try { previous = JSON.parse(fs.readFileSync(OUT, "utf8")); } catch {}
   const data = {
@@ -63,5 +71,15 @@ const strip = (html) =>
   const changed = !previous || JSON.stringify(previous.themes) !== JSON.stringify(themes)
     || JSON.stringify(previous.candidates) !== JSON.stringify(candidates);
   require("./build-llms")(); // met à jour site/llms-full.txt
-  console.log(`${candidates.length} candidats, ${themes.length} thèmes, ${total} propositions — ${changed ? "MODIFIÉ" : "inchangé"}`);
-})();
+  const before = previous ? countProps(previous) : 0;
+  console.log(`${candidates.length} candidats, ${themes.length} thèmes, ${total} propositions${changed && previous ? ` (avant : ${before})` : ""} — ${changed ? "MODIFIÉ" : "inchangé"}`);
+})().catch((e) => {
+  console.error("ÉCHEC — data/ifrap.json n'a pas été modifié :", e.message);
+  process.exit(1);
+});
+
+function countProps(d) {
+  let n = 0;
+  for (const t of d.themes || []) for (const s of t.subs || []) for (const l of Object.values(s.props || {})) n += l.length;
+  return n;
+}
