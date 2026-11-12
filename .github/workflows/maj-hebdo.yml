@@ -51,6 +51,7 @@ jobs:
           echo "resume=$(tail -n 1 "$RUNNER_TEMP/ifrap.txt" | tr -d '\r')" >> "$GITHUB_OUTPUT"
 
       - name: Recherche des nouveautés officielles (Claude)
+        id: claude
         if: env.HAS_CLAUDE == 'true'
         continue-on-error: true
         uses: anthropics/claude-code-action@v1
@@ -65,7 +66,7 @@ jobs:
           claude_args: >-
             --model claude-opus-5-5
             --max-turns 80
-            --allowedTools "Read,Glob,Grep,WebSearch,WebFetch,Edit(data/officiel.json),Edit(data/partis.json),Edit(data/glossaire.json),Write(compte-rendu.md),Bash(node scripts/check-data.js:*),Bash(node scripts/check-glossaire.js:*)"
+            --allowedTools "Read,Glob,Grep,WebSearch,WebFetch,Edit(data/officiel.json),Edit(data/partis.json),Edit(data/glossaire.json),Edit(compte-rendu.md),Write(compte-rendu.md),Bash(node scripts/check-data.js:*),Bash(node scripts/check-glossaire.js:*)"
 
       - name: Vérification des fichiers
         run: |
@@ -83,6 +84,8 @@ jobs:
           if ! git diff --quiet -- data; then node scripts/build-llms.js; fi
 
       - name: Description de la pull request
+        env:
+          EXEC_FILE: ${{ steps.claude.outputs.execution_file }}
         run: |
           {
             echo "Mise à jour automatique du $(date -u +%F). À relire avant de fusionner : rien n'est mis en ligne tant que ce n'est pas fusionné."
@@ -95,6 +98,10 @@ jobs:
             echo
             echo "## Compte rendu de Claude"
             echo
+            # Si Claude n'a pas pu écrire le fichier, on reprend son dernier message.
+            if [ ! -s compte-rendu.md ] && [ -f "$EXEC_FILE" ]; then
+              node -e 'const m=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const r=[].concat(m).reverse().find(x=>x&&x.type==="result");if(r&&typeof r.result==="string")process.stdout.write(r.result)' "$EXEC_FILE" > compte-rendu.md || true
+            fi
             if [ -s compte-rendu.md ]; then cat compte-rendu.md
             elif [ "$HAS_CLAUDE" = "true" ]; then echo "Pas de compte rendu (la recherche a peut-être échoué : voir le journal de l'action)."
             else echo "Recherche des nouveautés officielles non lancée : aucune clé Claude configurée."

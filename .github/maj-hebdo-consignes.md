@@ -26,7 +26,7 @@ Si tu ajoutes au moins une entrée, mets `updatedAt` à la date du jour.
 Si un candidat officiel n'existe pas dans `data/ifrap.json`, signale-le dans le compte rendu sans modifier la structure.
 
 ## 2. Partis et positions (`data/partis.json`)
-Chaque candidat de `data/ifrap.json` doit avoir une entrée (clé = son id). Vérifie les changements d'affiliation
+Chaque candidat de `data/ifrap.json` doit avoir une entrée (clé = son id). Retire les entrées dont l'id n'est plus dans `data/ifrap.json` (l'IFRAP change parfois l'id d'un candidat : reprends alors son ancienne entrée sous le nouvel id). Vérifie les changements d'affiliation
 (départ ou changement de parti, investiture, candidature indépendante) sur des sources fiables et officielles.
 Champs : `parti`, `sigle`, `bloc` (un des `blocs` du fichier), `nuance` (code du ministère de l'Intérieur),
 `base` (« nuance officielle » ou « par analogie : <raison> »), `note` facultative.
@@ -52,7 +52,7 @@ Chaque motif doit être unique dans tout le fichier. Si tu ajoutes un terme, met
 Lance `node scripts/check-data.js`. S'il signale un problème, corrige-le.
 
 ## 5. Compte rendu (`compte-rendu.md`)
-Écris un compte rendu court en français simple (il sert de description à la pull request) :
+Crée le fichier `compte-rendu.md` à la racine avec l'outil Write et écris un compte rendu court en français simple (il sert de description à la pull request) :
 nouveaux candidats ou thèmes, propositions officielles ajoutées (candidat, sous-thème, source),
 changements de parti ou de position, termes ajoutés au glossaire, et tout problème rencontré.
 Si rien n'a changé, écris-le simplement.
