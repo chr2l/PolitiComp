@@ -13,9 +13,12 @@ const strip = (html) =>
     .replace(/<\/(p|li|div)>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
     .replace(/&#039;|&rsquo;/g, "’")
+    .replace(/&gt;/g, ">")
+    .replace(/&lt;/g, "<")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&amp;/g, "&")
     .replace(/[ \t]+/g, " ")
     .replace(/\n\s*\n+/g, "\n")
     .trim();
@@ -46,7 +49,8 @@ const strip = (html) =>
       const props = {};
       for (const c of s.items) {
         const list = (c.content.proposals || []).map((p) => strip(p.text)).filter(Boolean);
-        if (c.content.number) list.push("Chiffrage : " + strip(c.content.number));
+        const chiffre = numberText(c.content.number);
+        if (chiffre) list.push("Chiffrage : " + chiffre);
         if (list.length) { props[c.id] = list; total += list.length; }
       }
       return { id: s.id, name: s.name.trim(), props };
@@ -77,6 +81,16 @@ const strip = (html) =>
   console.error("ÉCHEC — data/ifrap.json n'a pas été modifié :", e.message);
   process.exit(1);
 });
+
+// Le chiffrage est parfois un texte, parfois un objet (ex. { text: "…" }) : on garde seulement un vrai texte.
+function numberText(n) {
+  if (!n) return "";
+  if (typeof n === "string" || typeof n === "number") return strip(String(n));
+  if (typeof n === "object") {
+    for (const k of ["text", "value", "label", "amount", "content"]) if (typeof n[k] === "string" || typeof n[k] === "number") return strip(String(n[k]));
+  }
+  return "";
+}
 
 function countProps(d) {
   let n = 0;

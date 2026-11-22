@@ -339,7 +339,18 @@ table.pos tr:last-child td { border-bottom: 0 }
 
   .two { grid-template-columns: minmax(0, 1fr) }
   .vs-heads { top: 0; position: static }
+  /* Panneau de discussion fermé : son ombre dépassait sur le bord droit de l'écran */
+  .drawer:not(.open) { box-shadow: none; visibility: hidden; transition: transform .22s ease, visibility 0s .22s }
+  /* Face-à-face : les listes déroulantes prennent toute la largeur au lieu de dépasser */
+  .vs-controls .field { flex: 1 1 100% }
+  .vs-controls .field select { width: 100%; min-width: 0; text-overflow: ellipsis }
   .sec-head h2 { font-size: 23px }
+}
+/* Téléphone : face-à-face en une colonne (chaque case rappelle le nom du candidat), plus de défilement de côté */
+@media (max-width: 640px) {
+  .vs-table { overflow-x: visible }
+  .vs-row { grid-template-columns: minmax(0, 1fr); min-width: 0 }
+  .vs-heads .vs-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px }
 }
 </style>
 
